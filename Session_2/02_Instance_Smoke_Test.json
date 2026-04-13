@@ -1,0 +1,132 @@
+{
+  "name": "02 Instance Smoke Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000001",
+              "name": "instance_name",
+              "value": "Change me to your name",
+              "type": "string"
+            },
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000002",
+              "name": "course",
+              "value": "n8n Course V2 - Session 2",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000002",
+      "name": "Set Your Identity",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000003",
+              "name": "instance_name",
+              "value": "={{ $json.instance_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000004",
+              "name": "course",
+              "value": "={{ $json.course }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000005",
+              "name": "executed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000006",
+              "name": "timezone_check",
+              "value": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss ZZZZ') }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e2d3c4-0001-4000-8000-000000000007",
+              "name": "smoke_test_passed",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000003",
+      "name": "Add Timestamp",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Set Your Identity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Your Identity": {
+      "main": [
+        [
+          {
+            "node": "Add Timestamp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "smoketest-v1-0000-0000-000000000001",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "SmokeTest02",
+  "tags": [
+    {
+      "name": "session-2",
+      "id": "session-2-tag"
+    }
+  ]
+}

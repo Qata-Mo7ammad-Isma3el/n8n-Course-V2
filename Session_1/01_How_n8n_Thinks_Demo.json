@@ -1,0 +1,176 @@
+{
+  "name": "01 How n8n Thinks Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧠 How n8n Thinks — Live Demo\n\n**Use this workflow to demonstrate, live on screen:**\n\n1. **Trigger → action flow** — n8n runs nodes left to right.\n2. **Items are JSON** — every node receives and emits JSON items.\n3. **Each node has one job** — Set creates, Set transforms,\n   nothing magical.\n4. **The execution log is your friend** — click any node after\n   running to see exactly what came in and what went out.\n\n---\n\n### How to teach this\n1. Run the workflow (▶ Execute workflow).\n2. Click **Create Student** → show the Output panel → say:\n   *\"This is one item. It is a JSON object.\"*\n3. Click **Add Derived Fields** → show Input vs Output tabs →\n   say: *\"The item came in from the previous node, this node\n   added new fields, and passed it forward.\"*\n4. Click **Final Summary** → show how the previous fields are\n   still there and how new ones were built from them.\n5. Open the **execution log** (bottom of screen) and show\n   that every node has timing + status info.\n\n### Things to point out\n- Green `={{ ... }}` = expression (live data).\n- Plain text = static value.\n- The **Input** tab on a node = what the previous node sent.\n- The **Output** tab on a node = what this node passed forward.",
+        "height": 760,
+        "width": 540,
+        "color": 4
+      },
+      "id": "8744553c-caf9-4dec-b8a7-44225e84bffd",
+      "name": "Instructor Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-760, -80]
+    },
+    {
+      "parameters": {
+        "content": "### 1. Trigger\nThe workflow starts here.\nNothing happens until you click\n**Execute workflow**.",
+        "height": 180,
+        "width": 260,
+        "color": 5
+      },
+      "id": "caa071d8-9aba-4589-89b7-2554cf3bb443",
+      "name": "Note 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-160, -200]
+    },
+    {
+      "parameters": {
+        "content": "### 2. Create the item\nA **Set** node builds a JSON object\nfrom scratch.\n\n👉 After running, click here and\nopen the **Output** tab.",
+        "height": 200,
+        "width": 280,
+        "color": 5
+      },
+      "id": "ff44fe3b-28b1-4904-b2a3-02cdef6550e2",
+      "name": "Note 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, -220]
+    },
+    {
+      "parameters": {
+        "content": "### 3. Transform the item\nThis node **receives** the item\nfrom the previous node and adds\nnew fields using expressions.\n\n👉 Open **Input** AND **Output** tabs\nto compare.",
+        "height": 220,
+        "width": 280,
+        "color": 5
+      },
+      "id": "bd6d581d-3169-4669-b975-3ee2d2122e79",
+      "name": "Note 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [560, -240]
+    },
+    {
+      "parameters": {
+        "content": "### 4. Final shape\nThe item is now richer than when\nit started — same item, transformed\nby every node it passed through.\n\nThis is how n8n \"thinks\".",
+        "height": 220,
+        "width": 280,
+        "color": 5
+      },
+      "id": "652c290c-6288-4cc9-9a6f-add1922bcf8a",
+      "name": "Note 4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [940, -240]
+    },
+    {
+      "parameters": {},
+      "id": "03272be6-8911-4cba-90f6-06f75cf2ef34",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-80, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fc623cd-7252-4ff5-9219-0723f3aa3c22",
+              "name": "student_name",
+              "value": "Sara Khalil",
+              "type": "string"
+            },
+            {
+              "id": "a2e6215c-b84e-408b-9941-98d4abc9ca82",
+              "name": "course",
+              "value": "n8n Course V2",
+              "type": "string"
+            },
+            {
+              "id": "11111111-1111-1111-1111-111111111111",
+              "name": "session",
+              "value": 1,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "Create Student",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33333333-3333-3333-3333-333333333333",
+              "name": "first_name",
+              "value": "={{ $json.student_name.split(' ').first() }}",
+              "type": "string"
+            },
+            {
+              "id": "44444444-4444-4444-4444-444444444444",
+              "name": "joined_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "55555555-5555-5555-5555-555555555555",
+      "name": "Add Derived Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [600, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66666666-6666-6666-6666-666666666666",
+              "name": "welcome_message",
+              "value": "=Welcome {{ $json.first_name }} to {{ $json.course }} — Session {{ $json.session }}!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "77777777-7777-7777-7777-777777777777",
+      "name": "Final Summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [980, 80]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [[{ "node": "Create Student", "type": "main", "index": 0 }]]
+    },
+    "Create Student": {
+      "main": [[{ "node": "Add Derived Fields", "type": "main", "index": 0 }]]
+    },
+    "Add Derived Fields": {
+      "main": [[{ "node": "Final Summary", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "tags": []
+}

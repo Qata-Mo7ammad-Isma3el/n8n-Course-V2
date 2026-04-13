@@ -1,0 +1,145 @@
+{
+  "name": "Core n8n Concepts",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Core n8n Concepts — Theory\n\n### What is a workflow\n- A workflow is a visual automation made of connected steps.\n- It starts with a **trigger** and ends with one or more **actions**.\n- A workflow represents a complete business process.\n\n### n8n control panel (Editor UI)\n- **Canvas**: the main area where workflows are built.\n- **Nodes panel**: where you search and add nodes.\n- **Execution panel**: shows what happened during a run.\n- **Workflow settings**: execution mode, error handling, saving behavior.\n- **Credentials section**: where API keys and app connections are stored.\n\n### Nodes\n- Nodes are the building blocks of a workflow.\n- Each node performs **one task** (get data, process data, send data).\n- Examples: Trigger nodes, Core nodes, App nodes, AI nodes.\n\n### Connections and execution flow\n- Lines between nodes define the **order of execution**.\n- n8n runs nodes from left to right.\n- One node finishes before the next one starts.\n\n### Items and data passing between nodes\n- Data moves through the workflow as **items**.\n- Each item is usually a **JSON object**.\n- Nodes receive items, modify them, and pass them forward.\n\n### How n8n \"thinks\"\n- n8n follows logic, not intuition.\n- It executes nodes step by step based on connections.\n- It processes data exactly as it is structured.\n- If data is missing or wrong, the workflow fails.\n\n---\n\n### ▶ Run this workflow\nClick **Execute workflow** below, then click each node to see\nwhat data it received and what it passed forward.",
+        "height": 900,
+        "width": 520,
+        "color": 4
+      },
+      "id": "4efa6c6f-2809-40b3-af04-8b2f3d47e7e6",
+      "name": "Theory",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -80]
+    },
+    {
+      "parameters": {
+        "content": "### Step 1 — Trigger\nA workflow always starts with a trigger.\nThis is a **Manual Trigger** — it fires only when you click\n**Execute workflow**.",
+        "height": 200,
+        "width": 280,
+        "color": 7
+      },
+      "id": "727b353c-40b2-4f72-934b-2bdbde47cb05",
+      "name": "Note Step 1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-160, -240]
+    },
+    {
+      "parameters": {
+        "content": "### Step 2 — Create an item\nThe **Set** node creates a JSON item with three fields.\nClick this node after running and look at the **Output** tab —\nthat object is the *item* flowing through the workflow.",
+        "height": 220,
+        "width": 320,
+        "color": 7
+      },
+      "id": "f3886cd0-ccc5-43f3-a62d-bc370a7b4a4d",
+      "name": "Note Step 2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [180, -260]
+    },
+    {
+      "parameters": {
+        "content": "### Step 3 — Transform the item\nThis second **Set** node *receives* the item from Step 2 and\nadds new fields built from the existing ones using\n**expressions** (the green `={{ ... }}` syntax).\n\nThis is what \"data passing between nodes\" means in practice.",
+        "height": 240,
+        "width": 340,
+        "color": 7
+      },
+      "id": "0d9e009e-b1fc-43af-9d1d-795328658189",
+      "name": "Note Step 3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [560, -260]
+    },
+    {
+      "parameters": {},
+      "id": "d635913c-9126-4ac8-b005-bf3031c7062e",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-80, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f8b8bf7-ce1c-4aaf-8227-a4405b721d7a",
+              "name": "full_name",
+              "value": "Mohammad Ismail",
+              "type": "string"
+            },
+            {
+              "id": "25865cce-4434-49f3-b23f-90ee6e5d2d59",
+              "name": "age",
+              "value": 22,
+              "type": "number"
+            },
+            {
+              "id": "de8807bd-58e3-45fd-9207-a34d50b71371",
+              "name": "skills",
+              "value": "=[\"n8n\", \"automation\", \"AI\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "98b900a2-cc2c-4927-a14d-20e290288fe9",
+      "name": "Create Item",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d630504a-a92a-405f-85e7-d850cf40f598",
+              "name": "first_name",
+              "value": "={{ $json.full_name.split(' ').first() }}",
+              "type": "string"
+            },
+            {
+              "id": "a0cdf336-bb99-4a98-8969-ae0a90348df2",
+              "name": "skill_count",
+              "value": "={{ $json.skills.length }}",
+              "type": "number"
+            },
+            {
+              "id": "6f12a831-3fcf-4f45-9560-3330978e420b",
+              "name": "summary",
+              "value": "={{ $json.full_name }} is {{ $json.age }} years old and knows {{ $json.skills.length }} skills.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "225f47d5-b6de-41ab-a21a-aeb9b513d4e3",
+      "name": "Transform Item",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [620, 80]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [[{ "node": "Create Item", "type": "main", "index": 0 }]]
+    },
+    "Create Item": {
+      "main": [[{ "node": "Transform Item", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "tags": []
+}

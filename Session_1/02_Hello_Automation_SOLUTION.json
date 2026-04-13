@@ -1,0 +1,96 @@
+{
+  "name": "02 Hello Automation - SOLUTION",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ✅ Hello Automation — Solution\n\nThis is the reference solution to the **Hello Automation**\nexercise. Show this to students AFTER they have attempted the\nexercise themselves.\n\n### What this workflow does\nWhen executed manually, it produces a single item with three\nfields: a static name, today's date as an ISO string (computed\nlive every run), and a one-line goal.\n\n### Key teaching points\n1. **Static vs. expression** — `name` and `goal` are typed in\n   directly. `date` uses `{{ $now.toISO() }}` which is\n   evaluated *every run*. Run twice and the date changes,\n   the others don't.\n2. **Field types matter** — all three are strings here, but\n   n8n is strict about types. If you set the field type wrong,\n   you'll get a validation error.\n3. **One node, one purpose** — this whole workflow is two\n   nodes. Real workflows are bigger, but the rule is the same:\n   each node does exactly one thing.\n\n### Common student mistakes you'll see\n- Forgetting to toggle the expression mode (`={{}}`) on the\n  date field → they get the literal string `{{ $now }}` in\n  the output instead of a real date.\n- Typing `$now()` instead of `$now` — `$now` is already a\n  DateTime object, not a function.\n- Not saving before executing → workflow runs the old version.\n- Setting `date` field type to `dateTime` and pasting an\n  expression → works, but for S1 simplicity keep it `string`.",
+        "height": 760,
+        "width": 580,
+        "color": 4
+      },
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+      "name": "Solution Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-740, -80]
+    },
+    {
+      "parameters": {
+        "content": "### Trigger\nManual — fires only when you\nclick **Execute workflow**.",
+        "height": 140,
+        "width": 240,
+        "color": 5
+      },
+      "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "name": "Note Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-160, -160]
+    },
+    {
+      "parameters": {
+        "content": "### Set node\n- `name` → static string\n- `date` → **expression** `{{ $now.toISO() }}`\n- `goal` → static string\n\nRun the workflow and click here to\nsee the output item.",
+        "height": 220,
+        "width": 300,
+        "color": 5
+      },
+      "id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "name": "Note Set",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [220, -240]
+    },
+    {
+      "parameters": {},
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-80, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+              "name": "name",
+              "value": "Mohammad Ismail",
+              "type": "string"
+            },
+            {
+              "id": "10101010-1010-1010-1010-101010101010",
+              "name": "date",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "20202020-2020-2020-2020-202020202020",
+              "name": "goal",
+              "value": "Master n8n and build production-ready automations for real clients.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "30303030-3030-3030-3030-303030303030",
+      "name": "Hello Automation",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [280, 80]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [[{ "node": "Hello Automation", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "tags": []
+}

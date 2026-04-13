@@ -1,0 +1,47 @@
+{
+  "name": "02 Hello Automation - Exercise",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎯 Your First Workflow — Hello Automation\n\n### The brief\nBuild a workflow that, when triggered manually, outputs:\n\n1. **your full name** (a static text value)\n2. **today's date** (using an expression — hint: `{{ $now }}`)\n3. **your one-line goal** for taking this n8n course\n\n---\n\n### What you'll learn\n- How to add a node to the canvas\n- The difference between a **static value** and an **expression**\n- How to inspect a node's output after running\n\n### Steps\n1. The **Manual Trigger** is already on the canvas. Good — every\n   workflow needs a trigger.\n2. Add a **Set / Edit Fields** node after the trigger.\n   (Click the **+** between nodes or drag from the trigger.)\n3. Add **three fields** inside the Set node:\n   - `name` → string → type your full name\n   - `date` → string → click the small `={{}}` toggle and type:\n     `{{ $now.toISO() }}`\n   - `goal` → string → your one-line goal\n4. Save the workflow (top-right).\n5. Click **Execute workflow** at the bottom.\n6. Click your Set node and open the **Output** tab.\n   You should see all three fields with real values.\n\n---\n\n### ✅ Done when\n- The workflow runs without errors\n- The Output tab of your Set node shows your name, a real ISO\n  date, and your goal\n- You can explain to the person next to you what the difference\n  is between a static value and an expression\n\n### ⏱ Time\n10–15 minutes. Raise your hand if you're stuck for more than 3.",
+        "height": 880,
+        "width": 600,
+        "color": 3
+      },
+      "id": "88888888-8888-8888-8888-888888888888",
+      "name": "Brief",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -100]
+    },
+    {
+      "parameters": {
+        "content": "👇 Add your **Set** node after this trigger.",
+        "height": 100,
+        "width": 280,
+        "color": 6
+      },
+      "id": "99999999-9999-9999-9999-999999999999",
+      "name": "Hint",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-80, -80]
+    },
+    {
+      "parameters": {},
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-80, 80]
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "tags": []
+}
