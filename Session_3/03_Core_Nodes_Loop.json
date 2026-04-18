@@ -1,0 +1,153 @@
+{
+  "name": "03 Core Nodes - Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Core Nodes Part 3 — Loop Over Items\n\n## Purpose\nClear up the #1 confusion in n8n: **looping is automatic\nby default**. You usually don't need a loop node at all.\nBut sometimes (rate limits, batching, large datasets) you\ndo want explicit batch control — that's what Loop Over\nItems (Split In Batches) is for.\n\n## Flow\nManual → Code (5 fake items) → Loop Over Items (batch=1)\n→ Set (adds an iteration counter) → loops back automatically.\n\n## Key teaching points\n- **n8n auto-loops over items.** A Set node receiving 5 items\n  runs 5 times automatically. Don't wrap things in a loop\n  \"to be safe\" — you'll multiply executions for nothing.\n- Use **Loop Over Items** when you need:\n  - To respect a rate limit between iterations\n  - To process huge datasets in chunks\n  - To insert a Wait between each iteration\n- The Loop node has TWO outputs:\n  - **\"loop\"** → goes back into the next iteration\n  - **\"done\"** → fires once at the very end\n\n## ⚠️ Common mistake\nWrapping every workflow in a loop \"because there are\nmultiple items.\" There don't need to be. n8n already does it.",
+        "height": 600,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -160],
+      "id": "lp-sn1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-160, 240],
+      "id": "lp-trigger",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FAKE DATA GENERATOR (Code = Session 6)\n// Outputs 5 fake task items.\n\nconst tasks = [\n  { id: 1, title: \"Send welcome email\",       priority: \"high\"   },\n  { id: 2, title: \"Update CRM record\",        priority: \"medium\" },\n  { id: 3, title: \"Generate invoice\",         priority: \"high\"   },\n  { id: 4, title: \"Schedule follow-up\",       priority: \"low\"    },\n  { id: 5, title: \"Archive old conversation\", priority: \"low\"    }\n];\n\nreturn tasks.map(t => ({ json: t }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [60, 240],
+      "id": "lp-code-fake",
+      "name": "Generate Fake Tasks (Code)"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [300, 240],
+      "id": "lp-loop",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "lp-1",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "lp-2",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "lp-3",
+              "name": "priority",
+              "value": "={{ $json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "lp-4",
+              "name": "iteration",
+              "value": "={{ $('Loop Over Items').context.currentRunIndex + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "lp-5",
+              "name": "processed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [540, 340],
+      "id": "lp-process",
+      "name": "Process One Task"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "done-1",
+              "name": "status",
+              "value": "all tasks processed",
+              "type": "string"
+            },
+            {
+              "id": "done-2",
+              "name": "finished_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [540, 140],
+      "id": "lp-done",
+      "name": "Done - Final Output"
+    },
+    {
+      "parameters": {
+        "content": "## Loop Over Items outputs\n**Top output (\"done\")** → fires ONCE at the end\n**Bottom output (\"loop\")** → next iteration\n\nThe loop node automatically routes back to itself.",
+        "height": 180,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [820, 220],
+      "id": "lp-sn2",
+      "name": "Sticky - Loop outputs"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Generate Fake Tasks (Code)", "type": "main", "index": 0 }]]
+    },
+    "Generate Fake Tasks (Code)": {
+      "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]]
+    },
+    "Loop Over Items": {
+      "main": [
+        [{ "node": "Done - Final Output", "type": "main", "index": 0 }],
+        [{ "node": "Process One Task", "type": "main", "index": 0 }]
+      ]
+    },
+    "Process One Task": {
+      "main": [[{ "node": "Loop Over Items", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,232 @@
+{
+  "name": "03 Core Nodes - Routing",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Core Nodes Part 1 — Routing\n\n## Purpose\nShow three different ways to **make decisions** about data:\n- **If** → binary split (yes / no)\n- **Switch** → multi-way split (route by category)\n- **Filter** → keep only matching items, drop the rest\n\n## Flow\nManual → Code (fake students) → branches into three\nrouting demos running in parallel.\n\n## Key teaching points\n- **If** has TWO outputs: `true` (top) and `false` (bottom).\n  Always label both.\n- **Switch** can have a fallback output — without it,\n  unmatched items disappear silently. Always handle fallback.\n- **Filter** has only ONE output. Items that fail the\n  condition are dropped. There's no \"rejected\" branch.",
+        "height": 480,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -120],
+      "id": "rt-sn1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-160, 320],
+      "id": "rt-trigger",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FAKE DATA GENERATOR\n// (Code node is officially Session 6 — for now just\n// know it outputs 5 fake student records.)\n\nconst students = [\n  { name: \"Mohammad\", score: 92, status: \"active\"   },\n  { name: \"Sara\",     score: 78, status: \"active\"   },\n  { name: \"Ahmad\",    score: 65, status: \"pending\"  },\n  { name: \"Layla\",    score: 88, status: \"active\"   },\n  { name: \"Omar\",     score: 54, status: \"inactive\" }\n];\n\nreturn students.map(s => ({ json: s }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [60, 320],
+      "id": "rt-code-fake",
+      "name": "Generate Fake Students (Code)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "if-cond-1",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [320, 80],
+      "id": "rt-if",
+      "name": "IF - Score above 80?"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-c1",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "active",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "active"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-c2",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "pending",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pending"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "sw-c3",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "inactive",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "inactive"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "unknown"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [320, 360],
+      "id": "rt-switch",
+      "name": "SWITCH - Route by status"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fl-c1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "active",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [320, 640],
+      "id": "rt-filter",
+      "name": "FILTER - Keep active only"
+    },
+    {
+      "parameters": {
+        "content": "## IF outputs\nTop = TRUE branch (score > 80)\nBottom = FALSE branch (score ≤ 80)",
+        "height": 140,
+        "width": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [580, 60],
+      "id": "rt-sn2",
+      "name": "Sticky - IF labels"
+    },
+    {
+      "parameters": {
+        "content": "## SWITCH outputs\n1: active   2: pending   3: inactive\n4: unknown (fallback — always have this!)",
+        "height": 140,
+        "width": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [580, 340],
+      "id": "rt-sn3",
+      "name": "Sticky - SWITCH labels"
+    },
+    {
+      "parameters": {
+        "content": "## FILTER\nOnly one output. Items that don't match\nare DROPPED — there's no rejected branch.",
+        "height": 140,
+        "width": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [580, 620],
+      "id": "rt-sn4",
+      "name": "Sticky - FILTER label"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Generate Fake Students (Code)", "type": "main", "index": 0 }]]
+    },
+    "Generate Fake Students (Code)": {
+      "main": [
+        [
+          { "node": "IF - Score above 80?", "type": "main", "index": 0 },
+          { "node": "SWITCH - Route by status", "type": "main", "index": 0 },
+          { "node": "FILTER - Keep active only", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

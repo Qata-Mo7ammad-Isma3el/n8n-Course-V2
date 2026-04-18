@@ -1,0 +1,254 @@
+{
+  "name": "03 Mini Project - Daily Sheets Report",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Mini Project — Daily Sheets Report\n\n## Goal\nThe FIRST workflow that feels like real business automation.\nIt ties together everything from Session 3:\n- Schedule trigger (daily 9 AM)\n- Manual trigger (for testing)\n- Code node (fake Sheets data — replace with real Google\n  Sheets read in Session 5 once credentials are set up)\n- Filter (only sales above $100)\n- Set (calculate per-row totals + report date)\n- Aggregate + Set (build a summary string)\n- Gmail send (instructor demos this — students stop at the\n  formatted summary because Gmail credentials = Session 5)\n\n## How to use in class\n1. Walk students through building this from scratch alongside\n   you. Stop at the **Format Summary** node.\n2. Instructor demos the Gmail send live; students just watch.\n3. After Session 5 (credentials), students come back and\n   replace the Code node with a real Google Sheets read,\n   and enable the Gmail send themselves.\n\n## Real-world tie-in\nThis is the skeleton of The-Golden-Meal-Project's daily\nfollow-up automation: schedule → read sheet → filter →\nformat → send.",
+        "height": 600,
+        "width": 520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-840, -160],
+      "id": "mp-sn1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9,
+              "triggerAtMinute": 0
+            }
+          ]
+        }
+      },
+      "id": "mp-schedule",
+      "name": "Daily 9 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-220, 160]
+    },
+    {
+      "parameters": {},
+      "id": "mp-manual",
+      "name": "Manual Test",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-220, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "// FAKE SHEETS DATA (Code = Session 6)\n// In Session 5 you will replace this with a real Google\n// Sheets \"Read Rows\" node connected to your sales sheet.\n//\n// Each row simulates one sale: salesperson, product, amount, date.\n\nconst rows = [\n  { salesperson: \"Mohammad\", product: \"Plan A\",  amount: 250, date: \"2026-04-10\" },\n  { salesperson: \"Sara\",     product: \"Plan B\",  amount:  90, date: \"2026-04-10\" },\n  { salesperson: \"Ahmad\",    product: \"Plan C\",  amount: 480, date: \"2026-04-10\" },\n  { salesperson: \"Layla\",    product: \"Plan A\",  amount: 250, date: \"2026-04-10\" },\n  { salesperson: \"Omar\",     product: \"Plan D\",  amount:  45, date: \"2026-04-10\" },\n  { salesperson: \"Mohammad\", product: \"Plan B\",  amount:  90, date: \"2026-04-10\" },\n  { salesperson: \"Sara\",     product: \"Plan C\",  amount: 480, date: \"2026-04-10\" },\n  { salesperson: \"Ahmad\",    product: \"Plan A\",  amount: 250, date: \"2026-04-10\" }\n];\n\nreturn rows.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [40, 260],
+      "id": "mp-code-fake",
+      "name": "Fake Sheets Data (Code)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "mp-fl-1",
+              "leftValue": "={{ $json.amount }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [280, 260],
+      "id": "mp-filter",
+      "name": "Filter - amount > 100"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "mp-en-1",
+              "name": "salesperson",
+              "value": "={{ $json.salesperson }}",
+              "type": "string"
+            },
+            {
+              "id": "mp-en-2",
+              "name": "product",
+              "value": "={{ $json.product }}",
+              "type": "string"
+            },
+            {
+              "id": "mp-en-3",
+              "name": "amount",
+              "value": "={{ $json.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "mp-en-4",
+              "name": "amount_with_tax",
+              "value": "={{ Math.round($json.amount * 1.16 * 100) / 100 }}",
+              "type": "number"
+            },
+            {
+              "id": "mp-en-5",
+              "name": "report_date",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [520, 260],
+      "id": "mp-enrich",
+      "name": "Enrich Rows"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "salesperson"
+            },
+            {
+              "fieldToAggregate": "product"
+            },
+            {
+              "fieldToAggregate": "amount"
+            },
+            {
+              "fieldToAggregate": "amount_with_tax"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [760, 260],
+      "id": "mp-aggregate",
+      "name": "Aggregate All Rows"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "mp-fmt-1",
+              "name": "report_date",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "mp-fmt-2",
+              "name": "row_count",
+              "value": "={{ $json.amount.length }}",
+              "type": "number"
+            },
+            {
+              "id": "mp-fmt-3",
+              "name": "total_revenue",
+              "value": "={{ $json.amount.reduce((a, b) => a + b, 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "mp-fmt-4",
+              "name": "total_with_tax",
+              "value": "={{ Math.round($json.amount_with_tax.reduce((a, b) => a + b, 0) * 100) / 100 }}",
+              "type": "number"
+            },
+            {
+              "id": "mp-fmt-5",
+              "name": "summary",
+              "value": "=Daily Sales Report — {{ $now.toFormat('yyyy-MM-dd') }}\n\nQualifying sales (amount > $100): {{ $json.amount.length }}\nTotal revenue: ${{ $json.amount.reduce((a, b) => a + b, 0) }}\nTotal with tax: ${{ Math.round($json.amount_with_tax.reduce((a, b) => a + b, 0) * 100) / 100 }}\n\nSalespeople: {{ $json.salesperson.join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1000, 260],
+      "id": "mp-format",
+      "name": "Format Summary"
+    },
+    {
+      "parameters": {
+        "content": "## ⛔ STOP HERE for students\n\nThis is where students stop building.\nInspect the **summary** field in the output —\nthat's your daily sales report as plain text.\n\nThe Gmail send below is **instructor demo only**\nbecause Gmail credentials are Session 5 territory.",
+        "height": 200,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1000, 480],
+      "id": "mp-sn-stop",
+      "name": "Sticky - STOP HERE"
+    },
+    {
+      "parameters": {
+        "sendTo": "team@example.com",
+        "subject": "=Daily Sales Report — {{ $json.report_date }}",
+        "emailType": "text",
+        "message": "={{ $json.summary }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1280, 260],
+      "id": "mp-gmail",
+      "name": "Send Daily Email (Instructor Demo)",
+      "webhookId": "s3-mp-gmail"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily 9 AM": {
+      "main": [[{ "node": "Fake Sheets Data (Code)", "type": "main", "index": 0 }]]
+    },
+    "Manual Test": {
+      "main": [[{ "node": "Fake Sheets Data (Code)", "type": "main", "index": 0 }]]
+    },
+    "Fake Sheets Data (Code)": {
+      "main": [[{ "node": "Filter - amount > 100", "type": "main", "index": 0 }]]
+    },
+    "Filter - amount > 100": {
+      "main": [[{ "node": "Enrich Rows", "type": "main", "index": 0 }]]
+    },
+    "Enrich Rows": {
+      "main": [[{ "node": "Aggregate All Rows", "type": "main", "index": 0 }]]
+    },
+    "Aggregate All Rows": {
+      "main": [[{ "node": "Format Summary", "type": "main", "index": 0 }]]
+    },
+    "Format Summary": {
+      "main": [[{ "node": "Send Daily Email (Instructor Demo)", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

@@ -1,0 +1,230 @@
+{
+  "name": "03 Core Nodes - Combine and Wait",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Core Nodes Part 2 — Combine & Wait\n\n## Purpose\nShow how parallel branches **rejoin** with Merge, and how\nWait pauses execution mid-workflow.\n\n## Flow\nManual → Code (fake source A + B data) → two parallel\nbranches → Merge → Wait (3s) → final Set.\n\n## Key teaching points\n- **Merge** combines parallel branches once. It does NOT\n  iterate. Different from Loop.\n- Merge has multiple **modes**: Append (stack items),\n  Combine (match by position/key), Choose Branch.\n  Default = Append.\n- **Wait** pauses THIS execution mid-workflow.\n  Wait is NOT for \"wait until tomorrow at 9 AM\" — that's\n  the Schedule trigger. Wait is for pacing (e.g. respect\n  a rate limit, wait between API calls).",
+        "height": 480,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -120],
+      "id": "cw-sn1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-160, 240],
+      "id": "cw-trigger",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FAKE DATA GENERATOR (Code = Session 6)\n// Generates 3 records tagged source A and 3 tagged source B,\n// then splits them into two arrays so we can route them\n// down two separate branches.\n\nconst sourceA = [\n  { id: 1, name: \"Item A1\", source: \"A\", value: 10 },\n  { id: 2, name: \"Item A2\", source: \"A\", value: 20 },\n  { id: 3, name: \"Item A3\", source: \"A\", value: 30 }\n];\n\nconst sourceB = [\n  { id: 4, name: \"Item B1\", source: \"B\", value: 40 },\n  { id: 5, name: \"Item B2\", source: \"B\", value: 50 },\n  { id: 6, name: \"Item B3\", source: \"B\", value: 60 }\n];\n\n// Output one item containing both arrays so the next two\n// Set nodes can each pull their slice.\nreturn [{ json: { sourceA, sourceB } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [60, 240],
+      "id": "cw-code-fake",
+      "name": "Generate Fake Sources (Code)"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "sourceA",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [280, 120],
+      "id": "cw-split-a",
+      "name": "Split - Source A"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "sourceB",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [280, 360],
+      "id": "cw-split-b",
+      "name": "Split - Source B"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "br-a-1",
+              "name": "branch",
+              "value": "Branch A",
+              "type": "string"
+            },
+            {
+              "id": "br-a-2",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "br-a-3",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "br-a-4",
+              "name": "value",
+              "value": "={{ $json.value }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 120],
+      "id": "cw-branch-a",
+      "name": "Branch A - Set"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "br-b-1",
+              "name": "branch",
+              "value": "Branch B",
+              "type": "string"
+            },
+            {
+              "id": "br-b-2",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "br-b-3",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "br-b-4",
+              "name": "value",
+              "value": "={{ $json.value }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 360],
+      "id": "cw-branch-b",
+      "name": "Branch B - Set"
+    },
+    {
+      "parameters": {
+        "numberInputs": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [740, 240],
+      "id": "cw-merge",
+      "name": "Merge Branches"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [960, 240],
+      "id": "cw-wait",
+      "name": "Wait 3 seconds",
+      "webhookId": "s3-cw-wait"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fin-1",
+              "name": "branch",
+              "value": "={{ $json.branch }}",
+              "type": "string"
+            },
+            {
+              "id": "fin-2",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "fin-3",
+              "name": "value",
+              "value": "={{ $json.value }}",
+              "type": "number"
+            },
+            {
+              "id": "fin-4",
+              "name": "merged_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1180, 240],
+      "id": "cw-final",
+      "name": "Final Output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Generate Fake Sources (Code)", "type": "main", "index": 0 }]]
+    },
+    "Generate Fake Sources (Code)": {
+      "main": [
+        [
+          { "node": "Split - Source A", "type": "main", "index": 0 },
+          { "node": "Split - Source B", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Split - Source A": {
+      "main": [[{ "node": "Branch A - Set", "type": "main", "index": 0 }]]
+    },
+    "Split - Source B": {
+      "main": [[{ "node": "Branch B - Set", "type": "main", "index": 0 }]]
+    },
+    "Branch A - Set": {
+      "main": [[{ "node": "Merge Branches", "type": "main", "index": 0 }]]
+    },
+    "Branch B - Set": {
+      "main": [[{ "node": "Merge Branches", "type": "main", "index": 1 }]]
+    },
+    "Merge Branches": {
+      "main": [[{ "node": "Wait 3 seconds", "type": "main", "index": 0 }]]
+    },
+    "Wait 3 seconds": {
+      "main": [[{ "node": "Final Output", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

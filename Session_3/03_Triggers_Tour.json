@@ -1,0 +1,430 @@
+{
+  "name": "03 Triggers Tour",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Session 3 — Triggers Tour\n\n## Purpose\nSide-by-side comparison of every trigger V2 S3 covers.\nEach trigger feeds a Set node that **normalizes** its output\ninto a common shape (trigger_type, triggered_at, payload),\nand all branches merge into one consolidated stream.\n\n## How to use\n1. Run the **Manual Trigger** branch first — works with no setup.\n2. Activate **Schedule Trigger** to see it fire on its own.\n3. **Webhook Trigger**: copy the test URL, hit it from your\n   terminal with `curl`, watch data appear.\n4. **Gmail / Sheets / Form / Telegram**: credentials needed.\n   These are show-and-tell only in Session 3 — credentials\n   proper happen in Session 5.\n\n## Key teaching point\nNo matter how different these triggers look on the outside,\nthey all produce **JSON items** that the rest of n8n treats\nidentically.\n\n⚠️ After importing: reconnect all credentials.",
+        "height": 480,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-800, 0],
+      "id": "sn-tt-1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {},
+      "id": "tt-manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-240, 80]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "tt-schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-240, 240]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "s3-triggers-tour",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "tt-webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-240, 400],
+      "webhookId": "s3-triggers-tour-demo"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "q": "is:unread"
+        }
+      },
+      "id": "tt-gmail-trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [-240, 560]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "id": "tt-sheets-trigger",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [-240, 720]
+    },
+    {
+      "parameters": {
+        "formTitle": "S3 Triggers Tour Demo",
+        "formDescription": "A tiny form for the triggers tour.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "message",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [-240, 880],
+      "id": "tt-form-trigger",
+      "name": "Form Trigger",
+      "webhookId": "s3-form-trigger-demo"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "tt-telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [-240, 1040],
+      "webhookId": "s3-telegram-trigger-demo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "m1",
+              "name": "trigger_type",
+              "value": "Manual",
+              "type": "string"
+            },
+            {
+              "id": "m2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "m3",
+              "name": "payload",
+              "value": "Manually triggered by user clicking Execute",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-manual",
+      "name": "Normalize - Manual",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "trigger_type",
+              "value": "Schedule",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "s3",
+              "name": "payload",
+              "value": "Triggered automatically on schedule (daily 9 AM)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-schedule",
+      "name": "Normalize - Schedule",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 240]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "w1",
+              "name": "trigger_type",
+              "value": "Webhook",
+              "type": "string"
+            },
+            {
+              "id": "w2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "w3",
+              "name": "payload",
+              "value": "={{ JSON.stringify($json.body || $json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-webhook",
+      "name": "Normalize - Webhook",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "g1",
+              "name": "trigger_type",
+              "value": "Gmail",
+              "type": "string"
+            },
+            {
+              "id": "g2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "g3",
+              "name": "payload",
+              "value": "=From: {{ $json.from }} | Subject: {{ $json.subject }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-gmail",
+      "name": "Normalize - Gmail",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 560]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "sh1",
+              "name": "trigger_type",
+              "value": "Google Sheets",
+              "type": "string"
+            },
+            {
+              "id": "sh2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "sh3",
+              "name": "payload",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-sheets",
+      "name": "Normalize - Sheets",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 720]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "trigger_type",
+              "value": "Form",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "payload",
+              "value": "=Name: {{ $json.name }} | Email: {{ $json.email }} | Msg: {{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-form",
+      "name": "Normalize - Form",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 880]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tg1",
+              "name": "trigger_type",
+              "value": "Telegram",
+              "type": "string"
+            },
+            {
+              "id": "tg2",
+              "name": "triggered_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "tg3",
+              "name": "payload",
+              "value": "=Chat: {{ $json.message?.chat?.id }} | Text: {{ $json.message?.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "tt-set-telegram",
+      "name": "Normalize - Telegram",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [80, 1040]
+    },
+    {
+      "parameters": {
+        "numberInputs": 7
+      },
+      "id": "tt-merge",
+      "name": "Consolidate All Triggers",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [440, 560]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Normalize - Manual", "type": "main", "index": 0 }]]
+    },
+    "Schedule Trigger": {
+      "main": [[{ "node": "Normalize - Schedule", "type": "main", "index": 0 }]]
+    },
+    "Webhook Trigger": {
+      "main": [[{ "node": "Normalize - Webhook", "type": "main", "index": 0 }]]
+    },
+    "Gmail Trigger": {
+      "main": [[{ "node": "Normalize - Gmail", "type": "main", "index": 0 }]]
+    },
+    "Google Sheets Trigger": {
+      "main": [[{ "node": "Normalize - Sheets", "type": "main", "index": 0 }]]
+    },
+    "Form Trigger": {
+      "main": [[{ "node": "Normalize - Form", "type": "main", "index": 0 }]]
+    },
+    "Telegram Trigger": {
+      "main": [[{ "node": "Normalize - Telegram", "type": "main", "index": 0 }]]
+    },
+    "Normalize - Manual": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 0 }]]
+    },
+    "Normalize - Schedule": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 1 }]]
+    },
+    "Normalize - Webhook": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 2 }]]
+    },
+    "Normalize - Gmail": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 3 }]]
+    },
+    "Normalize - Sheets": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 4 }]]
+    },
+    "Normalize - Form": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 5 }]]
+    },
+    "Normalize - Telegram": {
+      "main": [[{ "node": "Consolidate All Triggers", "type": "main", "index": 6 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

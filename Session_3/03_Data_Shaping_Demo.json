@@ -1,0 +1,154 @@
+{
+  "name": "03 Data Shaping Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Session 3 — JSON & Data Shaping\n\n## Purpose\nShow students how data **flows** between nodes, and how each\nnode can read and reshape the previous node's output.\n\n## Flow\n1. **Code node** generates 3 sample person records (just\n   fake data — ignore the JS for now, we cover Code in S6).\n2. **Build Person Object** — assigns clean fields with types.\n3. **Derive Fields** — uses expressions to compute first_name,\n   last_name, and skill_count from the previous node.\n\n## Key teaching points\n- JSON has **types**: string, number, boolean, array, object.\n- Each node receives → transforms → passes forward.\n- The next node reads the previous one with `{{ $json.field }}`.\n- Reshape ≠ create new data. It's transforming what's there.\n\n## Don't go deeper than this\nFull expressions, $node[], DateTime methods → Session 6.",
+        "height": 480,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-720, -80],
+      "id": "ds-sn1",
+      "name": "Sticky Note - Overview"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-160, 240],
+      "id": "ds-trigger",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FAKE DATA GENERATOR\n// (We'll learn the Code node properly in Session 6.)\n// For now, just know: this outputs 3 sample person records.\n\nconst people = [\n  {\n    full_name: \"Mohammad Ismail\",\n    age: 22,\n    is_student: false,\n    skills: [\"AI\", \"n8n\", \"automation\"],\n    contacts: { email: \"mohammad@example.com\", phone: \"123-456\" }\n  },\n  {\n    full_name: \"Sara Khalid\",\n    age: 27,\n    is_student: true,\n    skills: [\"Python\", \"data analysis\"],\n    contacts: { email: \"sara@example.com\", phone: \"234-567\" }\n  },\n  {\n    full_name: \"Ahmad Al-Rashid\",\n    age: 31,\n    is_student: false,\n    skills: [\"DevOps\", \"Docker\", \"Linux\", \"CI/CD\"],\n    contacts: { email: \"ahmad@example.com\", phone: \"345-678\" }\n  }\n];\n\nreturn people.map(p => ({ json: p }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [60, 240],
+      "id": "ds-code-fake",
+      "name": "Generate Fake People (Code)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bp1",
+              "name": "full_name",
+              "value": "={{ $json.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "bp2",
+              "name": "age",
+              "value": "={{ $json.age }}",
+              "type": "number"
+            },
+            {
+              "id": "bp3",
+              "name": "is_student",
+              "value": "={{ $json.is_student }}",
+              "type": "boolean"
+            },
+            {
+              "id": "bp4",
+              "name": "skills",
+              "value": "={{ $json.skills }}",
+              "type": "array"
+            },
+            {
+              "id": "bp5",
+              "name": "contacts",
+              "value": "={{ $json.contacts }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [280, 240],
+      "id": "ds-build",
+      "name": "Build Person Object"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df0",
+              "name": "full_name",
+              "value": "={{ $json.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "df1",
+              "name": "first_name",
+              "value": "={{ $json.full_name.split(' ').first() }}",
+              "type": "string"
+            },
+            {
+              "id": "df2",
+              "name": "last_name",
+              "value": "={{ $json.full_name.split(' ').last() }}",
+              "type": "string"
+            },
+            {
+              "id": "df3",
+              "name": "skill_count",
+              "value": "={{ $json.skills.length }}",
+              "type": "number"
+            },
+            {
+              "id": "df4",
+              "name": "primary_email",
+              "value": "={{ $json.contacts.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [500, 240],
+      "id": "ds-derive",
+      "name": "Derive Fields"
+    },
+    {
+      "parameters": {
+        "content": "# What to look at\n\nClick each node and open its **output** tab.\nNotice how:\n\n- Code → outputs raw JSON with nested objects\n- Build Person Object → re-types every field cleanly\n- Derive Fields → adds `first_name`, `last_name`,\n  `skill_count`, `primary_email` — computed from\n  the previous node's data using expressions.\n\nThat's data flow. That's the whole game.",
+        "height": 280,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [60, 480],
+      "id": "ds-sn2",
+      "name": "Sticky Note - What to look at"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Generate Fake People (Code)", "type": "main", "index": 0 }]]
+    },
+    "Generate Fake People (Code)": {
+      "main": [[{ "node": "Build Person Object", "type": "main", "index": 0 }]]
+    },
+    "Build Person Object": {
+      "main": [[{ "node": "Derive Fields", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
