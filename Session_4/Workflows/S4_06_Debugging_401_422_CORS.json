@@ -1,0 +1,369 @@
+{
+  "name": "S4 \u00b7 06 \u00b7 Debugging 401 / 422 / CORS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 06 \u00b7 Debugging 401 / 422 / CORS\n\nSix deliberately-broken HTTP nodes against your FastAPI.\nEach one teaches **how to read the error** and **how to fix it**.\n\nAll nodes have **Continue On Fail** so the whole lab runs to the end.\n\nOpen each node's output \u2014 read the status code AND the response body.",
+        "height": 280,
+        "width": 440,
+        "color": 1
+      },
+      "id": "7100419e-dbed-4f98-bd9d-b486fb09c6b5",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -450,
+        -300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2d0f71ef-a0be-43d8-83ad-ad1c5ad1ada4",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "id": "8792eebe-da3c-46fb-8993-0939dbfaab09",
+      "name": "BROKEN \u00b7 401 missing key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -350
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "5"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "totally-wrong"
+            }
+          ]
+        }
+      },
+      "id": "0377b0cc-1685-4f24-8d4a-1253fac87111",
+      "name": "BROKEN \u00b7 401 wrong key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -150
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": 10}"
+      },
+      "id": "f3e94ca3-6983-493d-9cac-5f29faa99462",
+      "name": "BROKEN \u00b7 422 missing field",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        50
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": \"ten\", \"num2\": \"five\"}"
+      },
+      "id": "507701dd-6485-4d2c-8994-7ad0779c501b",
+      "name": "BROKEN \u00b7 422 wrong type",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        250
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/query",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": 10, \"num2\": 5}"
+      },
+      "id": "99e69643-3ebe-418d-975d-eabf3e3b4eef",
+      "name": "BROKEN \u00b7 query in body",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        450
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/header",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Num1",
+              "value": "10"
+            },
+            {
+              "name": "Num2",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "id": "6b26b08c-ee0d-4f27-ae91-f9fe77d18c31",
+      "name": "BROKEN \u00b7 wrong header name",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        650
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** No `X-API-Key` header sent.\n\n**Symptom:** HTTP 401, body says\n`Invalid or missing API Key`\n\n**Fix:** Add header `X-API-Key: my-secret-api-key-123`",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "7d4bdcde-ae70-47a6-b68a-3169fd308d92",
+      "name": "Fix \u00b7 401 missing key",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** Header is present but value is wrong.\n\n**Symptom:** Same 401, same body.\n\n**Fix:** Use the exact key from main.py:\n`my-secret-api-key-123`",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "44277700-8fd3-4e0b-8f5a-a6470413f03a",
+      "name": "Fix \u00b7 401 wrong key",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** Body missing required `num2`.\n\n**Symptom:** HTTP 422, body lists which field failed validation.\n\n**Fix:** Send `{\"num1\": 10, \"num2\": 5}`",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "d66daf65-5905-411c-834d-18b7b9da9d5f",
+      "name": "Fix \u00b7 422 missing field",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** Sent strings where numbers expected.\n\n**Symptom:** HTTP 422, error mentions `float_parsing`.\n\n**Fix:** Use real numbers, not strings.",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "fc3b1ddc-d3c5-43d1-bcbf-2b6cb4387d14",
+      "name": "Fix \u00b7 422 wrong type",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** /sum/query expects **query params**, not a body.\n\n**Symptom:** HTTP 422 \u2014 `num1` field required.\n\n**Fix:** Send as query params, not JSON body.",
+        "height": 200,
+        "width": 350,
+        "color": 2
+      },
+      "id": "6fcc506c-57b3-4eee-b3c3-9d8b9d5b2d7d",
+      "name": "Fix \u00b7 query in body",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Problem:** FastAPI expects `X-Num1` / `X-Num2`.\nSending `Num1` / `Num2` fails validation.\n\n**Symptom:** HTTP 422, header field required.\n\n**Note on CORS:** CORS errors only happen in browsers, not in n8n. If you see CORS in your browser but n8n works fine \u2014 that's why.",
+        "height": 220,
+        "width": 350,
+        "color": 2
+      },
+      "id": "80db8727-7194-4245-b53a-307723c705a2",
+      "name": "Fix \u00b7 header naming",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        600,
+        620
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "BROKEN \u00b7 401 missing key",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BROKEN \u00b7 401 wrong key",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BROKEN \u00b7 422 missing field",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BROKEN \u00b7 422 wrong type",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BROKEN \u00b7 query in body",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "BROKEN \u00b7 wrong header name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

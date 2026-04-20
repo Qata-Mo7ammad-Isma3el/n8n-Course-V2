@@ -1,0 +1,176 @@
+{
+  "name": "S4 \u00b7 05 \u00b7 Project \u2014 Public API \u2192 Transform \u2192 Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 05 \u00b7 Project \u2014 Public API \u2192 Transform \u2192 Sheets\n\n**Goal:** Daily exchange-rate logger.\n\nPublic API: **open.er-api.com** (no auth).\n\nPipeline:\n1. Schedule trigger (daily) \u2014 or manual to test\n2. Fetch latest USD rates\n3. Transform into clean rows\n4. Append to Google Sheets\n\n**You must wire your own Google Sheets credentials** and set the spreadsheet/sheet IDs in the last node.",
+        "height": 360,
+        "width": 440,
+        "color": 4
+      },
+      "id": "0587ca39-42aa-4cdf-b640-f507ecf74199",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -450,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "3b8525b7-121b-42c8-8616-7b10312eafba",
+      "name": "Schedule (daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -50
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e02cea6f-dc97-4563-8eed-3bc21a20235b",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://open.er-api.com/v6/latest/USD",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "9c412c68-02a2-47b1-8294-10e9cc5ec706",
+      "name": "Fetch USD rates",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst rates = data.rates || {};\nconst date = data.time_last_update_utc || new Date().toISOString();\nconst wanted = ['EUR','GBP','JOD','SAR','AED','JPY','TRY'];\nreturn wanted.map(code => ({\n  json: {\n    date,\n    base: data.base_code || 'USD',\n    currency: code,\n    rate: rates[code] ?? null\n  }\n}));"
+      },
+      "id": "1a786aba-3379-48ff-ab6c-74e832bb383a",
+      "name": "Transform to rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        550,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "54d00419-f572-4f5a-a3d7-edb13774e4b7",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Before running:**\n\n1. Create a Google Sheet with header row:\n   `date | base | currency | rate`\n2. Replace `REPLACE_WITH_SPREADSHEET_ID` in the Sheets node\n3. Add your Google Sheets OAuth2 credential\n4. Set sheet name if not `Sheet1`",
+        "height": 220,
+        "width": 360,
+        "color": 7
+      },
+      "id": "afcb4d0a-9e75-450c-b81c-e6228fff757b",
+      "name": "Sheets setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -300
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule (daily)": {
+      "main": [
+        [
+          {
+            "node": "Fetch USD rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Fetch USD rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch USD rates": {
+      "main": [
+        [
+          {
+            "node": "Transform to rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to rows": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

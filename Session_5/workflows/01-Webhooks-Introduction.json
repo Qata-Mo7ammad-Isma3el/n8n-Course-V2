@@ -1,0 +1,193 @@
+{
+  "name": "01 - Webhooks Introduction",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Introduction To WebHooks\n\n![Workflow Diagram](https://ik.imagekit.io/MyImage/4_webhooks_in_n8n.png)\n\n## Lets Hit our WebHook from n8n itself",
+        "height": 800,
+        "width": 928,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "sticky-1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "979ed29c-291b-4409-a9a9-9c22c9a906b1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [192, 96],
+      "id": "wh-hello",
+      "name": "Webhook - Hello",
+      "webhookId": "979ed29c-291b-4409-a9a9-9c22c9a906b1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Hello from your first webhook!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [576, 96],
+      "id": "resp-hello",
+      "name": "Respond Hello"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "43a650bc-168a-4c24-a2bb-4bcfd75dc431",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-176, 384],
+      "id": "wh-pipeline",
+      "name": "Webhook - Pipeline",
+      "webhookId": "43a650bc-168a-4c24-a2bb-4bcfd75dc431"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {"id": "c1", "leftValue": "={{ $json.body.name }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}},
+            {"id": "c2", "leftValue": "={{ $json.body.email }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}},
+            {"id": "c3", "leftValue": "={{ $json.body.phone }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}}
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [48, 384],
+      "id": "if-validate",
+      "name": "Validate Required Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {"__rl": true, "value": "1hMhaajGUfuLqYvmCs3Pgs-fmk-aNg1Qhl5ply5lUAgU", "mode": "list"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone.startsWith('+') ? $json.body.phone.slice(1) : $json.body.phone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {"id": "Full Name", "displayName": "Full Name", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "Email", "displayName": "Email", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "Phone", "displayName": "Phone", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [272, 288],
+      "id": "sheets-append",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Thanks for submitting!",
+        "emailType": "text",
+        "message": "=Hi {{ $json[\"Full Name\"] }},\n\nThanks for applying to our form!\n\nBest regards,\nYour Company Team",
+        "options": {"appendAttribution": false}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [496, 288],
+      "id": "gmail-send",
+      "name": "Send Email"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"message\": \"Submission received. Please check your email.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [720, 288],
+      "id": "resp-ok",
+      "name": "Respond OK"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 400,
+        "responseBody": "={\n  \"status\": \"error\",\n  \"message\": \"Missing required fields: name, email, phone\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [272, 496],
+      "id": "resp-bad",
+      "name": "Respond 400"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-176, 736],
+      "id": "manual-self",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-NGROK-URL/webhook-test/43a650bc-168a-4c24-a2bb-4bcfd75dc431",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"name\": \"Mohammad\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"+962787499976\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [64, 736],
+      "id": "self-call",
+      "name": "Send to Webhook (self-call)"
+    },
+    {
+      "parameters": {
+        "content": "### Webhooks Introduction\n\n**What webhooks are**\nWebhooks let one system push data to another the moment something happens.\n\n**Webhooks vs APIs**\n- API = you ask\n- Webhook = you listen\n\n**Real-time data flow**\nNo polling. Event happens → workflow runs instantly.\n\n### This Workflow Has 3 Demos\n\n1. **Hello Webhook** (top)\n   Simplest possible: receive → respond.\n\n2. **Validated Pipeline** (middle)\n   Receive → IF validate → Sheets → Email → Respond.\n   Bad payload? Returns 400 with an error message.\n\n3. **Self-Call** (bottom)\n   Manual trigger → HTTP Request → hits Webhook 2.\n   Lets you see BOTH sides of a webhook in one workflow.\n\n### Try it\n- Hit the hello webhook with curl\n- Send valid + invalid bodies to the pipeline\n- Run the manual trigger to self-test",
+        "height": 800,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [944, 0],
+      "id": "sticky-2",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "Webhook - Hello": {"main": [[{"node": "Respond Hello", "type": "main", "index": 0}]]},
+    "Webhook - Pipeline": {"main": [[{"node": "Validate Required Fields", "type": "main", "index": 0}]]},
+    "Validate Required Fields": {
+      "main": [
+        [{"node": "Append row in sheet", "type": "main", "index": 0}],
+        [{"node": "Respond 400", "type": "main", "index": 0}]
+      ]
+    },
+    "Append row in sheet": {"main": [[{"node": "Send Email", "type": "main", "index": 0}]]},
+    "Send Email": {"main": [[{"node": "Respond OK", "type": "main", "index": 0}]]},
+    "Manual Trigger": {"main": [[{"node": "Send to Webhook (self-call)", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"}
+}

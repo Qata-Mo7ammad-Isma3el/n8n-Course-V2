@@ -1,0 +1,168 @@
+{
+  "name": "S4 \u00b7 01 \u00b7 HTTP Methods Tour",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 01 \u00b7 HTTP Methods Tour\n\nOne node per HTTP verb against your FastAPI playground.\nSee verbs as **intent**, not syntax:\n- **GET** = read\n- **POST** = create\n- **PUT** = replace\n- **PATCH** = update part\n- **DELETE** = remove\n\nPUT/PATCH/DELETE hit endpoints that don't exist in main.py \u2014 you'll see **405 Method Not Allowed**. That's the lesson.",
+        "height": 320,
+        "width": 420,
+        "color": 6
+      },
+      "id": "27bf3487-e0e8-438a-8454-cb236051bc6d",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "cee41414-8a0b-423c-ad38-e81ff7d15120",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "243e9c7f-4855-4e90-8922-64c43e56f96e",
+      "name": "GET \u00b7 root",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/query",
+        "method": "GET",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "id": "8706f9f1-0488-485b-a0a5-29823dfad6df",
+      "name": "GET \u00b7 /sum/query",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -50
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "POST",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": 10, \"num2\": 5}"
+      },
+      "id": "c03d46ff-58a9-490a-a3af-716e9c7ecf39",
+      "name": "POST \u00b7 /sum/body",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "PUT",
+        "options": {},
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": 10, \"num2\": 5}"
+      },
+      "id": "43a16d25-139a-41f0-a59a-f272fc0b9b73",
+      "name": "PUT \u00b7 expect 405",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        250
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "DELETE",
+        "options": {}
+      },
+      "id": "356092ac-0bf1-4ca6-b7cc-93abf10f6074",
+      "name": "DELETE \u00b7 expect 405",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        400
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "GET \u00b7 root",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET \u00b7 /sum/query",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "POST \u00b7 /sum/body",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "PUT \u00b7 expect 405",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DELETE \u00b7 expect 405",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

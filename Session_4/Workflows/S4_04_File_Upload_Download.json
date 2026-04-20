@@ -1,0 +1,147 @@
+{
+  "name": "S4 \u00b7 04 \u00b7 File Upload & Download",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 04 \u00b7 File Upload & Download\n\nPublic APIs used (no auth):\n- **httpbin.org** for upload echo\n- **picsum.photos** for download test\n\nPattern:\n1. Download a file \u2192 binary data\n2. Inspect it\n3. Re-upload via multipart/form-data\n4. Read echoed metadata\n\nKey idea: binary data lives in the **binary** key, not JSON.",
+        "height": 340,
+        "width": 420,
+        "color": 3
+      },
+      "id": "dbb9e9c8-4de1-4b9e-8e0e-4ebdce2d1333",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -450,
+        -250
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f8c22559-da7f-483a-86d0-b976de495c30",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://picsum.photos/200/300",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "2783343b-f32f-4a13-872f-b59051047435",
+      "name": "Download image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/post",
+        "method": "POST",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f2302891-30b8-4742-837d-e0788850870b",
+      "name": "Upload to httpbin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        550,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0e96f4a3-5a74-4d03-9353-cec653d67bb1",
+              "name": "uploaded_filename",
+              "value": "={{ $json.files ? Object.keys($json.files)[0] : 'none' }}",
+              "type": "string"
+            },
+            {
+              "id": "e9d1be56-ee65-4a36-9eab-030bef8fe45c",
+              "name": "content_type",
+              "value": "={{ $json.headers ? $json.headers['Content-Type'] : 'unknown' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c5b59ebb-7962-4905-b8b1-2a7dfac30297",
+      "name": "Inspect echo",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "Upload to httpbin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to httpbin": {
+      "main": [
+        [
+          {
+            "node": "Inspect echo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

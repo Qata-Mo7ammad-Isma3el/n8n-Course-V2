@@ -1,0 +1,227 @@
+{
+  "name": "03 - Webhook Auth (Basic, Header, JWT)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Webhook Authentication\n\nn8n's Webhook node supports several auth modes.\nThis workflow demos the 3 you'll actually use:\n\n1. **Basic Auth** — username + password\n2. **Header Auth** — custom header (e.g. x-api-key)\n3. **JWT Auth** — signed token, enterprise-grade\n\nEach row below has TWO parts:\n→ Left: the protected webhook (server side)\n→ Right: a manual trigger that calls it (client side)\n\nWrong credentials = 403. Try it.",
+        "height": 360,
+        "width": 900,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, -400],
+      "id": "sticky-intro",
+      "name": "Intro"
+    },
+    {
+      "parameters": {
+        "content": "## 1. Basic Auth\n\n**When to use:** quick internal tools, prototypes, trusted networks.\n**Security:** weakest of the three. Credentials sent on every request (base64, NOT encrypted — only safe over HTTPS).\n**Real example:** internal admin webhooks, dev tools.",
+        "height": 280,
+        "width": 480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, 0],
+      "id": "sticky-basic",
+      "name": "Basic Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth-basic-demo",
+        "authentication": "basicAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-16, 304],
+      "id": "wh-basic",
+      "name": "Webhook (Basic Auth)",
+      "webhookId": "auth-basic-demo"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"auth\": \"basic\",\n  \"message\": \"Authenticated via Basic Auth\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [208, 304],
+      "id": "resp-basic",
+      "name": "Respond Basic"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [496, 304],
+      "id": "trig-basic",
+      "name": "Test Basic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-N8N/webhook/auth-basic-demo",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"hello\": \"basic\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [704, 304],
+      "id": "http-basic",
+      "name": "Call Basic Webhook"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Header Auth\n\n**When to use:** the standard for SaaS webhooks (Stripe, Shopify, Evolution API, etc.)\n**Security:** good. Single secret in a custom header (e.g. x-api-key).\n**Real example:** WhatsApp Evolution API, Telegram bot secrets, most third-party integrations.",
+        "height": 280,
+        "width": 480,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, 624],
+      "id": "sticky-header",
+      "name": "Header Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth-header-demo",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-16, 928],
+      "id": "wh-header",
+      "name": "Webhook (Header Auth)",
+      "webhookId": "auth-header-demo"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"auth\": \"header\",\n  \"message\": \"Authenticated via Header Auth\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [208, 928],
+      "id": "resp-header",
+      "name": "Respond Header"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [496, 928],
+      "id": "trig-header",
+      "name": "Test Header"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-N8N/webhook/auth-header-demo",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"hello\": \"header\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [704, 928],
+      "id": "http-header",
+      "name": "Call Header Webhook"
+    },
+    {
+      "parameters": {
+        "content": "## 3. JWT Auth\n\n**When to use:** enterprise integrations, when payloads must be cryptographically signed, expiring tokens.\n**Security:** strongest. Token can encode user/scope/expiry and is verified against a secret or JWKS.\n**Real example:** B2B APIs, internal microservice mesh, signed third-party callbacks.",
+        "height": 280,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, 1248],
+      "id": "sticky-jwt",
+      "name": "JWT Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth-jwt-demo",
+        "authentication": "jwtAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-16, 1552],
+      "id": "wh-jwt",
+      "name": "Webhook (JWT Auth)",
+      "webhookId": "auth-jwt-demo"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"auth\": \"jwt\",\n  \"message\": \"Authenticated via JWT\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [208, 1552],
+      "id": "resp-jwt",
+      "name": "Respond JWT"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [496, 1552],
+      "id": "trig-jwt",
+      "name": "Test JWT"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-N8N/webhook/auth-jwt-demo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "Bearer YOUR_SIGNED_JWT_HERE"}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"hello\": \"jwt\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [704, 1552],
+      "id": "http-jwt",
+      "name": "Call JWT Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook (Basic Auth)": {"main": [[{"node": "Respond Basic", "type": "main", "index": 0}]]},
+    "Test Basic": {"main": [[{"node": "Call Basic Webhook", "type": "main", "index": 0}]]},
+    "Webhook (Header Auth)": {"main": [[{"node": "Respond Header", "type": "main", "index": 0}]]},
+    "Test Header": {"main": [[{"node": "Call Header Webhook", "type": "main", "index": 0}]]},
+    "Webhook (JWT Auth)": {"main": [[{"node": "Respond JWT", "type": "main", "index": 0}]]},
+    "Test JWT": {"main": [[{"node": "Call JWT Webhook", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"}
+}

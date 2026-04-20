@@ -1,0 +1,226 @@
+{
+  "name": "S4 \u00b7 03 \u00b7 Pagination Pattern",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 03 \u00b7 Pagination Pattern\n\nPublic API: **PokeAPI** (no auth needed).\nMost APIs return data in pages. You handle them with:\n\n**HTTP \u2192 Loop Over Items \u2192 HTTP**\n\nPattern:\n1. First request gets page 1 + a `next` URL\n2. Loop fetches subsequent pages\n3. Aggregate combines all results\n\nTry changing `limit` to see how page size affects calls.",
+        "height": 320,
+        "width": 420,
+        "color": 5
+      },
+      "id": "dd7c15d5-5a63-4ed6-b650-b096dbfdaf0f",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -450,
+        -250
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e8416e98-f1b8-4bfc-ba39-03a0aa893603",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f3bcd7b7-417a-43e5-a725-1872a31dbfb2",
+              "name": "limit",
+              "value": 20,
+              "type": "number"
+            },
+            {
+              "id": "a142e6eb-df46-4fe8-b2af-ed585bbbe570",
+              "name": "total_pages",
+              "value": 3,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d41042db-f628-454e-941a-4e717d60b237",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        250,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://pokeapi.co/api/v2/pokemon",
+        "method": "GET",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "={{ $json.limit }}"
+            },
+            {
+              "name": "offset",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "id": "4c934069-5fc6-476e-bf73-3a2fbf53dff4",
+      "name": "Page 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "id": "0f3b7415-c2fb-4547-82b7-6cdd1fec4fa5",
+      "name": "Split results",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        750,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "746231a2-3085-4718-bc29-fcfe077a742b",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "807e4534-f2c6-49f6-b365-cf839aea5bd4",
+      "name": "Fetch detail",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1250,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "fc9c7d7a-fb91-4c17-abe4-94c4cb0bbffd",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        -150
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Page 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page 1": {
+      "main": [
+        [
+          {
+            "node": "Split results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split results": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch detail": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

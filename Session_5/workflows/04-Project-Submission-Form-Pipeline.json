@@ -1,0 +1,194 @@
+{
+  "name": "04 - Project: Submission Form Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Capstone: Submission Form Pipeline\n\n**Pattern:** Public webhook → validate → enrich via API → store → email → respond\n\nThis is the exact backend pattern used in the IEEE-RAS-BAU Submission Form project.\n\n**Flow:**\n1. Webhook receives a POST (with Header Auth)\n2. Validate required fields → bad? respond 400\n3. Enrich the phone number with country info via free API\n4. Append the enriched record to Google Sheets\n5. Send a confirmation email\n6. Respond 200 with JSON\n\nAny failure in steps 3-5 → Error Trigger catches it → respond 500 cleanly.",
+        "height": 400,
+        "width": 1100,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-32, -440],
+      "id": "sticky-overview",
+      "name": "Overview"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submission-form",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-16, 16],
+      "id": "wh-submit",
+      "name": "Webhook Submit",
+      "webhookId": "submission-form"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": true, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {"id": "v1", "leftValue": "={{ $json.body.name }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}},
+            {"id": "v2", "leftValue": "={{ $json.body.email }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}},
+            {"id": "v3", "leftValue": "={{ $json.body.phone }}", "rightValue": "", "operator": {"type": "string", "operation": "notEmpty", "singleValue": true}}
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [208, 16],
+      "id": "if-valid",
+      "name": "Validate"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://restcountries.com/v3.1/alpha/{{ $('Webhook Submit').item.json.body.country_code || 'jo' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [432, -80],
+      "id": "enrich",
+      "name": "Enrich (Country API)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "f1", "name": "name", "value": "={{ $('Webhook Submit').item.json.body.name }}", "type": "string"},
+            {"id": "f2", "name": "email", "value": "={{ $('Webhook Submit').item.json.body.email }}", "type": "string"},
+            {"id": "f3", "name": "phone", "value": "={{ $('Webhook Submit').item.json.body.phone }}", "type": "string"},
+            {"id": "f4", "name": "country", "value": "={{ $json[0].name.common }}", "type": "string"},
+            {"id": "f5", "name": "submitted_at", "value": "={{ $now.toISO() }}", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [656, -80],
+      "id": "shape",
+      "name": "Shape Record"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {"__rl": true, "value": "REPLACE_WITH_YOUR_SHEET_ID", "mode": "list"},
+        "sheetName": {"__rl": true, "value": "gid=0", "mode": "list"},
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "country": "={{ $json.country }}",
+            "submitted_at": "={{ $json.submitted_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {"id": "name", "displayName": "name", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "email", "displayName": "email", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "phone", "displayName": "phone", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "country", "displayName": "country", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true},
+            {"id": "submitted_at", "displayName": "submitted_at", "type": "string", "display": true, "required": false, "defaultMatch": false, "canBeUsedToMatch": true}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [880, -80],
+      "id": "store",
+      "name": "Store in Sheets"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Submission received",
+        "emailType": "text",
+        "message": "=Hi {{ $json.name }},\n\nWe received your submission from {{ $json.country }}.\nWe'll be in touch soon.\n\n— The Team",
+        "options": {"appendAttribution": false}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1104, -80],
+      "id": "notify",
+      "name": "Send Confirmation"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"message\": \"Submission received\",\n  \"data\": {\n    \"name\": \"{{ $('Shape Record').item.json.name }}\",\n    \"country\": \"{{ $('Shape Record').item.json.country }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1328, -80],
+      "id": "resp-200",
+      "name": "Respond 200"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 400,
+        "responseBody": "={\n  \"status\": \"error\",\n  \"code\": 400,\n  \"message\": \"Missing required fields\",\n  \"required\": [\"name\", \"email\", \"phone\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [432, 144],
+      "id": "resp-400",
+      "name": "Respond 400"
+    },
+    {
+      "parameters": {
+        "content": "### Error Branch\n\nCatches any failure in the enrichment / storage / email path and returns a clean 500 instead of leaving the webhook hanging.\n\nWire this from any node above using its **Settings → On Error → Continue (Error Output)** then connect that error output here.",
+        "height": 280,
+        "width": 480,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [880, 240],
+      "id": "sticky-err",
+      "name": "Err Note"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseCode": 500,
+        "responseBody": "={\n  \"status\": \"error\",\n  \"code\": 500,\n  \"message\": \"Internal error processing submission\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [1104, 320],
+      "id": "resp-500",
+      "name": "Respond 500"
+    }
+  ],
+  "connections": {
+    "Webhook Submit": {"main": [[{"node": "Validate", "type": "main", "index": 0}]]},
+    "Validate": {
+      "main": [
+        [{"node": "Enrich (Country API)", "type": "main", "index": 0}],
+        [{"node": "Respond 400", "type": "main", "index": 0}]
+      ]
+    },
+    "Enrich (Country API)": {"main": [[{"node": "Shape Record", "type": "main", "index": 0}]]},
+    "Shape Record": {"main": [[{"node": "Store in Sheets", "type": "main", "index": 0}]]},
+    "Store in Sheets": {"main": [[{"node": "Send Confirmation", "type": "main", "index": 0}]]},
+    "Send Confirmation": {"main": [[{"node": "Respond 200", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"}
+}

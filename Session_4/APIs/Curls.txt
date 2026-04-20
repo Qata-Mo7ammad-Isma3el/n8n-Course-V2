@@ -1,0 +1,64 @@
+# ROOT ENDPOINT
+
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/"
+
+# QUERY PARAMETERS
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/query?num1=15&num2=25"
+
+# REQUEST BODY
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body" \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 30, "num2": 12}'
+
+# HEADER PARAMETERS
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/header" \
+  -H "X-Num1: 7.5" \
+  -H "X-Num2: 2.5"
+
+# API KEY IN HEADER (Valid)
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header?num1=100&num2=50" \
+  -H "X-API-Key: my-secret-api-key-123"
+
+# API KEY IN HEADER (Invalid)
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header?num1=100&num2=50" \
+  -H "X-API-Key: invalid-key-xyz"
+
+# API KEY IN QUERY
+curl -X GET "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-query?num1=80&num2=20&api_key=my-secret-api-key-123"
+
+# BEARER TOKEN (OAuth 2.0)
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/bearer" \
+  -H "Authorization: Bearer valid-bearer-token-xyz" \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 45, "num2": 55}'
+
+# BEARER TOKEN (Invalid)
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/bearer" \
+  -H "Authorization: Bearer invalid-token" \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 45, "num2": 55}'
+
+# BASIC AUTHENTICATION (Using -u flag)
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/basic" \
+  -u admin:secret123 \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 33, "num2": 67}'
+
+# BASIC AUTHENTICATION (Manual Base64 Header)
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/basic" \
+  -H "Authorization: Basic YWRtaW46c2VjcmV0MTIz" \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 33, "num2": 67}'
+
+# BASIC AUTHENTICATION (Invalid Credentials)
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/basic" \
+  -u wrong:password \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 33, "num2": 67}'
+
+# COMBINED EXAMPLE
+curl -X POST "https://sunday-chirurgic-earlene.ngrok-free.dev/combined/all-methods?multiplier=2.5" \
+  -H "X-API-Key: my-secret-api-key-123" \
+  -H "X-Operation: sum" \
+  -H "Content-Type: application/json" \
+  -d '{"num1": 10, "num2": 20}'

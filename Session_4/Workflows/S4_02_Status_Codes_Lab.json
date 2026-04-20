@@ -1,0 +1,316 @@
+{
+  "name": "S4 \u00b7 02 \u00b7 Status Codes Lab",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## S4 \u00b7 02 \u00b7 Status Codes Lab\n\nEvery HTTP node here has **Continue On Fail** enabled.\nWithout it, the workflow stops on the first 401 and you can't compare results.\n\n**Codes you'll see:**\n- 200 \u2014 OK (valid call)\n- 401 \u2014 Unauthorized (bad API key)\n- 404 \u2014 Not Found (wrong path)\n- 422 \u2014 Unprocessable (missing field)\n\nStatus codes are **information**, not failure.",
+        "height": 360,
+        "width": 420,
+        "color": 4
+      },
+      "id": "6bd41d83-6703-4a86-b5d7-9b916f884778",
+      "name": "Sticky Intro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -450,
+        -250
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "bee94870-fc4c-4e87-a7be-94b3930fe01c",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "5"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "my-secret-api-key-123"
+            }
+          ]
+        }
+      },
+      "id": "ce98f3bd-3ad4-4fcc-a229-f70d693bda82",
+      "name": "200 \u00b7 valid call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -250
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/auth/api-key-header",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "5"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "wrong-key"
+            }
+          ]
+        }
+      },
+      "id": "50cc5b82-764a-4b53-bc0c-05e59327efb6",
+      "name": "401 \u00b7 invalid key",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        -100
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/this/does/not/exist",
+        "method": "GET",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "e1e7d68c-2a55-47ca-98d7-80b87737370c",
+      "name": "404 \u00b7 wrong path",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        50
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/sum/body",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "{\"num1\": 10}"
+      },
+      "id": "d726864c-e937-4619-9c3d-e49ae852e4bd",
+      "name": "422 \u00b7 missing field",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "9d6d2ab3-3a74-49a5-bd88-3523da688383",
+      "name": "Merge all responses",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        600,
+        -25
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b09d178-7224-4d7c-86a7-11a74998838f",
+              "name": "explanation_200",
+              "value": "OK \u2014 request succeeded",
+              "type": "string"
+            },
+            {
+              "id": "d32f4bf7-7492-4ca2-ab3e-7a7c5efae79d",
+              "name": "explanation_401",
+              "value": "Unauthorized \u2014 auth missing or wrong",
+              "type": "string"
+            },
+            {
+              "id": "d44e55a9-63a6-470a-9588-2b3a08b37672",
+              "name": "explanation_404",
+              "value": "Not Found \u2014 endpoint or resource missing",
+              "type": "string"
+            },
+            {
+              "id": "5754d796-a43b-4ce2-afe9-9423b3bc19d7",
+              "name": "explanation_422",
+              "value": "Unprocessable Entity \u2014 body shape is wrong",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8644591-1023-4174-ad6e-94bf99a75487",
+      "name": "Map code \u2192 meaning",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        850,
+        -25
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "200 \u00b7 valid call",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "401 \u00b7 invalid key",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "404 \u00b7 wrong path",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "422 \u00b7 missing field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "200 \u00b7 valid call": {
+      "main": [
+        [
+          {
+            "node": "Merge all responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "401 \u00b7 invalid key": {
+      "main": [
+        [
+          {
+            "node": "Merge all responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "404 \u00b7 wrong path": {
+      "main": [
+        [
+          {
+            "node": "Merge all responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "422 \u00b7 missing field": {
+      "main": [
+        [
+          {
+            "node": "Merge all responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge all responses": {
+      "main": [
+        [
+          {
+            "node": "Map code \u2192 meaning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
