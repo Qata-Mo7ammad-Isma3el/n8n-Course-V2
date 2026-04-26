@@ -1,0 +1,1557 @@
+{
+  "name": "S6-Reference-02-Code-Node-JS",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# S6 \u2014 Code Node JavaScript Reference\n\n**Comprehensive guide** to writing JavaScript in n8n Code nodes. Each numbered section is self-contained \u2014 connect a Manual Trigger to any 'Input:' node to run that example.\n\n## \u2699\ufe0f Run Mode \u2014 READ THIS FIRST\n\nEvery Code node has TWO modes (set in the node's parameters):\n\n### \ud83d\udd35 Run Once for All Items (default)\n- Code runs **ONCE**, receives the **entire array** of input items\n- Use `$input.all()` \u2192 returns `[{json:{...}}, {json:{...}}, ...]`\n- You **MUST return an array** of `{json: {...}}` objects\n- Best for: aggregations, filtering, grouping, comparing items, batch ops\n\n```js\nconst items = $input.all();\nconst total = items.reduce((sum, i) => sum + i.json.amount, 0);\nreturn [{ json: { total } }];\n```\n\n### \ud83d\udfe2 Run Once for Each Item\n- Code runs **ONCE PER ITEM** \u2014 like a forEach loop\n- Use `$json` \u2192 the current item's data directly\n- You return a **single object** `{json: {...}}` (n8n wraps it automatically)\n- Best for: simple per-item transformations\n\n```js\nreturn { json: { name: $json.name.toUpperCase() } };\n```\n\n### \u274c Common mistakes\n- Using `$json` in 'All Items' mode \u2192 undefined\n- Returning a single object in 'All Items' mode \u2192 error\n- Returning an array in 'Each Item' mode \u2192 double-wrapping\n- Forgetting the `json:` wrapper \u2192 data lost",
+        "height": 720,
+        "width": 560,
+        "color": 6
+      },
+      "id": "6f023b4b-d419-4f04-9c7f-f7343c8f9d9f",
+      "name": "READ ME - Run Modes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "a0d154f2-c5fb-445d-97b9-6d912b71fe98",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        5488,
+        976
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Functions & Data Processing",
+        "height": 416,
+        "width": 1856,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5424,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "596d7100-482e-4181-9754-653c5e078c85",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "# Error Handling & Advanced Patterns\n",
+        "height": 432,
+        "width": 1856,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5424,
+        1248
+      ],
+      "id": "568fa362-3d57-4072-aea9-0f68b25818a1",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code nodes MUST return an array of objects\n// Each object MUST have a 'json' property containing your data\n\nreturn [\n  {\n    json: {\n      message: \"Hello from n8n!\",\n      timestamp: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        16
+      ],
+      "id": "db7f5e0a-d80e-4491-b7c4-9dc47f6863de",
+      "name": "1.1 Basic Structure"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "input-02-1",
+              "name": "name",
+              "value": "Alice",
+              "type": "string"
+            },
+            {
+              "id": "input-02-2",
+              "name": "age",
+              "value": "30",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        224
+      ],
+      "id": "101da0b6-a19c-4711-8f7b-5c833cee4eac",
+      "name": "Input: User Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// When in \"Run Once for Each Item\" mode, $json gives direct access\n// to the current item's data\n\n// Input:  { \"name\": \"Alice\", \"age\": 30 }\n\nconst userName = $json.name;\nconst userAge = $json.age;\n\nreturn [\n  {\n    json: {\n      greeting: `Hello, ${userName}!`,\n      birthYear: 2025 - userAge\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        224
+      ],
+      "id": "4f74bd66-ac35-4896-b935-60dc28fc7cf8",
+      "name": "2.1 Using $json (Each Item Mode)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Multiple employees\nreturn [\n  { json: { name: \"Alice\", department: \"Engineering\" } },\n  { json: { name: \"Bob\", department: \"Marketing\" } },\n  { json: { name: \"Charlie\", department: \"Engineering\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        416
+      ],
+      "id": "36dd2f29-6eca-47b2-98f2-34f0aed40ac0",
+      "name": "Input: Employees"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all items and process them together\nconst allItems = $input.all();\n\n// Each item has a 'json' property containing the actual data\nconst names = allItems.map(item => item.json.name);\n\nreturn [\n  {\n    json: {\n      totalItems: allItems.length,\n      allNames: names,\n      firstPerson: allItems[0].json.name\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        416
+      ],
+      "id": "b26b8bc7-97e6-4895-af68-161ecf697e2e",
+      "name": "2.2 Using $input.all()"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Names list\nreturn [\n  { json: { name: \"Alice\" } },\n  { json: { name: \"Bob\" } },\n  { json: { name: \"Charlie\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        624
+      ],
+      "id": "db32f53c-8a3a-4ece-ab6f-488fccb90409",
+      "name": "Input: Names"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get specific items from the input\nconst firstItem = $input.first();\nconst lastItem = $input.last();\n\nreturn [\n  {\n    json: {\n      firstPerson: firstItem.json.name,\n      lastPerson: lastItem.json.name,\n      message: `Processing from ${firstItem.json.name} to ${lastItem.json.name}`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        624
+      ],
+      "id": "e0f83233-2a31-4566-b49e-c5f38d8c6a1d",
+      "name": "2.3 Using $input.first() and last()"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return multiple items for the next node to process\n\nreturn [\n  { json: { id: 1, status: \"active\" } },\n  { json: { id: 2, status: \"pending\" } },\n  { json: { id: 3, status: \"active\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        816
+      ],
+      "id": "bd898d6c-9093-480b-8c1f-23deac554105",
+      "name": "3.1 Returning Multiple Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Items with status\nreturn [\n  { json: { id: 1, status: \"active\" } },\n  { json: { id: 2, status: \"pending\" } },\n  { json: { id: 3, status: \"inactive\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        1024
+      ],
+      "id": "379385ba-f85f-436f-b993-2716fcee440e",
+      "name": "Input: Status Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Return empty array when you want to stop the workflow branch\n// or when filtering removes all items\n\nconst items = $input.all();\nconst activeItems = items.filter(item => item.json.status === \"active\");\n\nif (activeItems.length === 0) {\n  // Return empty array - workflow branch stops here\n  return [];\n}\n\nreturn activeItems.map(item => ({\n  json: item.json\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        1024
+      ],
+      "id": "013f377e-8f49-46f7-ab01-9bb05a26af83",
+      "name": "3.2 Returning Empty Result"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with emails\nreturn [\n  { json: { name: \"Alice\", email: \"alice@example.com\" } },\n  { json: { name: \"Bob\", email: \"invalid-email\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        1216
+      ],
+      "id": "10fa12f3-07b7-4ba0-89c4-53cdd0625544",
+      "name": "Input: Users with Emails"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Use spread operator to keep original data and add new fields\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    ...item.json,  // Spread original data\n    processedAt: new Date().toISOString(),\n    isValid: item.json.email?.includes(\"@\") ?? false\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        1216
+      ],
+      "id": "0ee09e50-288d-42ab-8099-18392a880473",
+      "name": "3.3 Preserving Data & Adding Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with names and emails\nreturn [\n  { json: { firstName: \"Alice\", lastName: \"Smith\", email: \"ALICE@Example.com\" } },\n  { json: { firstName: \"Bob\", lastName: \"Jones\", email: \"BOB@Example.com\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        1424
+      ],
+      "id": "8953376f-edd6-416d-ae4d-67cb6bd984e7",
+      "name": "Input: Full Names"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform each item in the input\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      fullName: `${data.firstName} ${data.lastName}`,\n      email: data.email.toLowerCase(),\n      username: data.email.split(\"@\")[0]\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        1424
+      ],
+      "id": "a8fad7c1-cf0a-4609-9f9e-e792b6c67c05",
+      "name": "4.1 Processing Each Item"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with age and status\nreturn [\n  { json: { name: \"Alice\", age: 25, status: \"active\" } },\n  { json: { name: \"Bob\", age: 16, status: \"active\" } },\n  { json: { name: \"Charlie\", age: 30, status: \"inactive\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        1616
+      ],
+      "id": "00a66ae3-6441-41e7-9d72-7c0cdbfca7bb",
+      "name": "Input: Users Age Status"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Keep only items that match a condition\n\nconst items = $input.all();\n\nconst filteredItems = items.filter(item => {\n  const data = item.json;\n  return data.age >= 18 && data.status === \"active\";\n});\n\n// Must still wrap in proper return format\nreturn filteredItems.map(item => ({\n  json: item.json\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        1616
+      ],
+      "id": "be40f35c-4004-4937-9911-a8cb017a8fd2",
+      "name": "4.2 Filtering Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders with amounts\nreturn [\n  { json: { orderId: 1, amount: 100, category: \"electronics\" } },\n  { json: { orderId: 2, amount: 50, category: \"books\" } },\n  { json: { orderId: 3, amount: 200, category: \"electronics\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        1824
+      ],
+      "id": "c5c6b77d-e1e1-4b26-9c5e-4852f25b95d4",
+      "name": "Input: Orders"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine multiple items into a single summary\n\nconst items = $input.all();\n\nconst totalAmount = items.reduce((sum, item) => {\n  return sum + item.json.amount;\n}, 0);\n\nconst averageAmount = totalAmount / items.length;\n\nconst byCategory = items.reduce((acc, item) => {\n  const category = item.json.category;\n  acc[category] = (acc[category] || 0) + item.json.amount;\n  return acc;\n}, {});\n\nreturn [\n  {\n    json: {\n      totalOrders: items.length,\n      totalAmount: totalAmount,\n      averageAmount: averageAmount.toFixed(2),\n      amountByCategory: byCategory\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        1824
+      ],
+      "id": "48c59924-8806-4fc8-91d2-18aebb8d1bc0",
+      "name": "4.3 Aggregating Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Item with tags array\nreturn [\n  { json: { id: 123, tags: [\"urgent\", \"billing\", \"support\"] } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        0
+      ],
+      "id": "5aa307e3-5440-4423-bf47-8e45b202024b",
+      "name": "Input: Item with Tags"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Expand a single item with an array into multiple items\n\nconst item = $input.first();\nconst tags = item.json.tags;\n\nreturn tags.map(tag => ({\n  json: {\n    originalId: item.json.id,\n    tag: tag,\n    processedAt: new Date().toISOString()\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        0
+      ],
+      "id": "e273fe2c-eb0b-448d-93f1-1ef8f1c1869d",
+      "name": "4.4 Splitting One Item into Multiple"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Employees by department\nreturn [\n  { json: { name: \"Alice\", department: \"Engineering\" } },\n  { json: { name: \"Bob\", department: \"Marketing\" } },\n  { json: { name: \"Charlie\", department: \"Engineering\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        208
+      ],
+      "id": "2eeeec75-c6c1-468b-8f42-870af547b2b1",
+      "name": "Input: Employees Dept"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Group items by a common property\n\nconst items = $input.all();\n\nconst grouped = items.reduce((acc, item) => {\n  const key = item.json.department;\n  if (!acc[key]) {\n    acc[key] = [];\n  }\n  acc[key].push(item.json);\n  return acc;\n}, {});\n\n// Return each group as a separate item\nreturn Object.entries(grouped).map(([department, employees]) => ({\n  json: {\n    department: department,\n    employeeCount: employees.length,\n    employees: employees\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        208
+      ],
+      "id": "7a3290ad-c93d-45ff-b245-21e77ef2f49c",
+      "name": "4.5 Grouping Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders with amounts\nreturn [\n  { json: { orderId: 1, amount: 1500 } },\n  { json: { orderId: 2, amount: 250 } },\n  { json: { orderId: 3, amount: 50 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        400
+      ],
+      "id": "71ccf351-8a54-45d5-923a-7cc057f364d8",
+      "name": "Input: Order Amounts"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add conditional fields based on data\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  let priority;\n  if (data.amount > 1000) {\n    priority = \"high\";\n  } else if (data.amount > 100) {\n    priority = \"medium\";\n  } else {\n    priority = \"low\";\n  }\n  \n  return {\n    json: {\n      ...data,\n      priority: priority,\n      requiresApproval: data.amount > 500\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        400
+      ],
+      "id": "9503b79a-018b-4468-8a68-da035e0e6723",
+      "name": "5.1 Basic Conditionals"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with activity\nreturn [\n  { json: { isActive: true, nickname: \"Ally\", fullName: \"Alice Smith\", purchases: 150 } },\n  { json: { isActive: false, fullName: \"Bob Jones\", purchases: 30 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        608
+      ],
+      "id": "293590d0-5d9f-4df4-8364-9106c757cc30",
+      "name": "Input: User Activity"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Concise conditionals with ternary operators\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      ...data,\n      status: data.isActive ? \"active\" : \"inactive\",\n      displayName: data.nickname || data.fullName || \"Unknown User\",\n      tier: data.purchases > 100 ? \"gold\" : data.purchases > 50 ? \"silver\" : \"bronze\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        608
+      ],
+      "id": "18d43d08-013f-4b25-9a83-3363ce7b520a",
+      "name": "5.2 Using Ternary Operators"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with nested data\nreturn [\n  { json: { name: \"Alice\", address: { city: \"Boston\", country: \"USA\" }, score: 0 } },\n  { json: { name: \"Bob\", phone: \"555-1234\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        800
+      ],
+      "id": "77ccf3bd-b766-402a-a0ca-eb251feb429d",
+      "name": "Input: Nested Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Safely handle missing or null data\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      // Optional chaining - safely access nested properties\n      city: data.address?.city ?? \"Unknown\",\n      country: data.address?.country ?? \"Unknown\",\n      \n      // Nullish coalescing - provide defaults for null/undefined\n      phone: data.phone ?? \"No phone provided\",\n      \n      // Combine both for deeply nested data\n      managerName: data.team?.manager?.name ?? \"No manager assigned\",\n      \n      // Note: || treats 0, \"\", false as falsy; ?? only treats null/undefined\n      score: data.score ?? 0,  // Preserves 0 if that's the value\n      legacyScore: data.score || 0  // Would replace 0 with 0 (same here, but beware)\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        800
+      ],
+      "id": "336b7770-25b2-470d-a7ce-9e19bc8b561e",
+      "name": "5.3 Nullish Coalescing & Optional Chaining"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders for routing\nreturn [\n  { json: { orderId: 1, amount: 1500, isNewCustomer: true, priority: \"high\", dueInDays: 1, preferredContact: \"email\" } },\n  { json: { orderId: 2, amount: 200, isNewCustomer: false, priority: \"low\", dueInDays: 5, preferredContact: \"sms\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        1008
+      ],
+      "id": "8702658e-ef21-4068-932b-4983996f15b0",
+      "name": "Input: Orders Routing"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add routing flags for downstream IF nodes\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Determine routing\n  const needsReview = data.amount > 1000 || data.isNewCustomer;\n  const isUrgent = data.priority === \"high\" || data.dueInDays < 2;\n  \n  return {\n    json: {\n      ...data,\n      _routing: {\n        needsReview: needsReview,\n        isUrgent: isUrgent,\n        channel: data.preferredContact === \"email\" ? \"email\" : \"sms\"\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1008
+      ],
+      "id": "21d2b943-7ffb-4472-9bae-b0e493ac8e6e",
+      "name": "5.4 Routing Logic for IF Nodes"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: API response structure\nreturn [\n  { json: { id: 123, name: \"Alice\", email: \"alice@example.com\", phone_number: \"555-1234\", street: \"123 Main St\", city: \"Boston\", zip: \"02101\", company: { name: \"TechCorp\", industry: \"Software\" } } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        1200
+      ],
+      "id": "2c73de6a-132f-47cf-938e-0575fded0147",
+      "name": "Input: API Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform API response structure to your desired format\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      // Rename fields\n      userId: data.id,\n      userName: data.name,\n      userEmail: data.email,\n      \n      // Nest related data\n      contact: {\n        email: data.email,\n        phone: data.phone_number,\n        address: `${data.street}, ${data.city}, ${data.zip}`\n      },\n      \n      // Flatten nested data\n      companyName: data.company?.name,\n      companyIndustry: data.company?.industry\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1200
+      ],
+      "id": "0e8783b0-fe15-476d-9372-067206fab1be",
+      "name": "6.1 Restructuring Objects"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Order with line items\nreturn [\n  { json: { id: \"ORD-001\", customer: \"Alice\", items: [ { name: \"Widget\", price: 10, quantity: 3 }, { name: \"Gadget\", price: 25, quantity: 2 } ] } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        1408
+      ],
+      "id": "112e2bc4-3996-47bf-b517-60b293a3ba88",
+      "name": "Input: Order Line Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process items with nested arrays\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const order = item.json;\n  \n  // Calculate totals from line items\n  const lineItems = order.items || [];\n  const subtotal = lineItems.reduce((sum, li) => sum + (li.price * li.quantity), 0);\n  const itemCount = lineItems.reduce((sum, li) => sum + li.quantity, 0);\n  \n  return {\n    json: {\n      orderId: order.id,\n      customerName: order.customer,\n      itemCount: itemCount,\n      subtotal: subtotal,\n      tax: subtotal * 0.08,\n      total: subtotal * 1.08,\n      itemSummary: lineItems.map(li => `${li.name} x${li.quantity}`).join(\", \")\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1408
+      ],
+      "id": "5df7954d-893f-495b-b0fb-a95089515715",
+      "name": "6.2 Working with Nested Arrays"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Mixed types\nreturn [\n  { json: { amount: \"150.50\", quantity: \"5\", id: 123, price: 49.99, status: \"active\", isEnabled: true, tags: [\"urgent\", \"new\"], emails: \"alice@test.com, bob@test.com\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        1600
+      ],
+      "id": "229ed784-a341-41b6-8fd3-fb9bbef46e43",
+      "name": "Input: Mixed Types"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convert data types for consistency\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      // String to Number\n      amount: parseFloat(data.amount) || 0,\n      quantity: parseInt(data.quantity, 10) || 0,\n      \n      // Number to String\n      orderId: String(data.id),\n      price: data.price.toFixed(2),\n      \n      // String to Boolean\n      isActive: data.status === \"active\" || data.status === \"1\" || data.status === true,\n      \n      // Boolean to String\n      statusText: data.isEnabled ? \"Enabled\" : \"Disabled\",\n      \n      // Array to String\n      tags: Array.isArray(data.tags) ? data.tags.join(\", \") : data.tags,\n      \n      // String to Array\n      emails: typeof data.emails === \"string\" ? data.emails.split(\",\").map(e => e.trim()) : data.emails\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3584,
+        1600
+      ],
+      "id": "b23e6ba6-3c51-4b69-b4c8-6d9f496a440a",
+      "name": "6.3 Type Conversion"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: User with sensitive fields\nreturn [\n  { json: { id: 1, name: \"Alice\", email: \"alice@test.com\", password: \"secret123\", ssn: \"123-45-6789\", creditCard: \"4111111111111111\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        0
+      ],
+      "id": "d220e265-fd28-4037-98e7-db5d611a5aa8",
+      "name": "Input: Sensitive Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pick only specific fields or remove unwanted ones\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Method 1: Pick specific fields (whitelist)\n  const { id, name, email } = data;\n  const picked = { id, name, email };\n  \n  // Method 2: Remove specific fields (blacklist)\n  const { password, ssn, creditCard, ...safeData } = data;\n  \n  return {\n    json: {\n      // Using picked fields\n      ...picked,\n      // Or using safe data (everything except sensitive fields)\n      // ...safeData\n      \n      // Add metadata\n      processedAt: new Date().toISOString()\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        0
+      ],
+      "id": "def62e94-9512-421f-9314-975f0ce9379a",
+      "name": "6.4 Removing and Selecting Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users with various email states\nreturn [\n  { json: { name: \"Alice\", email: \"alice@example.com\" } },\n  { json: { name: \"Bob\", email: \"invalid-email\" } },\n  { json: { name: \"Charlie\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        192
+      ],
+      "id": "a702d0c6-cd7a-48ac-a2e5-dd3ab65fe3d5",
+      "name": "Input: Email Validation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle errors gracefully without breaking the workflow\n\nconst items = $input.all();\nconst results = [];\nconst errors = [];\n\nfor (const item of items) {\n  try {\n    const data = item.json;\n    \n    // Potentially risky operation\n    if (!data.email) {\n      throw new Error(\"Email is required\");\n    }\n    \n    const domain = data.email.split(\"@\")[1];\n    if (!domain) {\n      throw new Error(\"Invalid email format\");\n    }\n    \n    results.push({\n      json: {\n        ...data,\n        domain: domain,\n        processed: true,\n        error: null\n      }\n    });\n    \n  } catch (error) {\n    // Capture error but continue processing\n    errors.push({\n      json: {\n        originalData: item.json,\n        processed: false,\n        error: error.message\n      }\n    });\n  }\n}\n\n// Return both successful and failed items\nreturn [...results, ...errors];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        192
+      ],
+      "id": "674db8e1-3254-40bf-97bd-a0d80dab1b0f",
+      "name": "7.1 Try-Catch for Safe Processing"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users for validation\nreturn [\n  { json: { name: \"Alice\", email: \"alice@test.com\", age: 25 } },\n  { json: { name: \"\", email: \"invalid\", age: 200 } },\n  { json: { email: \"bob@test.com\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        400
+      ],
+      "id": "2830bf0f-7893-4d5f-8170-baf8f935b4db",
+      "name": "Input: Validation Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create reusable validation logic\n\nfunction validateItem(data) {\n  const errors = [];\n  \n  if (!data.name || data.name.trim() === \"\") {\n    errors.push(\"Name is required\");\n  }\n  \n  if (!data.email) {\n    errors.push(\"Email is required\");\n  } else if (!data.email.includes(\"@\")) {\n    errors.push(\"Email must be valid\");\n  }\n  \n  if (data.age !== undefined && (data.age < 0 || data.age > 150)) {\n    errors.push(\"Age must be between 0 and 150\");\n  }\n  \n  return {\n    isValid: errors.length === 0,\n    errors: errors\n  };\n}\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  const validation = validateItem(data);\n  \n  return {\n    json: {\n      ...data,\n      _validation: validation\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        400
+      ],
+      "id": "7c245e91-8469-48fd-a472-1496e1e03348",
+      "name": "7.2 Validation Functions"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Items with types\nreturn [\n  { json: { id: 1, type: \"normal\", data: \"test1\" } },\n  { json: { id: 2, type: \"critical\", data: \"test2\" } },\n  { json: { id: 3, type: \"normal\", data: \"test3\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        592
+      ],
+      "id": "b62a7563-bc2f-4c22-b5dd-fe8326eae981",
+      "name": "Input: Critical Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sometimes you WANT to stop the workflow on error\n\nconst items = $input.all();\n\nif (items.length === 0) {\n  throw new Error(\"No items received - cannot continue\");\n}\n\nconst criticalItem = items.find(item => item.json.type === \"critical\");\n\nif (!criticalItem) {\n  throw new Error(\"No critical items found - workflow cannot proceed\");\n}\n\n// Continue with normal processing\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    processed: true\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        592
+      ],
+      "id": "10dceaf4-6cbc-40a7-bfca-aa224fb286d7",
+      "name": "7.3 Throwing Errors to Stop Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Items with dates\nreturn [\n  { json: { id: 1, createdAt: \"2025-12-24T10:30:00Z\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        800
+      ],
+      "id": "7e2e869e-9e62-4100-b33f-30f2d45e2287",
+      "name": "Input: Date Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Date handling for automation workflows\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Parse date string\n  const createdDate = new Date(data.createdAt);\n  const now = new Date();\n  \n  // Calculate differences\n  const ageInMs = now - createdDate;\n  const ageInDays = Math.floor(ageInMs / (1000 * 60 * 60 * 24));\n  const ageInHours = Math.floor(ageInMs / (1000 * 60 * 60));\n  \n  // Format dates\n  const formattedDate = createdDate.toISOString().split(\"T\")[0]; // YYYY-MM-DD\n  const formattedTime = createdDate.toTimeString().split(\" \")[0]; // HH:MM:SS\n  \n  // Add/subtract time\n  const dueDate = new Date(createdDate);\n  dueDate.setDate(dueDate.getDate() + 7); // Add 7 days\n  \n  // Check conditions\n  const isOverdue = now > dueDate;\n  const isWeekend = [0, 6].includes(createdDate.getDay());\n  \n  return {\n    json: {\n      ...data,\n      dateInfo: {\n        original: data.createdAt,\n        formatted: formattedDate,\n        time: formattedTime,\n        ageInDays: ageInDays,\n        ageInHours: ageInHours,\n        dueDate: dueDate.toISOString(),\n        isOverdue: isOverdue,\n        isWeekend: isWeekend,\n        dayOfWeek: createdDate.toLocaleDateString(\"en-US\", { weekday: \"long\" })\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        800
+      ],
+      "id": "290d8050-3813-468c-8535-bb19d6097a90",
+      "name": "8.1 Working with Dates"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: String manipulation\nreturn [\n  { json: { name: \"  Alice Marie Smith  \", email: \"ALICE@Gmail.com\", description: \"This is a very long description that should be truncated for display purposes\", phone: \"(555) 123-4567\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        992
+      ],
+      "id": "cd1af2e3-7ed5-46fc-b8a4-11167f528ee3",
+      "name": "Input: String Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Common string operations in workflows\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  const name = data.name || \"\";\n  const email = data.email || \"\";\n  const description = data.description || \"\";\n  \n  return {\n    json: {\n      // Cleaning\n      cleanName: name.trim(),\n      lowerEmail: email.toLowerCase().trim(),\n      \n      // Extracting\n      firstName: name.split(\" \")[0],\n      lastName: name.split(\" \").slice(1).join(\" \"),\n      emailDomain: email.split(\"@\")[1] || \"\",\n      emailUsername: email.split(\"@\")[0] || \"\",\n      \n      // Checking\n      hasDescription: description.length > 0,\n      isGmail: email.toLowerCase().includes(\"gmail.com\"),\n      \n      // Transforming\n      slug: name.toLowerCase().replace(/\\s+/g, \"-\").replace(/[^a-z0-9-]/g, \"\"),\n      initials: name.split(\" \").map(word => word[0]?.toUpperCase()).join(\"\"),\n      truncated: description.length > 50 ? description.substring(0, 50) + \"...\" : description,\n      \n      // Formatting\n      phone: data.phone?.replace(/\\D/g, \"\"), // Remove non-digits\n      formatted: `${name} <${email}>`\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        992
+      ],
+      "id": "bff90870-d878-486c-b284-16a3a82577c5",
+      "name": "8.2 String Manipulation"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Order for templates\nreturn [\n  { json: { name: \"Alice\", orderId: \"ORD-12345\", itemCount: 3, total: 149.99, deliveryDate: \"2026-02-05\", isVIP: true, notes: \"Please gift wrap\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        1200
+      ],
+      "id": "240baca7-63b5-4b34-b8a5-c091bf0b715f",
+      "name": "Input: Order Template"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build formatted messages for notifications\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Simple template\n  const greeting = `Hello ${data.name}, welcome to our platform!`;\n  \n  // Multi-line template\n  const emailBody = `\nDear ${data.name},\n\nYour order #${data.orderId} has been confirmed. \n\nOrder Details:\n- Items: ${data.itemCount}\n- Total: $${data.total.toFixed(2)}\n- Estimated Delivery: ${data.deliveryDate}\n\nThank you for your purchase!\n\nBest regards,\nThe Team\n  `.trim();\n  \n  // Conditional content in templates\n  const slackMessage = `\n*New Order Received* \ud83d\uded2\n\u2022 Customer: ${data.name}\n\u2022 Amount: $${data.total.toFixed(2)}\n${data.isVIP ? \"\u2022 \u2b50 VIP Customer - Priority Handling\" : \"\"}\n${data.notes ? `\u2022 Notes: ${data.notes}` : \"\"}\n  `.trim();\n  \n  return {\n    json: {\n      ...data,\n      messages: {\n        greeting: greeting,\n        emailBody: emailBody,\n        slackMessage: slackMessage\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        1200
+      ],
+      "id": "ee30e4f4-f8c8-468f-9fe5-fe44268679da",
+      "name": "8.3 Template Strings for Messages"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders for best practices\nreturn [\n  { json: { customerName: \"Alice\", amount: 150 } },\n  { json: { customerName: \"Bob\", amount: 50 } },\n  { json: { customerName: \"Charlie\", amount: 200 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        1392
+      ],
+      "id": "0f1c0dcf-76ac-4a4d-b6b0-8ba22cce51ba",
+      "name": "Input: Orders Names"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 GOOD - Clear, descriptive names\nconst allOrders = $input.all();\nconst highValueOrders = allOrders.filter(order => order.json.amount > 100);\nreturn highValueOrders.map(order => ({\n  json: {\n    customerName: order.json.customerName,\n    orderAmount: order.json.amount\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        1392
+      ],
+      "id": "e10bf45f-1038-49d0-802c-ed560d5ca1de",
+      "name": "9.1 Use Meaningful Variable Names"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders with items\nreturn [\n  { json: { id: \"ORD-001\", items: [ { price: 25, quantity: 2 }, { price: 15, quantity: 3 } ] } },\n  { json: { id: \"ORD-002\", items: [ { price: 10, quantity: 1 } ] } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        1600
+      ],
+      "id": "b173ad2a-e536-4587-bff4-e32ec76b11fb",
+      "name": "Input: Orders Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 GOOD - Separate concerns into functions\n\nfunction calculateOrderTotal(items) {\n  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);\n}\n\nfunction determineShippingTier(total) {\n  if (total > 100) return \"free\";\n  if (total > 50) return \"reduced\";\n  return \"standard\";\n}\n\nfunction formatOrderSummary(order) {\n  const total = calculateOrderTotal(order.items);\n  const shipping = determineShippingTier(total);\n  \n  return {\n    orderId: order.id,\n    subtotal: total,\n    shippingTier: shipping,\n    estimatedTotal: shipping === \"free\" ? total : total + 9.99\n  };\n}\n\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: formatOrderSummary(item.json)\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4064,
+        1600
+      ],
+      "id": "2455da3f-7d17-4ce6-b66e-1cb8b8f1ecb7",
+      "name": "9.2 Break Down Complex Logic"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Orders for comments example\nreturn [\n  { json: { amount: 600, createdAt: \"2026-01-15T10:00:00Z\", firstName: \"Alice\", lastName: \"Smith\" } },\n  { json: { amount: 200, createdAt: \"2026-01-20T14:00:00Z\", fullName: \"Bob Jones\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        0
+      ],
+      "id": "68841974-10ca-463e-9310-10d337c58ef9",
+      "name": "Input: Comments Example"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 GOOD - Helpful comments explain WHY, not just WHAT\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  // Business rule: Orders over $500 require manager approval\n  const needsApproval = data.amount > 500;\n  \n  // Legacy system expects dates in MM/DD/YYYY format\n  const formattedDate = new Date(data.createdAt)\n    .toLocaleDateString(\"en-US\");\n  \n  // Combine first and last name, handling missing values\n  // Some older records only have fullName field\n  const displayName = data.firstName \n    ? `${data.firstName} ${data.lastName || \"\"}`.trim()\n    : data.fullName || \"Unknown\";\n  \n  return {\n    json: {\n      ...data,\n      needsApproval,\n      formattedDate,\n      displayName\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        0
+      ],
+      "id": "c0a03f6f-8254-4c75-ab33-710cce6497ef",
+      "name": "9.3 Comment Your Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Edge cases\nreturn [\n  { json: { name: \"Alice\", email: \"alice@test.com\", tags: [\"vip\", \"active\"], metadata: { source: \"web\" } } },\n  { json: { name: \"  Bob  \" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        208
+      ],
+      "id": "e947734d-accb-445f-8dc7-9dc3d0848902",
+      "name": "Input: Edge Cases"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 GOOD - Defensive coding\n\nconst items = $input.all();\n\n// Handle empty input\nif (!items || items.length === 0) {\n  return [{\n    json: {\n      status: \"no_data\",\n      message: \"No items to process\",\n      processedAt: new Date().toISOString()\n    }\n  }];\n}\n\nreturn items.map(item => {\n  const data = item.json || {};\n  \n  // Safe access with defaults\n  const name = data.name?.trim() || \"Unknown\";\n  const email = data.email?.toLowerCase().trim() || null;\n  const tags = Array.isArray(data.tags) ? data.tags : [];\n  const metadata = typeof data.metadata === \"object\" ? data.metadata : {};\n  \n  return {\n    json: {\n      name,\n      email,\n      hasTags: tags.length > 0,\n      tagCount: tags.length,\n      hasMetadata: Object.keys(metadata).length > 0\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        208
+      ],
+      "id": "c593d5f5-dd38-4208-aa48-67620f516386",
+      "name": "9.4 Handle Edge Cases"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Simple items\nreturn [\n  { json: { id: 1, name: \"Item A\" } },\n  { json: { id: 2, name: \"Item B\" } },\n  { json: { id: 3, name: \"Item C\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        400
+      ],
+      "id": "4b079bb7-5524-4298-b0fa-36304e464b43",
+      "name": "Input: Simple Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 SIMPLE AND CLEAR\nconst items = $input.all();\nreturn items.map((item, index) => ({\n  json: {\n    ...item.json,\n    index\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        400
+      ],
+      "id": "7e25c008-97a7-4e24-a38c-41bcb0eb5708",
+      "name": "9.5 Keep It Simple"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Users\nreturn [\n  { json: { name: \"Alice\", email: \"alice@test.com\" } },\n  { json: { name: \"Bob\", email: \"bob@test.com\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        608
+      ],
+      "id": "062a1698-2fd1-4a0b-b70a-c5ced250f386",
+      "name": "Input: Users Basic"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 CORRECT - Proper n8n format with json wrapper\nreturn $input.all().map(item => ({\n  json: {\n    name: item.json.name,\n    email: item.json.email\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        608
+      ],
+      "id": "bc67c765-f4d9-453c-bace-75eb92e122e6",
+      "name": "10.1 Correct JSON Wrapper"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 CORRECT - Array of objects with json property\nreturn [{ json: { status: \"success\" } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        800
+      ],
+      "id": "965943d8-262a-4d7f-a116-eb5511c1fca8",
+      "name": "10.2 Correct Return Type"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Names only\nreturn [\n  { json: { name: \"Alice\" } },\n  { json: { name: \"Bob\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        1008
+      ],
+      "id": "7707eca7-58e1-45ad-93cf-e5c9c564a3be",
+      "name": "Input: Names Only"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 CORRECT - Access through item.json\nconst items = $input.all();\nreturn items.map(item => ({\n  json: {\n    name: item.json.name  // Correct!\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        1008
+      ],
+      "id": "5a02c2ad-ce79-4434-ac37-4ba60f43a2a6",
+      "name": "10.3 Access item.json Correctly"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Single name\nreturn [\n  { json: { name: \"Alice\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        1200
+      ],
+      "id": "3802631a-307a-4788-92b6-15b7597f10ee",
+      "name": "Input: Single Name"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 CORRECT for \"Run Once for All Items\" mode\nconst items = $input.all();\nconst firstItemName = items[0]?.json.name;\n\nreturn [{\n  json: {\n    firstItemName: firstItemName\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        1200
+      ],
+      "id": "0b5e3399-2012-4941-9793-000109cbf577",
+      "name": "10.4 Correct Mode Usage"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: Mutation test\nreturn [\n  { json: { name: \"Original\", value: 100 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        1408
+      ],
+      "id": "c536ad37-cb3e-434e-ab5a-d3e69a45aa5d",
+      "name": "Input: Mutation Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 GOOD PRACTICE - Create new objects (don't mutate)\nconst items = $input.all();\nreturn items.map(item => ({\n  json: {\n    ...item.json,\n    name: \"Modified\"\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        1408
+      ],
+      "id": "fe24a145-2e94-4eff-9edc-0d43a56fd24a",
+      "name": "10.5 Don't Mutate Input Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: For empty array handling\nreturn [\n  { json: { id: 1, data: \"test\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4336,
+        1600
+      ],
+      "id": "a21a3632-0469-4c4e-ab80-b66c924185fc",
+      "name": "Input: Empty Array Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2705 SAFE - Handle empty input\nconst items = $input.all();\nif (items.length === 0) {\n  return [];  // or return a default item\n}\nconst firstItem = items[0].json;\n\nreturn [{\n  json: {\n    firstItem: firstItem\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        1600
+      ],
+      "id": "00081381-3cec-4d43-b6e2-a8e2c5b22d25",
+      "name": "10.6 Handle Empty Arrays"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n// n8n CODE NODE QUICK REFERENCE\n// \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n\n// \u2500\u2500\u2500 ACCESSING DATA \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n// $input.all()          // All items as array\n// $input.first()        // First item only\n// $input.last()         // Last item only\n// $json                 // Current item data (Each Item mode only)\n// $json.propertyName    // Access specific property\n\n// \u2500\u2500\u2500 RETURN FORMAT (ALWAYS REQUIRED) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nreturn [{ json: { key: \"value\" } }];  // Single item\n// return items.map(i => ({ json: i.json }));  // Multiple items\n// return [];  // Empty result (stops branch)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        -16
+      ],
+      "id": "8d450116-f831-4688-b615-3d0407e54463",
+      "name": "Quick Reference: Accessing Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: For transform\nreturn [\n  { json: { id: 1, name: \"Test Item\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4832,
+        176
+      ],
+      "id": "42674dad-af81-46dd-a95f-622162697630",
+      "name": "Input: Transform Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2500\u2500\u2500 COMMON PATTERNS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n// Transform items\nreturn $input.all().map(item => ({\n  json: { ...item.json, newField: \"value\" }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        176
+      ],
+      "id": "e9cba16c-5158-46a0-963c-449c44a1703b",
+      "name": "Quick Reference: Transform"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: For filter\nreturn [\n  { json: { id: 1, status: \"active\" } },\n  { json: { id: 2, status: \"inactive\" } },\n  { json: { id: 3, status: \"active\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4832,
+        384
+      ],
+      "id": "b8adc54c-9e0b-4c27-a597-e5c64fa4766d",
+      "name": "Input: Filter Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter items  \nreturn $input.all()\n  .filter(item => item.json.status === \"active\")\n  .map(item => ({ json: item.json }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        384
+      ],
+      "id": "0846f8da-68ef-4464-9286-3eb8997aebfd",
+      "name": "Quick Reference: Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: For aggregate\nreturn [\n  { json: { id: 1, amount: 100 } },\n  { json: { id: 2, amount: 200 } },\n  { json: { id: 3, amount: 150 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4832,
+        576
+      ],
+      "id": "53854d73-4142-4bd4-876d-846f9cdde7d8",
+      "name": "Input: Aggregate Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate to single item\nreturn [{\n  json: {\n    total: $input.all().reduce((sum, i) => sum + (i.json.amount || 0), 0)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        576
+      ],
+      "id": "076ff79b-cd11-4fb0-8905-24c3222e4a2f",
+      "name": "Quick Reference: Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate test data: For safe access\nreturn [\n  { json: { property: \"actual value\", items: [1, 2, 3] } },\n  { json: { other: \"no property field\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4832,
+        784
+      ],
+      "id": "1e797931-60e9-4ceb-99c1-227f2830db45",
+      "name": "Input: Safe Access Test"
+    },
+    {
+      "parameters": {
+        "jsCode": "// \u2500\u2500\u2500 SAFE DATA ACCESS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nconst items = $input.all();\n\nreturn items.map(item => {\n  const data = item.json;\n  \n  return {\n    json: {\n      // Optional chaining + nullish coalescing\n      property: data?.property ?? \"default\",\n      // Safe array check\n      items: Array.isArray(data.items) ? data.items : []\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5040,
+        784
+      ],
+      "id": "9c0c1beb-1685-4a72-adb1-e4edf18d31bb",
+      "name": "Quick Reference: Safe Data Access"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Input: User Data": {
+      "main": [
+        [
+          {
+            "node": "2.1 Using $json (Each Item Mode)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Employees": {
+      "main": [
+        [
+          {
+            "node": "2.2 Using $input.all()",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Names": {
+      "main": [
+        [
+          {
+            "node": "2.3 Using $input.first() and last()",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Status Items": {
+      "main": [
+        [
+          {
+            "node": "3.2 Returning Empty Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Users with Emails": {
+      "main": [
+        [
+          {
+            "node": "3.3 Preserving Data & Adding Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Full Names": {
+      "main": [
+        [
+          {
+            "node": "4.1 Processing Each Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Users Age Status": {
+      "main": [
+        [
+          {
+            "node": "4.2 Filtering Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Orders": {
+      "main": [
+        [
+          {
+            "node": "4.3 Aggregating Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Item with Tags": {
+      "main": [
+        [
+          {
+            "node": "4.4 Splitting One Item into Multiple",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Employees Dept": {
+      "main": [
+        [
+          {
+            "node": "4.5 Grouping Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Order Amounts": {
+      "main": [
+        [
+          {
+            "node": "5.1 Basic Conditionals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: User Activity": {
+      "main": [
+        [
+          {
+            "node": "5.2 Using Ternary Operators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Nested Data": {
+      "main": [
+        [
+          {
+            "node": "5.3 Nullish Coalescing & Optional Chaining",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Orders Routing": {
+      "main": [
+        [
+          {
+            "node": "5.4 Routing Logic for IF Nodes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: API Response": {
+      "main": [
+        [
+          {
+            "node": "6.1 Restructuring Objects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Order Line Items": {
+      "main": [
+        [
+          {
+            "node": "6.2 Working with Nested Arrays",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Mixed Types": {
+      "main": [
+        [
+          {
+            "node": "6.3 Type Conversion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Sensitive Data": {
+      "main": [
+        [
+          {
+            "node": "6.4 Removing and Selecting Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Email Validation": {
+      "main": [
+        [
+          {
+            "node": "7.1 Try-Catch for Safe Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Validation Test": {
+      "main": [
+        [
+          {
+            "node": "7.2 Validation Functions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Critical Items": {
+      "main": [
+        [
+          {
+            "node": "7.3 Throwing Errors to Stop Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Date Items": {
+      "main": [
+        [
+          {
+            "node": "8.1 Working with Dates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: String Data": {
+      "main": [
+        [
+          {
+            "node": "8.2 String Manipulation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Order Template": {
+      "main": [
+        [
+          {
+            "node": "8.3 Template Strings for Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Orders Names": {
+      "main": [
+        [
+          {
+            "node": "9.1 Use Meaningful Variable Names",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Orders Items": {
+      "main": [
+        [
+          {
+            "node": "9.2 Break Down Complex Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Comments Example": {
+      "main": [
+        [
+          {
+            "node": "9.3 Comment Your Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Edge Cases": {
+      "main": [
+        [
+          {
+            "node": "9.4 Handle Edge Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Simple Items": {
+      "main": [
+        [
+          {
+            "node": "9.5 Keep It Simple",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Users Basic": {
+      "main": [
+        [
+          {
+            "node": "10.1 Correct JSON Wrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Names Only": {
+      "main": [
+        [
+          {
+            "node": "10.3 Access item.json Correctly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Single Name": {
+      "main": [
+        [
+          {
+            "node": "10.4 Correct Mode Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Mutation Test": {
+      "main": [
+        [
+          {
+            "node": "10.5 Don't Mutate Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Empty Array Test": {
+      "main": [
+        [
+          {
+            "node": "10.6 Handle Empty Arrays",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Transform Test": {
+      "main": [
+        [
+          {
+            "node": "Quick Reference: Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Filter Test": {
+      "main": [
+        [
+          {
+            "node": "Quick Reference: Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Aggregate Test": {
+      "main": [
+        [
+          {
+            "node": "Quick Reference: Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Safe Access Test": {
+      "main": [
+        [
+          {
+            "node": "Quick Reference: Safe Data Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

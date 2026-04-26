@@ -1,0 +1,993 @@
+{
+  "name": "S6-Reference-01-Expressions",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# S6 \u2014 Expressions Reference\n\n**Read-only cheat sheet.** All 108+ n8n expressions, grouped by data type.\n\nOpen this workflow side-by-side with your real workflows. Click any Set node to see live evaluation against the sample JSON.\n\n**How to use:**\n1. Run the Manual Trigger \u2192 'Set Example Json' to load sample data\n2. Click any *_Functions_Summary node to see all expressions evaluated\n3. Copy the expression you need into your own workflow\n\n\u26a0\ufe0f This workflow is for reference only \u2014 not a runnable pipeline.",
+        "height": 380,
+        "width": 460,
+        "color": 4
+      },
+      "id": "104c8350-64ab-41df-8f9d-99abc4b6c657",
+      "name": "READ ME",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -120
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        480
+      ],
+      "id": "44267322-57fb-45f6-8e48-d00d98ff3b99",
+      "name": "When clicking \u2018Execute workflow\u2019"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"string\":\"hello!\",\n  \"number\":3.5,\n  \"array\":\n  [\"Ahmad\",\"Mohammad\",\"Ismail\"],\n  \"object\":{\n  \"firstName\":\"Mohammad\",\n  \"lastName\":\"Ismail\",\n  \"heightinCm\":169\n  },\n  \"bool\":true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        480
+      ],
+      "id": "e5127a50-c2e9-4dc9-b336-708e5324fef8",
+      "name": "Set Example Json"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ee775268-de1a-46d2-91ee-45e337b1421e",
+              "name": "Summay",
+              "value": "# string functions \n## SUGGESTED\n1) includes() \n# Meaning: .includes() \u2192 checks if a string contains a specific substring. It returns true if found, false if not. \n# Use Case in n8n: Used in IF nodes, Set nodes, or expressions when you want to check if text includes certain words, patterns, or phrases.\n\n2) split()\n# Meaning: Splits a string into an array based on a separator (like space, comma, etc.).\n# Use Case in n8n: Used when you need to break text into parts \u2014 for example, splitting names, tags, or CSV-like data in a Set node or Function node.\n\n3.1) .startsWith()\n# Meaning: Checks if a string begins with a specific substring. Returns true/false.\n# Use Case in n8n: Used in IF nodes or Set nodes to filter or branch data \u2014 for example, checking if an email, filename, or message starts with a certain prefix.\n\n3.2) .endsWith()\n# Meaning: Checks if a string ends with a specific substring. Returns true/false.\n# Use Case in n8n: Used to detect file types, suffixes, or text endings.\n\n4) .replaceAll()\n# Meaning: Replaces all occurrences of a specific substring inside a string with another value.\n# Use Case in n8n: Used in Set or Function nodes to clean or format text, remove unwanted characters, or standardize data before passing it forward.\n\n5) .length (paramater)\n# Meaning: Returns the number of items in a string or array.\n  \u2022 For strings \u2192 number of characters.\n  \u2022 For arrays \u2192 number of elements.\n# Use Case in n8n: Used to count items or check if something is empty inside IF, Set, or Function nodes.\n\n## EDIT\n6.1) .base64Encode()\n# Meaning: Converts normal text into Base64 format \u2014 a way to represent binary/text data safely (used in APIs, files, images, etc.).\n# Use Case in n8n: Used when you need to encode text before sending it to another service (like an API that expects Base64).\n\n6.2) .base64Decode()\n# Meaning: Converts Base64 back to normal text.\n# Use Case in n8n: Used when you receive encoded data (like from a webhook or API) and need to make it readable or usable again.\n\n7) .concat()\n# Meaning: Joins (concatenates) two or more strings together into one.\n# Use Case in n8n: Used in Set nodes, Function nodes, or expressions to build messages, combine variables, or construct file names, URLs, or IDs dynamically.\n\n8) .extractDomain()\n# Meaning: Extracts the domain name from a URL or email.\n# Use Case in n8n: Used to identify or filter data by website or company domain.\n\n9) .extractEmail()\n# Meaning: Finds and returns an email address inside a text string.\n# Use Case in n8n: Used to clean or extract emails from messages, forms, or logs.\n\n10) .extractUrl()\n# Meaning: Finds and returns the first URL inside a text string.\n# Use Case in n8n: Used when you receive a message or API response containing links.\n\n11) .extractUrlPath()\n# Meaning: Extracts the path part of a URL (everything after the domain).\n# Use Case in n8n: Used to work with API endpoints or clean URLs for routing or analysis.\n\n12) .hash()\n# Meaning: Creates a hash value (a fixed-length encoded string) from your text \u2014 useful for encryption-like purposes or generating unique IDs. (It doesn\u2019t decrypt \u2014 hashing is one-way.)\n# Use Case in n8n: Used when you need to anonymize, verify, or uniquely identify data \u2014 like generating consistent IDs, protecting sensitive info, or checking if data changed.\n\n13) .quote()\n# Meaning: Wraps your string in double quotes (\" \") \u2014 escapes any inner quotes if needed.\n# Use Case in n8n: Used when you need to format text for JSON, logs, or API requests, where strings must be wrapped in quotes.\n\n\n14) .removeMarkdown()\n# Meaning: Removes Markdown formatting from a string \u2014 like **bold**, _italic_, # headers, - lists, links, etc., leaving only plain text.\n# Use Case in n8n: Used when you need clean, plain text for emails, messages, databases, or APIs that don\u2019t support Markdown.\n\n15) .removeTags()\n# Meaning: Removes HTML or XML tags from a string, leaving only plain text.\n# Use Case in n8n: Used when you need clean text from web pages, emails, or API responses that contain HTML.\n\n16) .replace()\n# Meaning: Replaces the first occurrence of a substring or pattern in a string with another value.\n# Use Case in n8n: Used when you want to modify text slightly \u2014 for example, replacing a single word, character, or placeholder before sending it to another node or API.\n\n17) .replaceSpecialChars()\n# Meaning: Replaces special characters (like !@#$%^&*()) with safe alternatives or removes them.\n# Use Case in n8n: Used when preparing clean text for filenames, URLs, IDs, or any system that cannot handle special characters.\n\n18) .slice()\n# Meaning: Returns a part of a string between start and end positions.\n  \u2022 start \u2192 index to begin extraction (0-based).\n  \u2022 end \u2192 index to stop extraction (not included).\n  \u2022 If end is omitted, extracts till the end.\n# Use Case in n8n: Used when you want to extract substrings like IDs, codes, prefixes, or portions of text in a Set or Function node.\n\n19) .substring()\n# Meaning: Returns a portion of a string between two indices.\n  \u2022 start \u2192 index to begin extraction (0-based).\n  \u2022 end \u2192 index to stop extraction (not included).\n  \u2022 Swaps start and end automatically if start > end.\n# Use Case in n8n: Used when you need to extract specific parts of text, like IDs, codes, or sections of a string in a Set or Function node.\n\n20) .toJsonString()\n# Meaning: Converts a JavaScript object or value into a JSON-formatted string.\n# Use Case in n8n: Used when you need to send data as JSON in HTTP requests, API calls, or logs, or when storing structured data as a single string.\n\n\n\n21) .trim()\n# Meaning: Removes whitespace from the start and end of a string.\n  \u2022 Does not remove spaces in the middle.\n# Use Case in n8n: Used when you need clean, trimmed text before saving, comparing, or sending data in Set, Function, or IF nodes.\n\n22.1) .trimStart()\n# Meaning: Removes whitespace only from the start of a string.\n# Use Case in n8n: Used when you want to clean leading spaces but keep trailing spaces intact.\n\n22.2) .trimEnd()\n# Meaning: Removes whitespace only from the end of a string.\n# Use Case in n8n: Used when you want to clean trailing spaces but keep leading spaces intact.\n\n23.1) .urlEncode()\n# Meaning: Converts a string into a URL-safe format, replacing spaces and special characters with % encoding.\n# Use Case in n8n: Used when sending data in query parameters or HTTP requests where URLs must be properly encoded.\n\n23.2) .urlDecode()\n# Meaning: Converts a URL-encoded string back into normal text.\n# Use Case in n8n: Used when receiving URL-encoded data from webhooks, APIs, or query parameters to make it readable or processable.\n\n24) .indexOf()\n# Meaning: Returns the position (index) of the first occurrence of a substring in a string.\n  \u2022 Returns -1 if the substring is not found.\n  \u2022 Indexing starts at 0.\n# Use Case in n8n: Used to check if a substring exists and find its position in a string \u2014 useful in IF nodes, Function nodes, or when manipulating text.\n\n25) .lastIndexOf()\n# Meaning: Returns the position (index) of the last occurrence of a substring in a string.\n  \u2022 Returns -1 if the substring is not found.\n  \u2022 Indexing starts at 0.\n# Use Case in n8n: Used when you want to find the last appearance of a word or character \u2014 useful in IF nodes, Function nodes, or text manipulation before slicing or extracting.\n\n26) .match() (https://regex101.com/)\n# Meaning: Searches a string for a pattern (usually a regular expression) and returns matches.\n  \u2022 Returns an array of matches or null if none found.\n# Use Case in n8n: Used when you need to extract specific patterns from text \u2014 like emails, phone numbers, codes, or any regex-based data \u2014 inside Function or Set nodes.\n\n27) .search()\n# Meaning: Searches a string for a pattern (string or regex) and returns the index of the first match.\n  \u2022 Returns -1 if the pattern is not found.\n# Use Case in n8n: Used when you want to find the position of a keyword or pattern in a string, often for IF node conditions or text processing.\n\n28) .isDomain()\n# Meaning: Checks if a string is a valid domain name (like example.com).\n  \u2022 Returns true if it is a valid domain, false otherwise.\n# Use Case in n8n: Used when you want to validate or filter domain names from URLs, emails, or user input \u2014 often in IF nodes or Function nodes.\n\n29) .isUrl()\n# Meaning: Checks if a string is a valid URL. Returns true/false.\n# Use Case in n8n: Used to validate URLs from webhooks, forms, or API responses before processing or routing in workflow nodes.\n\n30) .isEmail()\n# Meaning: Checks if a string is a valid email address. Returns true/false.\n# Use Case in n8n: Validate email inputs from forms, webhooks, or APIs before processing.\n\n31) .isEmpty()\n# Meaning: Checks if a string is empty (\"\") or only contains whitespace.\n# Use Case in n8n: Validate if a field has no content before sending, saving, or branching logic.\n\n32) .isNotEmpty()\n# Meaning: Checks if a string has content (opposite of .isEmpty()).\n# Use Case in n8n: Validate that a field contains meaningful data before proceeding.\n\n33) .isNumeric()\n# Meaning: Checks if a string represents a number (integer or decimal).\n# Use Case in n8n: Used to validate numeric input before calculations, database insertion, or API calls.\n\n34) .toLowerCase()\n# Meaning: Converts all letters in a string to lowercase.\n# Use Case in n8n: Used to normalize text for comparisons, searches, or consistent formatting in Set, Function, or IF nodes.\n\n35) .toUpperCase()\n# Meaning: Converts all letters in a string to uppercase.\n# Use Case in n8n: Used to normalize text or emphasize values for consistent formatting in Set, Function, or IF nodes.\n\n36) .toSentenceCase()\n# Meaning: Converts a string so that the first letter of the sentence is uppercase and the rest are lowercase.\n# Use Case in n8n: Used to format text neatly for messages, emails, or database entries in Set or Function nodes.\n\n37) .toSnakeCase()\n# Meaning: Converts a string to snake_case \u2014 lowercase words separated by underscores (_).\n# Use Case in n8n: Used when you need consistent naming for variables, filenames, database fields, or API parameters.\n\n38) .toTitleCase()\n# Meaning: Converts a string so that the first letter of each word is uppercase and the rest are lowercase.\n# Use Case in n8n: Used to format names, titles, or headings in Set or Function nodes for better readability and presentation.\n\n39) .parseJson()\n# Meaning: Converts a JSON-formatted string into a JavaScript object.\n# Use Case in n8n: Used when receiving JSON as a string (from APIs, webhooks, or text fields) and you need to access its properties.\n\n40) .toBoolean()\n# Meaning: Converts a string like \"true\"/\"false\" or numbers \"0\"/\"1\" into a Boolean value.\n# Use Case in n8n: Useful for IF nodes or logic operations where the input is a string but needs to be treated as true/false.\n\n41) .toDateTime()\n# Meaning: Converts a string into a Date object.\n# Use Case in n8n: Used when parsing dates from text, webhooks, or API responses for comparisons, filtering, or formatting.\n\n42) .toNumber()\n# Meaning: Converts a string into a numeric value (integer or decimal).\n# Use Case in n8n: Useful for calculations, comparisons, or numeric validation when input comes as a string.\n",
+              "type": "string"
+            },
+            {
+              "id": "d449ca94-d9ca-4820-b779-c14f148904d5",
+              "name": "includes_Ex",
+              "value": "={{ $json.string.includes('h') }}\n{{ $json.string.includes('X') }}",
+              "type": "string"
+            },
+            {
+              "id": "039f7205-a85c-4fed-b697-d870884bee2c",
+              "name": "split_Ex",
+              "value": "={{ $json.string.split(\"ll\") }}",
+              "type": "string"
+            },
+            {
+              "id": "fdd550bb-d50c-49bd-b482-3a68eecaef70",
+              "name": "startsWith_endsWith_Ex",
+              "value": "={{ $json.string.startsWith(\"h\")}}\n{{ $json.string.startsWith(\"x\")}}\n{{ $json.string.endsWith(\"!\") }}\n{{ $json.string.endsWith(\"x\") }}",
+              "type": "string"
+            },
+            {
+              "id": "62a2d3fe-dac9-475e-97e8-dbe07ce3c699",
+              "name": "replaceall_Ex",
+              "value": "={{ $json.string.replaceAll(\"l\",\"w\") }}",
+              "type": "string"
+            },
+            {
+              "id": "3257b0a5-6530-4c57-991d-9df044b29436",
+              "name": "length_Ex",
+              "value": "={{$json.string.length}}\n{{ $json.array.length }}",
+              "type": "string"
+            },
+            {
+              "id": "34db21d1-843d-43ce-a345-7bcfe2d6b836",
+              "name": "base64Encode_base64Decode_Ex",
+              "value": "={{ $json.string.base64Encode() }}\n{{ $json.string.base64Encode().base64Decode() }}",
+              "type": "string"
+            },
+            {
+              "id": "b3f1283b-97d3-4230-9194-df0249b7fabf",
+              "name": "concat_EX",
+              "value": "={{ $json.string.concat(\" world!\") }}\n{{ $json.string.concat([\" world!\",\" how are you!\" ]) }}\n",
+              "type": "string"
+            },
+            {
+              "id": "4c6cf910-77b6-4bc0-856b-c6510baa5aae",
+              "name": "Extract_Ex",
+              "value": "={{\"https://openai.com/blog\".extractDomain()}}\n{{ \"Contact us at info@pioneers.com\".extractEmail() }}\n{{ \"Check this: https://pioneers.ai/courses\".extractUrl() }}\n{{ \"https://pioneers.ai/courses/python\".extractUrlPath() }}",
+              "type": "string"
+            },
+            {
+              "id": "658cbd5a-a7b6-425d-b891-9f979d146997",
+              "name": "hash_Ex",
+              "value": "={{ $json.string.hash() }}",
+              "type": "string"
+            },
+            {
+              "id": "28c2e70a-94e1-425d-9698-59564750aefc",
+              "name": "quote_Ex",
+              "value": "={{'my name is \"Mohammad\"'.quote('_')}}",
+              "type": "string"
+            },
+            {
+              "id": "da174e1b-7c68-4373-b840-7638ee791db5",
+              "name": "removeMarkdown_Ex",
+              "value": "={{ ' ## Title **Hello** _World_'.removeMarkdown() }}",
+              "type": "string"
+            },
+            {
+              "id": "793b6d9a-ce03-4289-b5b3-d10215c632ab",
+              "name": "removeTags_Ex",
+              "value": "={{\"<p>Hello <b>World!</b></p>\".removeTags()}}",
+              "type": "string"
+            },
+            {
+              "id": "13ef559a-bed1-4a6e-85a3-0e512d5e8322",
+              "name": "replace_Ex",
+              "value": "={{ $json.string.replace('l','w') }}",
+              "type": "string"
+            },
+            {
+              "id": "d08a922a-8fc4-4a6d-802a-7570f1c1720e",
+              "name": "replaceSpecialChars_Ex",
+              "value": "={{ \"d\u00e9j\u00e0\".replaceSpecialChars() }}",
+              "type": "string"
+            },
+            {
+              "id": "91675adf-532b-47b7-ab53-1e973b21ec7b",
+              "name": "slice_Ex",
+              "value": "={{ $json.string.slice(0,4) }}",
+              "type": "string"
+            },
+            {
+              "id": "311dbef6-c35a-48b9-af73-5f19c86e73d1",
+              "name": "trim_start_endEx",
+              "value": "={{ \"   Mohammad   \".trim() }}\n{{ \"\\n\\n\\t Mohammad   \".trim() }}\n{{ \"   Mohammad   \".trimStart() }}\n{{ \"\\n\\n\\t Mohammad   \".trimEnd() }}",
+              "type": "string"
+            },
+            {
+              "id": "c31aaf42-9379-4725-b477-709252f2f649",
+              "name": "urlEncode_urlDecode_ex",
+              "value": "={{ \"https://openai.com/mohammad ismail\".urlEncode() }}\n{{ \"https://openai.com/mohammad ismail\".urlEncode().urlDecode() }}",
+              "type": "string"
+            },
+            {
+              "id": "6c53101a-b797-4d1a-87fb-a002d433095e",
+              "name": "indexOf_Ex",
+              "value": "={{ $json.string.indexOf('l') }}\n{{ $json.string.indexOf('x') }}\n",
+              "type": "string"
+            },
+            {
+              "id": "8818d9f3-2a7a-482f-a659-70befb0ec1e8",
+              "name": "lastindexOf_Ex",
+              "value": "={{ $json.string.lastIndexOf('l') }}\n{{ $json.string.lastIndexOf('x') }}",
+              "type": "string"
+            },
+            {
+              "id": "26012d76-fb0a-444d-87ec-e147c8b8b1a3",
+              "name": " match_Ex",
+              "value": "={{\"hay man, how are you doing today?\".match(/hay/)}}",
+              "type": "string"
+            },
+            {
+              "id": "1fc447ac-e846-4e06-af51-d913c616fa75",
+              "name": "search_Ex",
+              "value": "={{ \"say hello world\".search(\"hello\") }}",
+              "type": "string"
+            },
+            {
+              "id": "03e0b8eb-5814-418f-b08a-1b43eb180187",
+              "name": "isDomain_Ex",
+              "value": "={{ \"openai.com\".isDomain() }}",
+              "type": "string"
+            },
+            {
+              "id": "481f3964-7c1e-448d-b848-1e334e577655",
+              "name": "isUrl_Ex",
+              "value": "={{ \"https://openai.com/\".isUrl() }}",
+              "type": "string"
+            },
+            {
+              "id": "2b89bb36-495a-4500-b7f2-74e9d271701c",
+              "name": "isEmail_Ex",
+              "value": "={{ \"user@example.com\".isEmail() }}",
+              "type": "string"
+            },
+            {
+              "id": "b91d7562-1fb8-4197-8653-dc9ba71b2f94",
+              "name": "isEmpty_isNotEmpty_Ex",
+              "value": "={{ \"\".isEmpty() }}\n{{ \"Mohammad\".isNotEmpty() }}",
+              "type": "string"
+            },
+            {
+              "id": "f01c768e-71ec-406b-b15e-1037a1f0f838",
+              "name": "isNumeric_Ex",
+              "value": "={{ \"3.522635\".isNumeric() }}",
+              "type": "string"
+            },
+            {
+              "id": "4e14e7ae-7fc5-46de-9de6-cb7ead8aaf2a",
+              "name": "toLowerCase_Ex",
+              "value": "={{ \"My Name Is Mohammad ISmail\".replaceAll(\" \",\"-\").toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "2bbf1f94-add5-40a2-b393-89bcc9f7a99f",
+              "name": "toUpperCase_Ex",
+              "value": "={{ \"My Name Is Mohammad ISmail\".replaceAll(\" \",\"-\").toUpperCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "e645e10c-450e-4839-a740-1064a55f17fb",
+              "name": "toSentenceCase_Ex",
+              "value": "={{ \"mohammad iSmail\".toSentenceCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "c3549552-ec16-4d09-acfe-f94fc4d8ad8d",
+              "name": "toSnakeCase_Ex",
+              "value": "={{ \"Mohammad iSmail\".toSnakeCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "89f23681-6a26-4046-9283-2b99461e2574",
+              "name": "toTitleCase_Ex",
+              "value": "={{ \"hello world from n8n\".toTitleCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "acd3a533-b006-4d7f-8dc4-9787b3684bd4",
+              "name": "parseJson_ex",
+              "value": "={{\"{\\\"name\\\":\\\"mohammad\\\"}\".parseJson().name }}",
+              "type": "string"
+            },
+            {
+              "id": "071695b9-ad14-4bb1-9399-0137cd93f231",
+              "name": "toBoolean_Ex",
+              "value": "={{ '1'.toBoolean() }}\n{{ '0'.toBoolean() }}",
+              "type": "string"
+            },
+            {
+              "id": "a8a933b4-a13e-4f1b-8990-0f6705aa0c74",
+              "name": "toDateTime_Ex",
+              "value": "={{ \"10/18/2025\".toDateTime().toLocaleString() }}",
+              "type": "string"
+            },
+            {
+              "id": "07daa1e2-9b81-4d82-8692-42a9285141ab",
+              "name": "toNumber_Ex",
+              "value": "={{ \"2025\".toNumber()+5 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        32
+      ],
+      "id": "804d2878-f549-4fdb-b278-9587d8821d61",
+      "name": "String_Functions_Summary"
+    },
+    {
+      "parameters": {
+        "content": "## SUGGESTED\n{{ $json.string.includes() }}\n{{ $json.string.split() }}\n{{ $json.string.startsWith() }}\n{{ $json.string.endsWith() }}\n{{ $json.string.replaceAll() }}\n{{ $json.string.length }}\n\n## EDIT\n{{ $json.string.base64Decode() }}\n{{ $json.string.base64Encode() }}\n{{ $json.string.concat() }}\n{{ $json.string.extractDomain() }}\n{{ $json.string.extractEmail() }}\n{{ $json.string.extractUrl() }}\n{{ $json.string.extractUrlPath() }}\n{{ $json.string.hash() }}\n{{ $json.string.quote() }}\n{{ $json.string.removeMarkdown() }}\n{{ $json.string.removeTags() }}\n{{ $json.string.replace() }}\n{{ $json.string.replaceAll() }}\n{{ $json.string.replaceSpecialChars() }}\n{{ $json.string.slice() }}\n{{ $json.string.split() }}\n{{ $json.string.substring() }}\n{{ $json.string.toJsonString() }}\n{{ $json.string.trim() }}\n{{ $json.string.trimEnd() }}\n{{ $json.string.trimStart() }}\n{{ $json.string.urlDecode() }}\n{{ $json.string.urlEncode() }}\n\n",
+        "height": 736,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "3ea28030-3864-4aed-85cb-7ef41a26b45b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75f61d3d-5bc6-4186-b95e-0ab064e1ceb8",
+              "name": "Summay",
+              "value": "1) .round()\n# Meaning: Rounds a number to the nearest integer.\n# Use Case in n8n: Used when you need whole numbers for calculations, display, or IDs in Set or Function nodes.\n\n2) .floor()\n# Meaning: Rounds a number down to the nearest integer.\n# Use Case in n8n: Used when you want to always drop decimals (e.g., inventory, pricing, or indexing).\n\n3) .ceil()\n# Meaning: Rounds a number up to the nearest integer.\n# Use Case in n8n: Used when you want to always round up (e.g., shipping costs, quotas, or limits).\n\n4) .abs()\n# Meaning: Returns the absolute value of a number (removes the negative sign).\n# Use Case in n8n: Used when you need only positive numbers for calculations, differences, or comparisons in Set or Function nodes.\n\n5) .format()\n# Meaning: Formats a number into a string with specified formatting, like decimal places, commas, or currency symbols.\n# Use Case in n8n: Used when you want to display numbers in a readable or standardized way in emails, messages, or reports.\n\n6.1) .isOdd()\n# Meaning: Checks if a number is odd. Returns true or false.\n# Use Case in n8n: Used when you want to branch workflow logic based on odd numbers (e.g., alternating actions, validations).\n\n6.2) .isEven()\n# Meaning: Checks if a number is even. Returns true or false.\n# Use Case in n8n: Used when you want to branch workflow logic based on even numbers.\n\n7) .isInteger()\nMeaning: Checks if a number is a whole number (no decimals). Returns true or false.\nUse Case in n8n: Used to validate numeric input before processing, storing in databases, or performing calculations that require integers.\n\n8) .toBoolean()\n# Meaning: Converts a number into a Boolean:\n  \u2022 0 \u2192 false\n  \u2022 Any other number \u2192 true\n# Use Case in n8n: Used for conditional logic when numbers determine workflow decisions.\n\n9) .toDateTime() (https://www.unixtimestamp.com/) add 000 after the time stamp\n# Meaning: Converts a number (timestamp) into a Date object.\n# Use Case in n8n: Used when handling timestamps from APIs or databases and converting them for filtering, formatting, or comparisons.\n\n10) .toLocaleString()\n# Meaning: Formats a number into a string with locale-specific formatting (commas, decimals, etc.).\n# Use Case in n8n: Used when displaying numbers readably in messages, emails, reports, or dashboards.\n\n11) .toString()\n# Meaning: Converts a number into a string.\n# Use Case in n8n: Used when you need to combine numbers with text, send them to APIs, or store as string values.\n",
+              "type": "string"
+            },
+            {
+              "id": "ebea560f-1e23-43ef-a11e-484c6773244d",
+              "name": "round_Ex",
+              "value": "={{ $json.number.round() }}",
+              "type": "number"
+            },
+            {
+              "id": "24df1890-6fd7-4212-9b4f-91cdbbfb62cf",
+              "name": "floor_Ex",
+              "value": "={{ $json.number.floor() }}",
+              "type": "number"
+            },
+            {
+              "id": "e0163976-7f53-49b8-9d73-1f060596e034",
+              "name": "ceil_Ex",
+              "value": "={{ $json.number.ceil() }}",
+              "type": "number"
+            },
+            {
+              "id": "9f874fb1-3914-4cee-bea6-4eba2a16865e",
+              "name": "abs_Ex",
+              "value": "={{ (-16).abs()+100 }}",
+              "type": "number"
+            },
+            {
+              "id": "8a008e98-a116-4bb4-8010-fe3508e8b75e",
+              "name": "format_Ex",
+              "value": "={{(962787499976).format('fr-FR') }}",
+              "type": "string"
+            },
+            {
+              "id": "b754b827-bcfb-425e-8b3d-7de8e4f6cb6f",
+              "name": "isInteger_Ex",
+              "value": "={{ (10).isInteger() }}",
+              "type": "string"
+            },
+            {
+              "id": "0011120a-ba84-45a3-9f95-6f5c13c4e4d0",
+              "name": "isEven_isOdd_Ex",
+              "value": "={{ (10).isEven()}}\n{{ (10).isOdd() }}",
+              "type": "number"
+            },
+            {
+              "id": "644d95a4-e761-4892-84fd-249edeb83b18",
+              "name": "toBoolean_Ex",
+              "value": "={{ (0).toBoolean()}} \n{{ (100).toBoolean()}} ",
+              "type": "number"
+            },
+            {
+              "id": "8bd44b5a-fef0-4d76-882d-ef4fb88fe5ea",
+              "name": "toDateTime_Ex",
+              "value": "={{ (1760791902000).toDateTime('ms') }}",
+              "type": "number"
+            },
+            {
+              "id": "5eb5b0a3-71fc-4bff-9c31-d4c907ac5e16",
+              "name": "toLocalString_Ex",
+              "value": "={{ (50050304).toLocaleString().concat(\" mohammad\") }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        208
+      ],
+      "id": "6eb89587-c02f-4ba3-9b0c-dd416e250546",
+      "name": "Number_Functions_Summary"
+    },
+    {
+      "parameters": {
+        "content": "## SUGGESTED\n\n{{ $json.number.round() }}\n{{ $json.number.floor() }}\n{{ $json.number.ceil() }}\n\n## METHODS\n\n{{ $json.number.abs() }}\n{{ $json.number.ceil() }}\n{{ $json.number.floor() }}\n{{ $json.number.format() }}\n{{ $json.number.isEven() }}\n{{ $json.number.isOdd() }}\n{{ $json.number.isInteger() }}\n{{ $json.number.round() }}\n{{ $json.number.toBoolean() }}\n{{ $json.number.toDateTime() }}\n{{ $json.number.toLocaleString() }}\n{{ $json.number.toString() }}",
+        "height": 464,
+        "width": 352,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        592,
+        96
+      ],
+      "id": "313fef3d-c49b-4d36-823c-8675745b9f21",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## QUERY\n{{ $json.string.endsWith() }}\n{{ $json.string.includes() }}\n{{ $json.string.indexOf() }}\n{{ $json.string.lastIndexOf() }}\n{{ $json.string.length }}\n{{ $json.string.match() }}\n{{ $json.string.search() }}\n{{ $json.string.startsWith() }}\n\n##  VALIDATE\n{{ $json.string.isDomain() }}\n{{ $json.string.isEmail() }}\n{{ $json.string.isEmpty() }}\n{{ $json.string.isNotEmpty() }}\n{{ $json.string.isNumeric() }}\n{{ $json.string.isUrl() }}\n\n## CASE\n{{ $json.string.toLowerCase() }}\n{{ $json.string.toSentenceCase() }}\n{{ $json.string.toSnakeCase() }}\n{{ $json.string.toTitleCase() }}\n{{ $json.string.toUpperCase() }}\n\n## CAST\n{{ $json.string.parseJson() }}\n{{ $json.string.toBoolean() }}\n{{ $json.string.toDateTime() }}\n{{ $json.string.toNumber() }}",
+        "height": 736,
+        "width": 272
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        304,
+        96
+      ],
+      "id": "78cb66bd-56a9-4e47-ac1f-1565a964bfe5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# String Functions",
+        "height": 80,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3c71dd71-f46a-4252-addc-262e85e839c0",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Number Functions",
+        "height": 80,
+        "width": 352,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        592,
+        0
+      ],
+      "id": "4f9ea2f4-f8b4-4cc2-b4c9-ee3062e1eeff",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9dac7e8e-9ecf-4bef-8770-73cd417f2b0f",
+              "name": "Summary",
+              "value": "1) .length\n# Meaning:Returns the number of elements in the array.\n# Use Case in n8n: Used to check array size before looping, filtering, or making decisions in IF or Function nodes.\n\n2.1) .first() \n# Meaning: Returns the first element of an array.\n# Use Case in n8n: Used when you want the earliest item or first value in a list, often for processing or routing in Set, Function, or IF nodes.\n\n2.2) .last()\n# Meaning: Returns the last element of the array.\n# Use Case in n8n: Used when you want the most recent item or last value in a list.\n\n3) .includes()\n# Meaning: Checks if the array contains a specific value. Returns true/false.\n# Use Case in n8n:Used to validate or filter data before proceeding in a workflow.\n\n4) .map(item => item)\n# Meaning: Creates a new array by transforming each element using a function.\n# Use Case in n8n: Used to modify array elements before passing to other nodes.\n\n5) .filter(item => true)\n# Meaning: Creates a new array with elements that match a condition.\n# Use Case in n8n: Used to remove unwanted items or keep only certain values in a workflow.\n\n6) .append(value) arrays can take multiple data types.\n# Meaning: Adds one or more elements to the end of an array.\n# Use Case in n8n: Used to dynamically add items to an array during workflow execution, for example when collecting results from multiple nodes before sending or processing them.\n\n7) .chunk(size)\n# Meaning: Splits an array into **smaller arrays** (chunks) of a specified size.\n# Use Case in n8n: Used when you need to **process or send array data in batches**, for example sending API requests in groups or handling large datasets step by step.\n\n8) .compact()\n# Meaning: Removes **falsy values** (`null`, `undefined`, `false`, `0`, `\"\"`, `NaN`) from an array.\n# Use Case in n8n: Used to **clean arrays** before processing, ensuring that only meaningful values are passed to other nodes.\n\n9) .concat(array2)\n# Meaning: Combines the **original array** with one or more arrays or values into a **new array**.\n# Use Case in n8n: Used to **merge multiple arrays** or add extra elements before sending data to other nodes or APIs.\n\n10) .difference(array2)\n# Meaning: Returns a new array containing elements from the **original array** that are **not present** in `array2`.\n# Use Case in n8n: Used to **filter out unwanted or duplicate items** when comparing arrays, for example removing already processed IDs or tasks.\n\n11) .find(item => true)\n# Meaning: Returns the **first element** in the array that **matches a condition** defined in the callback function.\n# Use Case in n8n: Used to **locate a specific item** in an array based on a condition, often for routing or extracting data in Function or IF nodes.\n\n12) .indexOf(value)\n# Meaning: Returns the **index (position)** of the **first occurrence** of a value in an array. Returns `-1` if the value is not found.\n# Use Case in n8n: Used to **check the position of an element** in an array or to determine if it exists before performing actions in IF or Function nodes.\n\n13) .intersection(array2)\n# Meaning: Returns a new array containing elements that are present in both arrays.\n# Use Case in n8n: Used to find common items between arrays, for example matching IDs, tags, or values from multiple sources.\n\n14.1) .isEmpty()\n# Meaning: Checks if an array **has no elements**. Returns `true` if empty, `false` otherwise.\n# Use Case in n8n: Used to **validate or branch workflow logic** based on whether an array contains any data.\n\n14.2) .isNotEmpty()\n# Meaning: Checks if an array **contains one or more elements**. Returns `true` if not empty, `false` otherwise.\n# Use Case in n8n: Used to **ensure there is data to process** before performing actions in Function or IF nodes.\n\n15) .join(separator)\n# Meaning: Converts an array into a **string**, joining elements with the specified separator (default is `,`).\n# Use Case in n8n: Used to **create a string from array elements**, for example sending CSV data or concatenating values for messages.\n\n\n16) .merge(array2)\n# Meaning: Combines the **original array** with another array into a **single array**.\n# Use Case in n8n: Used to **combine multiple arrays** before processing or sending to another node.\n\n17) .pluck(key)\n# Meaning: Extracts a specific **property value** from each object in an array.\n# Use Case in n8n: Used to **get a list of specific fields** from an array of objects.\n\n18) .randomItem()\n# Meaning: Returns a **random element** from the array.\n# Use Case in n8n: Used to **pick random items** for testing, sampling, or dynamic workflows.\n\n19) .reduce(item => item)\n# Meaning: Reduces the array to a **single value** using a function.\n# Use Case in n8n: Used to **aggregate array elements**, like summing numbers or concatenating strings.\n\n20) .renameKeys(mapping)\n# Meaning: Renames keys in an array of objects according to a **mapping object**.\n# Use Case in n8n: Used to **standardize or transform object keys** before sending to APIs or databases.\n\n21) .reverse()\n# Meaning: Reverses the **order of elements** in the array.\n# Use Case in n8n: Used to **process items from last to first** or reorder arrays for display.\n\n22) .slice(start, end)\n# Meaning: Returns a **portion of the array** from `start` to `end` (exclusive).\n# Use Case in n8n: Used to **extract specific segments** of an array for processing.\n\n23) .smartJoin(separator)\n# Meaning: Joins array elements into a **readable string** with smart separators (like commas and \u201cand\u201d).\n# Use Case in n8n: Used to **format array elements** nicely for messages or notifications.\n\n24) .sort(compareFn)\n# Meaning: Sorts the array **based on a comparison function**.\n# Use Case in n8n: Used to **order array elements** before processing or output.\n\n25) .toJsonString()\n# Meaning: Converts the array into a **JSON string**.\n# Use Case in n8n: Used when sending arrays to APIs or storing in text fields as JSON.\n\n26) .toSpliced(start, deleteCount, ...items)\n# Meaning: Creates a **new array** with elements **added/removed** at a specific position (does not mutate original).\n# Use Case in n8n: Used to **insert or remove items** from an array without changing the original data.\n\n27) .union(array2)\n# Meaning: Returns a new array containing **all unique elements** from both arrays.\n# Use Case in n8n: Used to **merge arrays** while avoiding duplicates.\n\n28) .unique()\n# Meaning: Returns a new array containing **only unique elements** (removes duplicates).\n# Use Case in n8n: Used to **clean arrays** and ensure no repeated values before processing.",
+              "type": "string"
+            },
+            {
+              "id": "48764d8c-89bd-4b26-b495-a70c40a3993e",
+              "name": "length_Ex",
+              "value": "={{ $json.array.length }}",
+              "type": "array"
+            },
+            {
+              "id": "808b777d-1d6c-4463-8214-8932d1f2dadb",
+              "name": "last_first_Ex",
+              "value": "={{ $json.array.first() }}\n{{ $json.array.last() }}",
+              "type": "array"
+            },
+            {
+              "id": "ddcab609-6339-4c6c-b26d-120a4cfd108e",
+              "name": "includes_Ex",
+              "value": "={{ $json.array.includes('Mohammad') }}\n{{ $json.array.includes('ABCD') }}\n",
+              "type": "array"
+            },
+            {
+              "id": "389df873-43af-402e-99b3-ab110b492739",
+              "name": "append_Ex",
+              "value": "={{ $json.array.append('Hassan') }}\n{{ $json.array.append([\"Hassan\",\"mahdi\",5]) }}",
+              "type": "array"
+            },
+            {
+              "id": "b4e5c3a1-7c73-4ca2-a315-06faba4862c5",
+              "name": "chunk_Ex",
+              "value": "={{ $json.array.chunk(2) }}",
+              "type": "array"
+            },
+            {
+              "id": "b69db277-8fd3-49f5-a0f8-3f27620570b5",
+              "name": "compact_Ex",
+              "value": "={{ [1,2,'',4,5,6].compact() }}",
+              "type": "array"
+            },
+            {
+              "id": "0a0b3662-036d-4a91-a245-f6e512614b15",
+              "name": "concat_Ex",
+              "value": "={{ [1,2,3,4,5,6].concat([7,8,9]) }}",
+              "type": "array"
+            },
+            {
+              "id": "c1c69683-9320-4da8-b0a1-b5226ff5e4fc",
+              "name": "difference_Ex",
+              "value": "={{ [1,2,3,4,5].difference([1,2,3]) }}",
+              "type": "array"
+            },
+            {
+              "id": "1a07000d-19a3-47f1-89cf-ba17ef37cf90",
+              "name": "find_Ex",
+              "value": "={{ $json.array.find(item => item.length > 6) }}",
+              "type": "array"
+            },
+            {
+              "id": "14b73428-fe26-44cb-ad03-edeab015db4b",
+              "name": "indexOf_Ex",
+              "value": "={{ $json.array.indexOf(\"Mohammad\") }}",
+              "type": "array"
+            },
+            {
+              "id": "05cb28bb-5d78-4403-8caa-2df45d093e50",
+              "name": "intersection_Ex",
+              "value": "={{ [1,2,3,4,5].intersection([3,4,5,6,7,8,9]) }}",
+              "type": "array"
+            },
+            {
+              "id": "b630ec83-1d5b-4859-b945-6abf424be328",
+              "name": "isEmpty_isNotEmpty_Ex",
+              "value": "={{ [].isEmpty() }}\n{{ [].isNotEmpty() }}",
+              "type": "array"
+            },
+            {
+              "id": "2fb20151-1308-4fe8-ac6b-e08a76de67f0",
+              "name": "join_Ex",
+              "value": "={{ $json.array.join(' | ') }}",
+              "type": "array"
+            },
+            {
+              "id": "65834cfd-10e8-4670-b33e-1cbc6e13aaef",
+              "name": "merge_Ex",
+              "value": "={{ \n[\n  {\"name\":\"mohammad\"},\n  {\"city\":\"amman\"},\n  {\"hight\":169}\n].merge() \n}}",
+              "type": "array"
+            },
+            {
+              "id": "cb805225-6d5f-40d7-9086-aa0b03c2d4da",
+              "name": "pluck_Ex",
+              "value": "={{[ \n  {\"name\":\"mohammad\"}, \n  {\"city\":\"amman\"},\n  {\"hight\":169} \n].pluck(\"name\")\n}}",
+              "type": "array"
+            },
+            {
+              "id": "834514de-afea-457e-af26-6bf25aed16a9",
+              "name": "randomItem_Ex",
+              "value": "={{ $json.array.randomItem() }}",
+              "type": "array"
+            },
+            {
+              "id": "3fb5ccc5-9b01-49db-a141-3814f8f0b45b",
+              "name": "reverse_Ex",
+              "value": "={{ $json.array.reverse() }}",
+              "type": "array"
+            },
+            {
+              "id": "ed2303e3-decd-4eea-b668-1aa984bb88dc",
+              "name": "slice_Ex",
+              "value": "={{ $json.array.slice(1,3) }}",
+              "type": "array"
+            },
+            {
+              "id": "a8445adf-d41a-475c-866d-a6fbc1ec8a73",
+              "name": "smartJoin_Ex",
+              "value": "={{ [{ field: 'age', value: 2 }, { field: 'city', value: 'Berlin' }].smartJoin('field', 'value') }}",
+              "type": "array"
+            },
+            {
+              "id": "8af591af-a007-4306-9af9-a9fa101fd499",
+              "name": "sort_Ex",
+              "value": "={{ $json.array.sort() }}\n{{ [4,5,7,4,3,7,9,0].sort() }}",
+              "type": "array"
+            },
+            {
+              "id": "5a751392-0d4e-4e18-9f15-116bf3b35061",
+              "name": "toJsonString_Ex",
+              "value": "={{ $json.array.toJsonString()}}",
+              "type": "array"
+            },
+            {
+              "id": "a039a24b-f15e-481d-8c40-5219a3fe5a20",
+              "name": "toSpliced_Ex",
+              "value": "={{ $json.array.toSpliced(2,3,\"hassan\") }}",
+              "type": "array"
+            },
+            {
+              "id": "7c3d6b6b-0385-407f-a682-9572077bbd7f",
+              "name": "union_Ex",
+              "value": "={{ [1,2,3,4,5].union([3,4,5,6,8]) }}",
+              "type": "array"
+            },
+            {
+              "id": "bc84bfee-5150-4ca9-80ed-dc07c4267af5",
+              "name": "unique_Ex",
+              "value": "={{ [1,2,4,6,7,4,6,7].unique() }}",
+              "type": "array"
+            },
+            {
+              "id": "0a0733fe-c5a9-4c57-912d-f73fb3b0c826",
+              "name": " map_Ex_1",
+              "value": "={{ $json.array.map(i => i.concat(\"@gmail.com\").toLowerCase()) }}",
+              "type": "array"
+            },
+            {
+              "id": "90766e88-578d-4b71-82e6-229df3135b10",
+              "name": "map_Ex_2",
+              "value": "={{ [1,2,3,4,5,6].map(i => i*5) }}",
+              "type": "string"
+            },
+            {
+              "id": "a978f583-028b-46e3-895a-3d0a199b8ea1",
+              "name": "filter_Ex",
+              "value": "={{ [1,2,3,4].filter(i => i >= 3) }}",
+              "type": "string"
+            },
+            {
+              "id": "a161a160-5676-4bb6-a323-ade753f090d9",
+              "name": "",
+              "value": "={{ [1,2,3,4,5].reduce((a, b) => a+b) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        416
+      ],
+      "id": "76829e57-4a75-4f37-816b-d5b48888b4b8",
+      "name": "Array_Functions_Summary"
+    },
+    {
+      "parameters": {
+        "content": "## SUGGESTED\n{{ $json.array.length }}\n{{ $json.array.last() }}\n{{ $json.array.includes() }}\n{{ $json.array.map(item => item) }}\n{{ $json.array.filter(item => true) }}\n \n## OTHER\n{{ $json.array.append() }}\n{{ $json.array.chunk() }}\n{{ $json.array.compact() }}\n{{ $json.array.concat() }}\n{{ $json.array.difference() }}\n{{ $json.array.find(item => true) }}\n{{ $json.array.first() }}\n{{ $json.array.indexOf() }}\n{{ $json.array.intersection() }}\n{{ $json.array.isEmpty() }}\n{{ $json.array.isNotEmpty() }}\n{{ $json.array.join() }}\n{{ $json.array.merge() }}\n{{ $json.array.pluck() }}\n{{ $json.array.randomItem() }}\n{{ $json.array.reduce(item => item) }}\n{{ $json.array.renameKeys() }}\n{{ $json.array.reverse() }}\n{{ $json.array.slice() }}\n{{ $json.array.smartJoin() }}\n{{ $json.array.sort() }}\n{{ $json.array.toJsonString() }}\n{{ $json.array.toSpliced() }}\n{{ $json.array.union() }}\n{{ $json.array.unique() }}",
+        "height": 672,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        96
+      ],
+      "id": "8e0cc927-d24e-4886-ab88-b7090d0d7af1",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Array Functions",
+        "height": 80,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "d0a36521-0fc6-411c-b229-c059219e9a01",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Object Functions",
+        "height": 80,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        0
+      ],
+      "id": "41d915e3-b711-4073-927c-d24e93ac393a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## SUGGESTED METHODS\n{{ $json.object.keys() }}\n{{ $json.object.values() }}\n{{ $json.object.isEmpty() }}\n{{ $json.object.hasField() }}\n\n## OTHER METHODS\n{{ $json.object.compact() }}\n{{ $json.object.isNotEmpty() }}\n{{ $json.object.keepFieldsContaining() }}\n{{ $json.object.removeField() }}\n{{ $json.object.removeFieldsContaining() }}\n{{ $json.object.toJsonString() }}\n{{ $json.object.urlEncode() }}\n\n",
+        "height": 336,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        96
+      ],
+      "id": "73061e30-ee42-4dd6-8531-354c28aba933",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ebbe1e1-749e-4d0d-9f67-a931a03768e3",
+              "name": "Summary",
+              "value": "1) .keys()\n# Meaning: Returns an array of all the keys (property names) in an object.\n# Use Case in n8n: Used when you need to iterate, inspect, or manipulate object keys inside Function or Set nodes.\n\n2) .values()\n# Meaning: Returns an array of all the values in an object.\n# Use Case in n8n: Useful for looping through values or performing transformations on data extracted from JSON.\n\n3) .isEmpty()\n# Meaning: Checks if the object has no keys (empty). Returns true or false.\n# Use Case in n8n: Used to validate if a JSON object contains data before processing or branching workflows.\n\n4) .hasField()\n# Meaning: Checks if an object contains a specific field or property.\n# Use Case in n8n: Often used in IF or Switch nodes to verify if expected data fields exist before further actions.\n\n5) .compact()\n# Meaning: Removes any fields with null, undefined, or empty values from the object.\n# Use Case in n8n: Helps clean data before storing, exporting, or processing in integrations.\n\n6) .isNotEmpty()\n# Meaning: Checks if an object contains at least one field. Opposite of .isEmpty().\n# Use Case in n8n: Used to ensure a node\u2019s output has valid data before continuing workflow execution.\n\n7) .keepFieldsContaining()\n# Meaning: Keeps only the fields in an object that match a specific substring or pattern.\n# Use Case in n8n: Useful when you want to retain only relevant data (e.g., fields containing \u201cemail\u201d or \u201cid\u201d).\n\n8) .removeField()\n# Meaning: Removes a specific field from an object by key name.\n# Use Case in n8n: Used to clean sensitive or unnecessary data before sharing with other systems.\n\n9) .removeFieldsContaining()\n# Meaning: Removes all fields whose names contain a specific substring.\n# Use Case in n8n: Helps sanitize or simplify data structures by removing unwanted fields.\n\n10) .toJsonString()\n# Meaning: Converts an object into a JSON-formatted string.\n# Use Case in n8n: Used when sending data to APIs, storing in text fields, or logging structured data.\n\n11) .urlEncode()\n# Meaning: Encodes the object into a URL-safe format (query string style).\n# Use Case in n8n: Used when preparing data for HTTP requests or building dynamic URLs with parameters.\n\n",
+              "type": "object"
+            },
+            {
+              "id": "49dbfbc6-494e-478d-b118-fe542efdfadb",
+              "name": "keys_Ex",
+              "value": "={{ $json.object.keys() }}",
+              "type": "object"
+            },
+            {
+              "id": "8c2c61d9-505c-4be9-9922-5c36cd9156b9",
+              "name": "values_Ex",
+              "value": "={{ $json.object.values() }}",
+              "type": "object"
+            },
+            {
+              "id": "085097e0-a95b-4a78-ae0a-858e6afb443c",
+              "name": "isEmpty_isNotEmpty_Ex",
+              "value": "={{ $json.object.isEmpty() }}\n{{ $json.object.isNotEmpty() }}",
+              "type": "object"
+            },
+            {
+              "id": "ed2e86c0-c540-49fe-b27d-5538579d1888",
+              "name": "hasField_Ex",
+              "value": "={{ $json.object.hasField(\"firstName\") }}\n{{ $json.object.hasField(\"Age\") }}\n",
+              "type": "object"
+            },
+            {
+              "id": "6544a1ce-5191-40dd-81b7-e85fe06acf8e",
+              "name": "compact_Ex",
+              "value": "={{ {\"firstName\":\"mohammad\",\"lastname\":\"\"}.compact() }}",
+              "type": "object"
+            },
+            {
+              "id": "bac2901a-5997-46ba-8484-c42b58f8d14d",
+              "name": "",
+              "value": "={{ $json.object.keepFieldsContaining(\"Mohammad\") }}",
+              "type": "object"
+            },
+            {
+              "id": "4f3af5ea-1744-42b5-8ccb-5303966b4985",
+              "name": "removeField_Ex",
+              "value": "={{ $json.object.removeField(\"firstName\") }}",
+              "type": "object"
+            },
+            {
+              "id": "8fddb344-1309-486f-8815-1a199bf9df59",
+              "name": "removeFieldsContaining_Ex",
+              "value": "={{ $json.object.removeFieldsContaining(\"Moh\") }}",
+              "type": "object"
+            },
+            {
+              "id": "20d1542d-65d7-4fe9-a95f-c4468df4e51e",
+              "name": "toJsonString",
+              "value": "={{ $json.object.toJsonString() }}",
+              "type": "object"
+            },
+            {
+              "id": "f1819668-c24f-49c5-a498-90310d993bc0",
+              "name": "urlEncode_Ex",
+              "value": "={{ $json.object.urlEncode() }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        608
+      ],
+      "id": "59598180-1732-459f-8175-ed8424bcc77d",
+      "name": "Object_Functions_Summary"
+    },
+    {
+      "parameters": {
+        "content": "# Expressions (explained)\n\nThis table shows common n8n expression patterns (the content in the image). n8n evaluates any expression wrapped in double curly braces `{{ ... }}`. Inside those braces you can read data from the current item, other nodes, call helper functions, do date formatting, run conditions, and more.\n\n## Quick syntax\n- Wrap any expression in `{{ ... }}`.\n- Use `$json` to access the current item's JSON.\n- Use `$node[\"NodeName\"].json` to access another node's output.\n- Use `$now` for the current date/time and format it with `.format(...)`.\n- Use JavaScript expressions (comparisons, ternary operator, arithmetic) inside the braces.\n\n---\n\n## Row-by-row explanation\n\n- Basic\n  - Example: `{{ $json[\"key\"] }}`\n  - What it does: returns the value of the property `key` from the current item\u2019s JSON.\n\n- Node notation (accessing other node output)\n  - Example: `{{ $node[\"Other Node\"].json[\"value\"] }}`\n  - What it does: reads the field `value` from the output of the node named `Other Node`. Use the exact node name.\n\n- Date formatting\n  - Example: `{{ $now.format(\"YYYY-MM-DD\") }}`\n  - What it does: formats the current date/time. Use the supported format tokens (e.g., `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss`).\n\n- Condition\n  - Example: `{{ $json[\"price\"] > 100 }}`\n  - What it does: evaluates to `true` or `false`. Useful in \"If\" nodes or to decide a value.\n\n- Ternary operator\n  - Example: `{{ $json[\"price\"] > 100 ? \"expensive\" : \"cheap\" }}`\n  - What it does: returns `\"expensive\"` when the condition is true, otherwise `\"cheap\"`.\n\n- Built-in methods\n  - Examples: `$jmespath(...)`, `$fromAll(...)`, `$max(...)`, `$min(...)`, ...\n  - What they do: helper functions provided by n8n for common transformations and queries. See the n8n docs for full list and usage:\n    - https://docs.n8n.io/code/builtin/data-transformation-functions/\n\n- Metadata / workflow variables\n  - Common names you can access inside expressions:\n    - `$execution` \u2014 execution-level data\n    - `$itemIndex` (or similar item index variable) \u2014 index of the current item\n    - `$input` \u2014 raw input data\n    - `$parameters` \u2014 node parameters (the values configured on the node)\n    - `$prevNode` / `$node` \u2014 access other nodes\n    - `$runIndex` / `$runIndex`-style \u2014 run counters\n    - `$today` / `$now` \u2014 date/time helpers\n    - `$vars` \u2014 workflow variables\n    - `$workflow` \u2014 workflow metadata\n    - `$nodeVersion` \u2014 node version info\n  - What they do: let you access execution, environment and workflow-related metadata inside expressions.\n\n---\n\n## Tips / best practices\n- Keep expressions small and test them in the node's UI (Expression editor) to confirm results.\n- When accessing another node, use the exact node name and the `.json[...]` path.\n- Use the ternary operator for simple conditional value selection.\n- For complex transformations, prefer built-in functions (`$jmespath`, `$fromAll`, etc.) or write a Function/Function Item node (JavaScript).\n- Refer to the official docs for the exact available helpers and up-to-date format tokens:\n  - https://docs.n8n.io/code/builtin/data-transformation-functions/\n",
+        "height": 1520,
+        "width": 1040,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        0
+      ],
+      "id": "c234c318-0e11-4d0f-b89b-afa1c2122f1d",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6aa5d98-5e09-4217-804f-334bb6d225d4",
+              "name": "Summary",
+              "value": "1) .toNumber()\n# Meaning: Converts a boolean value to a number \u2014 `true` becomes `1`, and `false` becomes `0`.\n# Use Case in n8n: Used when performing mathematical operations or storing boolean data as numeric values (e.g., for APIs or databases).\n\n2) .toString()\n# Meaning: Converts a boolean value to its string representation \u2014 `\"true\"` or `\"false\"`.\n# Use Case in n8n: Useful when preparing boolean values for text fields, logs, or when concatenating with other strings.\n",
+              "type": "string"
+            },
+            {
+              "id": "e336f5c2-e86c-499c-926b-e2d7fec5be76",
+              "name": "toNumber_Ex",
+              "value": "={{ $json.bool.toNumber() }}\n",
+              "type": "number"
+            },
+            {
+              "id": "e1224a4e-6b41-4911-8e08-b031c7f252a7",
+              "name": "toString_Ex",
+              "value": "={{ $json.bool.toString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        816
+      ],
+      "id": "e914a393-b6c8-40a9-94d4-69443d697298",
+      "name": "Boolean_Functions_Summary"
+    },
+    {
+      "parameters": {
+        "content": "# Boolean Functions",
+        "height": 80,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        448
+      ],
+      "id": "f599ba0f-fc48-41b6-8299-3f8c4c947d5b",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "{{ $json.bool.toNumber() }}\n{{ $json.bool.toString() }}",
+        "height": 224,
+        "width": 336,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        544
+      ],
+      "id": "ecb0b746-b5b2-4e09-83ee-a2297ff95efe",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1264fae0-cc4e-4dcb-8f6e-47ba83c39a63",
+              "name": "Summary",
+              "value": "1) .toDateTime().format('yyyy-MM-dd') (https://moment.github.io/luxon/#/formatting?id=table-of-tokens)\n# Meaning:\n  \u2022 .toDateTime() \u2192 Converts a string into a DateTime object that n8n can understand.\n  \u2022 .format('yyyy-MM-dd') \u2192 Formats that date into the specified pattern (e.g., 2025-10-08).\n# Use Case in n8n: Used to standardize date formats when handling timestamps from APIs or inputs \u2014 especially useful before comparing, filtering, or storing dates.\n\n2) .minus(4, 'hour')\n# Meaning: Subtracts 4 hours from the current date and time.\n# Use Case in n8n: Used to adjust timestamps backward \u2014 for example, to convert from UTC to a local timezone or check records from the past few hours.\n\n3) .plus(20, 'seconds')\n# Meaning: Adds 20 seconds to the current date and time.\n# Use Case in n8n: Used to schedule or offset timestamps forward, such as setting a short delay for time-based triggers or future actions.\n\n4) .diffTo(\"10/8/2025\".toDateTime(), 'days')\n# Meaning: Calculates the difference between two dates \u2014 in this case, between the current date and `\"10/8/2025\"` \u2014 measured in days.\n# Use Case in n8n: Used when you need to measure time gaps between two dates (e.g., to find how many days until a deadline, or how long ago something happened).\n\n5) .extract('hours')\n# Meaning: Extracts a specific part of a DateTime \u2014 here, it pulls out the hour from the current time.\n# Use Case in n8n:\nUsed when you need to get a specific time unit (like hour, minute, or day) for logic, scheduling, or conditions \u2014 for example, triggering an action only during certain hours.\n\n6) .startOf('month')\n# Meaning: Returns a DateTime representing the first moment of the specified unit, here the start of the month (i.e., day 1 at 00:00:00).\n# Use Case in n8n: Used to align dates to a specific boundary, such as the beginning of a day, week, or month \u2014 helpful for reports, billing cycles, or filtering records by month.\n\n7) .endOf('month')\n# Meaning: Returns a DateTime representing the last moment of the specified unit, here the end of the current month (i.e., the last day at 23:59:59).\n# Use Case in n8n:Used to calculate or filter data within monthly periods, such as generating monthly reports, setting billing cutoffs, or comparing dates to the month\u2019s end.\n\n\n\n\n",
+              "type": "string"
+            },
+            {
+              "id": "5587432f-e5e5-4c1a-8d51-13ab5f8d3413",
+              "name": "format_Ex",
+              "value": "={{ \"10/8/2025\".toDateTime().format('yyyy-MM-dd') }}\n{{ \"10/8/2025\".toDateTime().format('ffff') }}\n{{ $now.toDateTime().format('yyyy/MM/dd HH:mm:ss') }}",
+              "type": "string"
+            },
+            {
+              "id": "0217f0f2-83ef-409c-8f5b-90c18bfdae77",
+              "name": "minus_Ex",
+              "value": "={{ $now.toDateTime().format('yyyy/MM/dd HH:mm:ss').toDateTime().minus(4,'hour') }}",
+              "type": "string"
+            },
+            {
+              "id": "b609d2ef-ac9e-44f8-9fde-b110bf96536b",
+              "name": "plus_Ex",
+              "value": "={{ $now.toDateTime().format('yyyy/MM/dd HH:mm:ss').toDateTime().plus(20,'seconds') }}",
+              "type": "string"
+            },
+            {
+              "id": "f0deac72-0d80-4e21-923f-56a348bccac5",
+              "name": "diffTo_Ex",
+              "value": "={{ $now.format('yyyy/MM/dd HH:mm:ss').toDateTime().diffTo(\"10/8/2025\".toDateTime(), 'days') }}",
+              "type": "string"
+            },
+            {
+              "id": "fb28e651-d4bf-46f9-92d8-ac572ff1f1c3",
+              "name": "extract_Ex",
+              "value": "={{ $now.format('yyyy/MM/dd HH:mm:ss').toDateTime().extract('hour') }}",
+              "type": "string"
+            },
+            {
+              "id": "08e87513-9046-4a63-a410-cd837f07ea0f",
+              "name": "startOf_Ex",
+              "value": "={{ $now.format('yyyy/MM/dd HH:mm:ss').toDateTime().startOf('month') }}",
+              "type": "string"
+            },
+            {
+              "id": "26a00234-6b48-48b4-b8f2-7753612a8d1d",
+              "name": "endOf_Ex",
+              "value": "={{ $now.format('yyyy/MM/dd HH:mm:ss').toDateTime().endOf('month') }}",
+              "type": "string"
+            },
+            {
+              "id": "2a839deb-0cde-4333-9102-d9bb62bfb275",
+              "name": "Component_Ex",
+              "value": "={{ $now.year }}\n{{ $now.month }}\n{{ $now.day }}\n{{ $now.hour }}\n{{ $now.minute }}\n{{ $now.second }}\n{{ $now.millisecond }}\n{{ $now.zone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        1008
+      ],
+      "id": "0eb2ae9b-8e02-4ead-9b1a-1d7e278f10eb",
+      "name": "DateTime_Functions_Summary"
+    }
+  ],
+  "connections": {
+    "When clicking \u2018Execute workflow\u2019": {
+      "main": [
+        [
+          {
+            "node": "Set Example Json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Example Json": {
+      "main": [
+        [
+          {
+            "node": "String_Functions_Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Number_Functions_Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Array_Functions_Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Object_Functions_Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Boolean_Functions_Summary",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DateTime_Functions_Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

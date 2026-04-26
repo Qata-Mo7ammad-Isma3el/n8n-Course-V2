@@ -1,0 +1,329 @@
+{
+  "name": "S6-Reference-03-Code-Node-Python",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# S6 \u2014 Code Node Python Reference\n\n**Python mirror** of the JavaScript reference. Same 4 lessons, same logic, Python syntax.\n\n## \u2699\ufe0f Run Mode in Python\n\n### \ud83d\udd35 Run Once for All Items\n- Use `_input.all()` \u2192 returns list of items\n- Each item: `item.json` (dict-like) or `item['json']`\n- **Return a list** of dicts with `json` key\n\n```python\nitems = _input.all()\ntotal = sum(i.json['amount'] for i in items)\nreturn [{'json': {'total': total}}]\n```\n\n### \ud83d\udfe2 Run Once for Each Item\n- Use `_json` \u2192 current item dict\n- Return a single dict `{'json': {...}}`\n\n```python\nreturn {'json': {'name': _json['name'].upper()}}\n```\n\n## Python in n8n \u2014 what to know\n- **Stdlib only** \u2014 no pip install\n- Variables: `_input`, `_json`, `_node`, `_workflow`\n- No `requests` lib \u2192 use n8n HTTP Request node instead\n- Great for: text processing, math, dataclasses, regex, JSON shaping\n- Choose Python over JS when: you're more fluent in it, or the logic is data-science-ish",
+        "width": 600,
+        "height": 720,
+        "color": 4
+      },
+      "id": "87d4cc54-7103-4316-be4f-a0f09feb405c",
+      "name": "note-2c0e80",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 1. JavaScript \u2192 Python Fundamentals\n\nBasic structure, returning data, both run modes.",
+        "width": 460,
+        "height": 120,
+        "color": 7
+      },
+      "id": "c1d5612c-5726-44bc-856e-d7793818a688",
+      "name": "note-32b5c5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "7f75aa24-d8fa-4a78-83c4-748b6a04b78f",
+      "name": "Run Lesson 1",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForAllItems",
+        "pythonCode": "# Run Once for All Items \u2014 Python\n# Must return a LIST of dicts with 'json' key\nfrom datetime import datetime, timezone\n\nreturn [{\n    'json': {\n        'message': 'Hello from n8n Python!',\n        'timestamp': datetime.now(timezone.utc).isoformat()\n    }\n}]\n"
+      },
+      "id": "24158a95-8bdb-45b6-b2d7-d8e4047f7634",
+      "name": "1.1 Basic Structure (All Items)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForEachItem",
+        "pythonCode": "# Run Once for Each Item \u2014 Python\n# Return a SINGLE dict with 'json' key (no list wrapping)\n# _json is the current item\n\nreturn {\n    'json': {\n        'original': _json,\n        'note': 'this code ran once per input item'\n    }\n}\n"
+      },
+      "id": "f6785af2-d51e-476d-8d68-dd234c12b026",
+      "name": "1.2 Each Item Mode",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 2. Arrays & Control Flow\n\nLoops, filters, conditionals \u2014 Python style.",
+        "width": 460,
+        "height": 120,
+        "color": 7
+      },
+      "id": "0a563fd5-68db-478f-a1c8-ceb46d81a3b9",
+      "name": "note-490661",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "[{\"id\":1,\"amount\":120,\"status\":\"paid\"},{\"id\":2,\"amount\":45,\"status\":\"pending\"},{\"id\":3,\"amount\":300,\"status\":\"paid\"}]",
+        "options": {}
+      },
+      "id": "1011a9a5-816d-4610-907f-9a2ab6bce527",
+      "name": "Input: Orders",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForAllItems",
+        "pythonCode": "# Filter paid orders, double the amount, return new list\nitems = _input.all()\n\nresult = []\nfor item in items:\n    data = item.json\n    if data['status'] == 'paid':\n        result.append({\n            'json': {\n                'id': data['id'],\n                'doubled': data['amount'] * 2\n            }\n        })\n\nreturn result\n"
+      },
+      "id": "ad5d6e13-539a-46f5-a1eb-e8574ab3cb88",
+      "name": "2.1 Filter & Map (All Items)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForAllItems",
+        "pythonCode": "# Sum all amounts using a comprehension\nitems = _input.all()\ntotal = sum(i.json['amount'] for i in items)\ncount = len(items)\n\nreturn [{\n    'json': {\n        'total': total,\n        'count': count,\n        'average': total / count if count else 0\n    }\n}]\n"
+      },
+      "id": "1257e990-324d-4056-81d7-eb9344be6b54",
+      "name": "2.2 Aggregate Total",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 3. Functions & Data Processing\n\nReusable functions, restructuring, type conversion.",
+        "width": 460,
+        "height": 120,
+        "color": 7
+      },
+      "id": "8d302d0c-292b-469a-9211-0e0c2fab1e86",
+      "name": "note-6a885c",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "[{\"name\":\"alice smith\",\"email\":\"ALICE@X.COM\",\"age\":\"30\"},{\"name\":\"bob jones\",\"email\":\"BOB@Y.COM\",\"age\":\"25\"}]",
+        "options": {}
+      },
+      "id": "c3a0ae19-3650-4711-b708-f8ea8fb61167",
+      "name": "Input: Users",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForEachItem",
+        "pythonCode": "# Run Once for Each Item \u2014 clean a user record\ndef title_case(s: str) -> str:\n    return ' '.join(w.capitalize() for w in s.split())\n\ndef normalize_email(e: str) -> str:\n    return e.strip().lower()\n\ndata = _json\nreturn {\n    'json': {\n        'full_name': title_case(data['name']),\n        'email': normalize_email(data['email']),\n        'age': int(data['age']),\n        'is_adult': int(data['age']) >= 18\n    }\n}\n"
+      },
+      "id": "7895a57f-795f-468a-85dd-945f3e766c65",
+      "name": "3.1 Clean & Restructure (Each Item)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# 4. Error Handling & Advanced Patterns\n\nTry/except, validation, raising errors safely.",
+        "width": 460,
+        "height": 120,
+        "color": 7
+      },
+      "id": "f9664f4c-2f38-457a-a068-04f022fd41fd",
+      "name": "note-789f3a",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "[{\"id\":1,\"value\":\"42\"},{\"id\":2,\"value\":\"oops\"},{\"id\":3,\"value\":\"100\"}]",
+        "options": {}
+      },
+      "id": "9d7e045f-5001-497e-ba57-e406fa44bf28",
+      "name": "Input: Mixed Records",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForAllItems",
+        "pythonCode": "# Validate and split valid vs invalid records\nitems = _input.all()\n\nvalid = []\nerrors = []\n\nfor item in items:\n    data = item.json\n    try:\n        num = int(data['value'])\n        if num < 0:\n            raise ValueError('negative not allowed')\n        valid.append({'json': {'id': data['id'], 'number': num}})\n    except (ValueError, KeyError) as e:\n        errors.append({'json': {\n            'id': data.get('id'),\n            'error': str(e),\n            'raw': data\n        }})\n\n# Return both \u2014 downstream can use IF node to route\nreturn valid + errors\n"
+      },
+      "id": "a85ad12b-a424-4a7d-bed3-5f89596b64b1",
+      "name": "4.1 Try/Except Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForEachItem",
+        "pythonCode": "# Raising an error stops the workflow (or triggers Error workflow)\ndata = _json\n\nif 'number' not in data:\n    raise Exception(f\"Missing 'number' field in item {data}\")\n\nreturn {'json': {**data, 'checked': True}}\n"
+      },
+      "id": "e71d002a-f08e-4822-9058-f14acf12af21",
+      "name": "4.2 Raise to Stop Workflow",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        1200
+      ]
+    }
+  ],
+  "connections": {
+    "Run Lesson 1": {
+      "main": [
+        [
+          {
+            "node": "1.1 Basic Structure (All Items)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1.1 Basic Structure (All Items)": {
+      "main": [
+        [
+          {
+            "node": "1.2 Each Item Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Orders": {
+      "main": [
+        [
+          {
+            "node": "2.1 Filter & Map (All Items)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.1 Filter & Map (All Items)": {
+      "main": [
+        [
+          {
+            "node": "2.2 Aggregate Total",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Users": {
+      "main": [
+        [
+          {
+            "node": "3.1 Clean & Restructure (Each Item)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input: Mixed Records": {
+      "main": [
+        [
+          {
+            "node": "4.1 Try/Except Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4.1 Try/Except Validation": {
+      "main": [
+        [
+          {
+            "node": "4.2 Raise to Stop Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

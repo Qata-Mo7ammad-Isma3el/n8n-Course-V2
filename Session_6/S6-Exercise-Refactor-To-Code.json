@@ -1,0 +1,471 @@
+{
+  "name": "S6-Exercise-Refactor-To-Code",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# S6 \u2014 Exercise: Refactor 10 Nodes Into 1 Code Node\n\n## The challenge\nYou're given a sales pipeline that uses **10+ core nodes** to:\n1. Filter orders by status\n2. Calculate tax (15%)\n3. Add a discount for orders > $200\n4. Format customer names\n5. Compute the grand total\n\nYour job: **rebuild the entire BEFORE branch as a single Code node** in the AFTER branch \u2014 and prove the outputs match.\n\n## How to use\n- \u25b6\ufe0f Click 'Run Exercise' \u2192 both branches execute\n- Compare outputs of `BEFORE: Final Output` vs `AFTER: Code Node Solution`\n- They should be identical\n- Try doing it yourself FIRST in `AFTER: Your Solution Here` before peeking at the reference\n\n## Why this matters\n- Fewer nodes = easier to read, faster to run, easier to debug\n- BUT: Code nodes hide logic from non-coders \u2192 use judgment\n- **Rule of thumb:** if you're chaining 4+ Set/IF/Filter nodes for one transformation, switch to Code.",
+        "width": 620,
+        "height": 440,
+        "color": 4
+      },
+      "id": "ea5b4ca9-dbe2-401e-b893-bb22c8c9a26f",
+      "name": "READ ME",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4d975e68-157a-4eb9-a865-df67a8781431",
+      "name": "Run Exercise",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "[{\"id\":1,\"customer\":\"alice smith\",\"status\":\"paid\",\"amount\":250},{\"id\":2,\"customer\":\"bob jones\",\"status\":\"pending\",\"amount\":80},{\"id\":3,\"customer\":\"carol white\",\"status\":\"paid\",\"amount\":150},{\"id\":4,\"customer\":\"dan brown\",\"status\":\"cancelled\",\"amount\":400},{\"id\":5,\"customer\":\"eve black\",\"status\":\"paid\",\"amount\":600}]",
+        "options": {}
+      },
+      "id": "9b733c28-745b-4d97-b8d2-20f9043956ad",
+      "name": "Sample Orders",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -40,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## \u274c BEFORE \u2014 10 nodes\n\nThe long way. Works, but painful to maintain.",
+        "width": 1600,
+        "height": 80,
+        "color": 2
+      },
+      "id": "23ad909e-c5af-4e37-aa42-dc0049799920",
+      "name": "BEFORE label",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "fe4e2dbf-be96-405a-bf9e-68f1e76a8033",
+      "name": "BEFORE: Split Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        240,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "paid",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "92cf197e-96a8-4d41-9698-fd52e1ded1cf",
+      "name": "BEFORE: Filter Paid",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        480,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "amount_with_tax",
+              "type": "numberValue",
+              "numberValue": "={{ $json.amount * 1.15 }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "2c2fec39-7ebd-4375-934b-6c6055b463a9",
+      "name": "BEFORE: Add Tax",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {
+              "id": "2",
+              "leftValue": "={{ $json.amount }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "40ac5f00-1667-4278-8ebe-018c408f3ce8",
+      "name": "BEFORE: Check Discount",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        960,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "final_amount",
+              "type": "numberValue",
+              "numberValue": "={{ $json.amount_with_tax * 0.9 }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "1bbfe969-e9b0-4ed9-bb45-c0fc2b41dfb5",
+      "name": "BEFORE: Apply Discount",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "final_amount",
+              "type": "numberValue",
+              "numberValue": "={{ $json.amount_with_tax }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "150347e3-0337-406b-bdfe-63cd19e8f091",
+      "name": "BEFORE: No Discount",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Title-case the customer name\nconst name = $json.customer.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');\nreturn { json: { ...$json, customer: name } };"
+      },
+      "id": "0336768d-4a9b-42d4-836a-a18ddafecef2",
+      "name": "BEFORE: Format Name",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "fields": {
+          "values": [
+            {
+              "name": "id",
+              "type": "numberValue",
+              "numberValue": "={{ $json.id }}"
+            },
+            {
+              "name": "customer",
+              "type": "stringValue",
+              "stringValue": "={{ $json.customer }}"
+            },
+            {
+              "name": "final_amount",
+              "type": "numberValue",
+              "numberValue": "={{ $json.final_amount }}"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "2e9d9bea-d774-4b5a-b510-b91194cf5d68",
+      "name": "BEFORE: Final Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1680,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## \u2705 AFTER \u2014 1 Code node\n\nSame logic, one node. Try writing it yourself before opening the reference solution.",
+        "width": 1600,
+        "height": 80,
+        "color": 3
+      },
+      "id": "cec1f57e-0ca1-46da-a516-ba2b963b25ab",
+      "name": "AFTER label",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \ud83d\udc47 YOUR TURN\n// Replicate the BEFORE branch in this single Code node.\n// Steps:\n//   1. Get all items\n//   2. Filter status === 'paid'\n//   3. Add 15% tax\n//   4. If amount > 200, apply 10% discount\n//   5. Title-case the customer name\n//   6. Return {id, customer, final_amount}\n\nconst items = $input.all();\n\n// TODO: write your transformation here\nreturn items;\n"
+      },
+      "id": "d8435ce8-9b65-4e23-b836-96fd220139dd",
+      "name": "AFTER: Your Solution Here",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \u2705 Reference solution \u2014 same output as the 10-node BEFORE branch\nconst titleCase = s => s.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');\n\nreturn $input.all()\n  .filter(i => i.json.status === 'paid')\n  .map(i => {\n    const withTax = i.json.amount * 1.15;\n    const final = i.json.amount > 200 ? withTax * 0.9 : withTax;\n    return {\n      json: {\n        id: i.json.id,\n        customer: titleCase(i.json.customer),\n        final_amount: Math.round(final * 100) / 100\n      }\n    };\n  });\n"
+      },
+      "id": "37d32e76-14e4-4bbb-b7ef-19d657d3846d",
+      "name": "AFTER: Reference Solution",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "mode": "runOnceForAllItems",
+        "pythonCode": "# Same logic in Python\ndef title_case(s): return ' '.join(w.capitalize() for w in s.split())\n\nresult = []\nfor item in _input.all():\n    data = item.json\n    if data['status'] != 'paid':\n        continue\n    with_tax = data['amount'] * 1.15\n    final = with_tax * 0.9 if data['amount'] > 200 else with_tax\n    result.append({'json': {\n        'id': data['id'],\n        'customer': title_case(data['customer']),\n        'final_amount': round(final, 2)\n    }})\n\nreturn result\n"
+      },
+      "id": "6b5c095e-3088-409d-8bc2-844a31311b8a",
+      "name": "AFTER: Python Equivalent",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## \ud83d\udca1 Lessons learned\n\n**10 nodes \u2192 1 node**\n\n- Filter, map, conditional logic, name formatting, and field selection all happen in **one place**\n- Easier to test, easier to read, easier to version-control\n- The Python version is identical \u2014 pick the language you're more fluent in\n- \u26a0\ufe0f But: a non-coder reviewing your workflow now needs to read code. Tradeoff.\n\n## When to refactor to Code\n- 4+ chained Set / IF / Filter nodes for one transformation\n- Logic that's hard to express in expressions\n- You need loops, recursion, or complex conditionals\n\n## When to KEEP core nodes\n- Logic non-developers must read/edit\n- Each step is meaningfully distinct and worth visualizing",
+        "width": 520,
+        "height": 520,
+        "color": 5
+      },
+      "id": "e537c3d5-b352-4593-8ce7-58cf1f990b74",
+      "name": "Lessons sticky",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        520
+      ]
+    }
+  ],
+  "connections": {
+    "Run Exercise": {
+      "main": [
+        [
+          {
+            "node": "Sample Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sample Orders": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Split Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AFTER: Your Solution Here",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Split Items": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Filter Paid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Filter Paid": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Add Tax",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Add Tax": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Check Discount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Check Discount": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Apply Discount",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "BEFORE: No Discount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Apply Discount": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Format Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: No Discount": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Format Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BEFORE: Format Name": {
+      "main": [
+        [
+          {
+            "node": "BEFORE: Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AFTER: Your Solution Here": {
+      "main": [
+        [
+          {
+            "node": "AFTER: Reference Solution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AFTER: Reference Solution": {
+      "main": [
+        [
+          {
+            "node": "AFTER: Python Equivalent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
