@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 Must-Know Agentic AI Design Patterns</title>
+    <link rel="icon"
+        href="./static/icon.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0f14;
+            --surface: #14181f;
+            --border: #1e2430;
+            --accent: #6ee7b7;
+            --accent2: #34d399;
+            --text: #e2e8f0;
+            --muted: #8892a4;
+            --card-hover: #1a1f2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(110, 231, 183, 0.25);
+            padding: 0.35rem 1rem;
+            border-radius: 100px;
+            margin-bottom: 1.5rem;
+            background: rgba(110, 231, 183, 0.06);
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.4rem, 5vw, 3.6rem);
+            font-weight: 400;
+            line-height: 1.15;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        h1 em {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .pattern {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .pattern:hover {
+            border-color: rgba(110, 231, 183, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .pattern-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 4rem;
+            color: rgba(110, 231, 183, 0.12);
+            font-weight: 400;
+            line-height: 1;
+            position: absolute;
+            top: 1.5rem;
+            right: 1.8rem;
+        }
+
+        .pattern-header {
+            padding: 2rem 2.2rem 1.2rem;
+            position: relative;
+        }
+
+        .pattern-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.65rem;
+            font-weight: 400;
+            color: #fff;
+            margin-bottom: 0.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+
+        .pattern-subtitle {
+            color: var(--accent2);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .pattern-image {
+            padding: 0 2.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pattern-image {
+            text-align: center;
+            padding: 0.8rem 2.2rem 1.2rem;
+            background: rgba(255, 255, 255, 0.015);
+            margin: 0 2.2rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .pattern-image img {
+            max-width: 675px;
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: inline-block;
+                        padding: 20px; 
+            background-color:white
+        }
+
+        .pattern-body {
+            padding: 0 2.2rem 2rem;
+        }
+
+        .pattern-body p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.75;
+        }
+
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 1.2rem;
+        }
+
+        .tag {
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 0.25rem 0.7rem;
+            border-radius: 6px;
+            background: rgba(110, 231, 183, 0.08);
+            color: var(--accent);
+            border: 1px solid rgba(110, 231, 183, 0.12);
+        }
+
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+            display: block;
+        }
+
+        .limitations {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid rgba(110, 231, 183, 0.15);
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-top: 0.5rem;
+        }
+
+        .limitations p {
+            margin-bottom: 0 !important;
+            font-size: 0.88rem !important;
+            color: #7a8598 !important;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .pattern-header {
+                padding: 1.5rem 1.3rem 1rem;
+            }
+
+            .pattern-image {
+                padding: 0 1.3rem;
+            }
+
+            .pattern-body {
+                padding: 0 1.3rem 1.5rem;
+            }
+
+            .pattern-number {
+                font-size: 3rem;
+                top: 1rem;
+                right: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise"></div>
+    <div class="container">
+
+        <header>
+            <div class="badge">Agentic AI · Design Patterns</div>
+            <h1>7 Must-Know Agentic AI <em>Design Patterns</em></h1>
+            <p>Proven blueprints that define agent behavior — from reasoning loops to human oversight — extracted from
+                research by Google, AWS, and production teams deploying agents at scale.</p>
+        </header>
+
+        <!-- 1. ReAct -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">01</span>
+                <div class="pattern-subtitle">Pattern 1</div>
+                <div class="pattern-title">ReAct — Reason and Act</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/react-pattern.png"
+                    alt="ReAct Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p>Structures agent behavior into <strong style="color:#e2e8f0">explicit reasoning loops</strong>. The
+                    agent alternates between reasoning (analyzing information), acting (executing tools), and observing
+                    (evaluating results). This cycle repeats until the task is complete. Every decision becomes visible,
+                    creating a clear audit trail.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Research agents</span>
+                    <span class="tag">Debugging assistants</span>
+                    <span class="tag">Non-standard support</span>
+                    <span class="tag">Adaptive problem-solving</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Trades speed for thoughtfulness — each loop adds latency and cost. Error propagation risk if one
+                        tool returns bad data.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Reflection -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">02</span>
+                <div class="pattern-subtitle">Pattern 2</div>
+                <div class="pattern-title">Reflection — The Agent That Critiques
+                    Itself</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-reflection-pattern.png"
+                    alt="Reflection Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p>Adds a <strong style="color:#e2e8f0">self-evaluation layer</strong> to agent outputs. The agent
+                    generates an initial response, switches into critic mode to assess its own work — checking accuracy,
+                    constraints, and logical gaps — then revises until quality thresholds are met. Role separation
+                    reduces confirmation bias.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Code generation + audits</span>
+                    <span class="tag">Factual content creation</span>
+                    <span class="tag">Financial analysis</span>
+                    <span class="tag">High-stakes outputs</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Each reflection cycle increases tokens and latency. Without clear exit conditions, agents can
+                        loop unnecessarily.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Planning -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">03</span>
+                <div class="pattern-subtitle">Pattern 3</div>
+                <div class="pattern-title">Planning — Break It Down Before Building
+                    Up</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-planning-pattern.png"
+                    alt="Planning Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p><strong style="color:#e2e8f0">Decomposes complex tasks</strong> into structured roadmaps before
+                    execution begins. The agent analyzes requirements, identifies dependencies between subtasks, and
+                    sequences operations. Only after creating the plan does execution begin, preventing roadblocks from
+                    wrong approaches mid-execution.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Multi-system integrations</span>
+                    <span class="tag">Research projects</span>
+                    <span class="tag">Data migrations</span>
+                    <span class="tag">Product dev workflows</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Planning overhead only justifies itself for genuinely complex work. Simple tasks don't need
+                        elaborate decomposition.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Tool Use -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">04</span>
+                <div class="pattern-subtitle">Pattern 4</div>
+                <div class="pattern-title">Tool Use — Extending Beyond Training Data
+                </div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-tool-use.png"
+                    alt="Tool Use Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p>Enables agents to <strong style="color:#e2e8f0">perform actions beyond training data</strong> by
+                    integrating external capabilities — calling APIs, querying databases, executing code, scraping
+                    websites. The model orchestrates these tools, deciding which to invoke, interpreting outputs, and
+                    chaining calls to achieve objectives impossible with static knowledge.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Customer service</span>
+                    <span class="tag">Data analysis</span>
+                    <span class="tag">Real-time research</span>
+                    <span class="tag">Automation agents</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Tool reliability becomes your system's reliability. API errors, rate limits, and timeouts
+                        propagate directly to the agent.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Multi-Agent -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">05</span>
+                <div class="pattern-subtitle">Pattern 5</div>
+                <div class="pattern-title">Multi-Agent Collaboration — Specialists
+                    Working Together</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-multiagent-pattern.png"
+                    alt="Multi-Agent Collaboration Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p><strong style="color:#e2e8f0">Distributes work across specialized agents</strong> rather than
+                    building one generalist. Each agent has focused expertise, specific tools, and a defined role. A
+                    coordinator manages routing, distributes tasks to specialists, and synthesizes outputs into unified
+                    responses.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Complex multi-domain workflows</span>
+                    <span class="tag">Task routing</span>
+                    <span class="tag">Diverse use cases</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Significantly harder to build, debug, and maintain. Coordination adds latency; inter-agent
+                        communication introduces new failure modes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Sequential Workflow -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">06</span>
+                <div class="pattern-subtitle">Pattern 6</div>
+                <div class="pattern-title">Sequential Workflow — The Predictable
+                    Pipeline</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-seq-pattern.png"
+                    alt="Sequential Workflow Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p>Organizes agent systems as <strong style="color:#e2e8f0">fixed-order pipelines</strong>. Agent A →
+                    Agent B → Agent C. Each specialist handles exactly one step in a predetermined sequence.
+                    Orchestration requires no AI — just predefined logic. The assembly-line approach delivers
+                    predictability, lower latency, and simpler debugging.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">ETL pipelines</span>
+                    <span class="tag">Document processing</span>
+                    <span class="tag">Content moderation</span>
+                    <span class="tag">Order processing</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Cannot adapt to changing conditions mid-workflow. If a step becomes unnecessary for certain
+                        inputs, it still executes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Human-in-the-Loop -->
+        <div class="pattern">
+            <div class="pattern-header">
+                <span class="pattern-number">07</span>
+                <div class="pattern-subtitle">Pattern 7</div>
+                <div class="pattern-title">Human-in-the-Loop — Safety Rails for High
+                    Stakes</div>
+            </div>
+            <div class="pattern-image">
+                <img src="./static/bala-hil-pattern.png"
+                    alt="Human-in-the-Loop Pattern Diagram">
+            </div>
+            <div class="pattern-body">
+                <p>At critical checkpoints, the agent <strong style="color:#e2e8f0">pauses execution and surfaces
+                        information to human reviewers</strong>. Humans evaluate, provide guidance, or grant approval
+                    before the agent continues. Agents handle routine work autonomously but escalate decisions requiring
+                    judgment, accountability, or oversight.</p>
+                <span class="section-label">Best for</span>
+                <div class="tag-row">
+                    <span class="tag">Financial transactions</span>
+                    <span class="tag">Edge-case moderation</span>
+                    <span class="tag">Legal approvals</span>
+                    <span class="tag">Hiring decisions</span>
+                </div>
+                <div class="limitations" style="margin-top:1rem;">
+                    <p>Adds architectural complexity for pausing workflows, managing handoffs, and resuming. Needs clear
+                        escalation criteria.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Source: <a href="https://machinelearningmastery.com/7-must-know-agentic-ai-design-patterns/"
+                target="_blank">MachineLearningMastery.com</a> · By Bala Priya C
+        </footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1587 @@
+{
+  "name": "Fundamental Core Nodes",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d2914e69-0165-42a2-a91f-4132c30ab768",
+      "name": "Start - Edit Fields Demo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "product_id",
+              "value": "P001",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "product_name",
+              "value": "Laptop",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "price",
+              "value": 999,
+              "type": "number"
+            },
+            {
+              "id": "id-4",
+              "name": "category",
+              "value": "Electronics",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "in_stock",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0ef8bd62-3d8e-4fa4-9ca5-de08488a016f",
+      "name": "Edit Fields - Add Sample Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        1664
+      ]
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "id",
+        "options": {}
+      },
+      "id": "7e9c48ca-87b9-4c39-82cb-ddbb3c7ea256",
+      "name": "Remove Duplicates",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.amount }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "89a0a215-83aa-4d93-987f-ccc41379944d",
+      "name": "IF - Check Value",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1808,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Electronics",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9fc849cf-d223-4e8d-a7b6-86ae4e934d94"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Electronics"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Books",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "69962d68-dbb0-4fcc-a00f-98bae4a46dbc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Books"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "Clothing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0978b348-4793-4d34-aa77-216347d329d6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Clothing"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "183a1db1-6aef-4fb5-a3b6-0805b007c823",
+      "name": "Switch - Route by Category",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1808,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "amount",
+              "renameField": true,
+              "outputFieldName": "total_amount"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f8910996-bb2b-42ba-9467-0eedb41a5e20",
+      "name": "Aggregate - Sum by Category",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "37b789db-6d60-408c-9c34-4b7abe071a4f",
+      "name": "Split Out - Separate Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "customer_id",
+        "options": {}
+      },
+      "id": "96a20270-9d86-414f-a186-0fda8b6e0988",
+      "name": "Merge - Combine Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2736,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "active",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "df339ba8-344c-467c-99d8-7f98429e9f85",
+      "name": "Filter - Keep Active Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        2512,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "sales"
+            },
+            {
+              "aggregation": "average",
+              "field": "sales"
+            },
+            {
+              "field": "sales"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "67d74c47-59f2-4fe4-ab20-24d20110b89f",
+      "name": "Summarize - Calculate Stats",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        2512,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ded59b6d-369b-467c-8dc2-ea294c88f0a7",
+      "name": "Sort - Order by Score",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        2512,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "f80a6d05-7f43-43d7-8b8e-509e1c9dc42d",
+      "name": "Limit - Top 3 Items",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "1a462344-c06d-48ba-8cae-8fd03ced0106",
+      "name": "Wait - Pause Execution",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        1440
+      ],
+      "webhookId": "ee29c85a-3b22-471c-9b35-c4805e3c5389"
+    },
+    {
+      "parameters": {},
+      "id": "8c846b61-c84e-4e1c-b6c4-d7ad76b6d4d2",
+      "name": "No Op - Pass Through",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        416,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "bc6fc915-af39-43cd-a366-0059bf9cb08f",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "edc9d549-285b-41ff-91bd-2ad1d581cdc0",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        1376
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "compress",
+        "fileName": "data.zip"
+      },
+      "id": "1156c601-27c2-4b7d-9b58-b474d04fef7f",
+      "name": "Compression",
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        1568
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"id\": 101, \"name\": \"MacBook Pro 16\", \"price\": 2499},\n  {\"id\": 102, \"name\": \"Logitech MX Master\", \"price\": 99},\n  {\"id\": 101, \"name\": \"MacBook Pro 16\", \"price\": 2499},\n  {\"id\": 103, \"name\": \"Keychron K8\", \"price\": 89},\n  {\"id\": 102, \"name\": \"Logitech MX Master\", \"price\": 99},\n  {\"id\": 104, \"name\": \"Dell UltraSharp 27\", \"price\": 549}\n].map(item => ({json: item}))"
+      },
+      "id": "d16ecd31-3fb3-4c20-8e6e-a630305a7a73",
+      "name": "Generate Duplicate Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"order_id\": \"ORD-2024-001\", \"amount\": 1250.50},\n  {\"order_id\": \"ORD-2024-002\", \"amount\": 89.99},\n  {\"order_id\": \"ORD-2024-003\", \"amount\": 3450.00},\n  {\"order_id\": \"ORD-2024-004\", \"amount\": 45.75},\n  {\"order_id\": \"ORD-2024-005\", \"amount\": 567.20}\n].map(item => ({json: item}))"
+      },
+      "id": "ac034aa7-d782-4684-8d24-5248ffd5be90",
+      "name": "Generate Order Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"product\": \"MacBook Pro 16\", \"category\": \"Electronics\", \"brand\": \"Apple\"},\n  {\"product\": \"The Great Gatsby\", \"category\": \"Books\", \"brand\": \"Scribner\"},\n  {\"product\": \"Nike Air Max\", \"category\": \"Clothing\", \"brand\": \"Nike\"},\n  {\"product\": \"iPhone 15 Pro\", \"category\": \"Electronics\", \"brand\": \"Apple\"},\n  {\"product\": \"Atomic Habits\", \"category\": \"Books\", \"brand\": \"Penguin\"}\n].map(item => ({json: item}))"
+      },
+      "id": "f9505333-6760-4d6b-b454-532220d8f889",
+      "name": "Generate Category Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"transaction_id\": \"TXN-001\", \"category\": \"Electronics\", \"amount\": 2499.00},\n  {\"transaction_id\": \"TXN-002\", \"category\": \"Books\", \"amount\": 45.99},\n  {\"transaction_id\": \"TXN-003\", \"category\": \"Electronics\", \"amount\": 1299.00},\n  {\"transaction_id\": \"TXN-004\", \"category\": \"Clothing\", \"amount\": 189.50},\n  {\"transaction_id\": \"TXN-005\", \"category\": \"Books\", \"amount\": 32.99},\n  {\"transaction_id\": \"TXN-006\", \"category\": \"Electronics\", \"amount\": 899.00}\n].map(item => ({json: item}))"
+      },
+      "id": "45a32a03-4ef9-46ab-8649-b0d9810dde7a",
+      "name": "Generate Transaction Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    order_id: \"ORD-2024-100\",\n    customer: \"Tech Startup Inc\",\n    items: [\n      {\"product\": \"MacBook Pro 16\", \"qty\": 5, \"unit_price\": 2499},\n      {\"product\": \"Logitech MX Master\", \"qty\": 10, \"unit_price\": 99},\n      {\"product\": \"Dell UltraSharp 27\", \"qty\": 5, \"unit_price\": 549}\n    ]\n  }\n}]"
+      },
+      "id": "f6bfd8b2-e5e1-48cf-8c86-8e9e06ee4213",
+      "name": "Generate Order with Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"customer_id\": \"CUST-001\", \"name\": \"Sarah Johnson\", \"company\": \"Tech Innovations LLC\"},\n  {\"customer_id\": \"CUST-002\", \"name\": \"Michael Chen\", \"company\": \"Digital Solutions Inc\"},\n  {\"customer_id\": \"CUST-003\", \"name\": \"Emma Rodriguez\", \"company\": \"Cloud Systems Corp\"}\n].map(item => ({json: item}))"
+      },
+      "id": "fee66f61-e4fc-4b35-87ae-fedaebc4718d",
+      "name": "Generate Customer Names",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"customer_id\": \"CUST-001\", \"email\": \"sarah.johnson@techinnovations.com\", \"phone\": \"+1-555-0101\"},\n  {\"customer_id\": \"CUST-002\", \"email\": \"michael.chen@digitalsolutions.com\", \"phone\": \"+1-555-0102\"},\n  {\"customer_id\": \"CUST-003\", \"email\": \"emma.rodriguez@cloudsystems.com\", \"phone\": \"+1-555-0103\"}\n].map(item => ({json: item}))"
+      },
+      "id": "762d05dd-3787-44ea-9651-4312f114abd2",
+      "name": "Generate Customer Emails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2272,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"user\": \"alice.thompson@company.com\", \"status\": \"active\", \"last_login\": \"2024-01-15\"},\n  {\"user\": \"bob.martinez@company.com\", \"status\": \"inactive\", \"last_login\": \"2023-11-20\"},\n  {\"user\": \"charlie.wong@company.com\", \"status\": \"active\", \"last_login\": \"2024-01-14\"},\n  {\"user\": \"diana.patel@company.com\", \"status\": \"inactive\", \"last_login\": \"2023-10-05\"},\n  {\"user\": \"evan.kim@company.com\", \"status\": \"active\", \"last_login\": \"2024-01-16\"}\n].map(item => ({json: item}))"
+      },
+      "id": "f1ac9ffd-c40a-4c03-a0aa-bc3ec17176ea",
+      "name": "Generate User Status Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"player\": \"AlexTheGreat\", \"score\": 9850, \"level\": 47},\n  {\"player\": \"BetaMaster\", \"score\": 8720, \"level\": 42},\n  {\"player\": \"CyberNinja\", \"score\": 9340, \"level\": 45},\n  {\"player\": \"DragonSlayer\", \"score\": 8890, \"level\": 43},\n  {\"player\": \"EpicGamer\", \"score\": 9120, \"level\": 44},\n  {\"player\": \"FlashRunner\", \"score\": 8560, \"level\": 41}\n].map(item => ({json: item}))"
+      },
+      "id": "0441bbaf-4bf5-4bfd-869c-b68ba705b5b9",
+      "name": "Generate Player Scores",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        1120
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"id\": \"SKU-1001\", \"product\": \"MacBook Pro 16\", \"price\": 2499.00, \"stock\": 25},\n  {\"id\": \"SKU-1002\", \"product\": \"Logitech MX Master\", \"price\": 99.00, \"stock\": 150},\n  {\"id\": \"SKU-1003\", \"product\": \"Keychron K8\", \"price\": 89.00, \"stock\": 75},\n  {\"id\": \"SKU-1004\", \"product\": \"Dell UltraSharp 27\", \"price\": 549.00, \"stock\": 40}\n].map(item => ({json: item}))"
+      },
+      "id": "d023e445-144e-47a7-ab4b-ef542d9dbfb7",
+      "name": "Generate Product Catalog",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"product\": \"MacBook Pro 16\", \"sales\": 12500, \"units_sold\": 5},\n  {\"product\": \"Logitech MX Master\", \"sales\": 990, \"units_sold\": 10},\n  {\"product\": \"Keychron K8\", \"sales\": 2670, \"units_sold\": 30},\n  {\"product\": \"Dell UltraSharp 27\", \"sales\": 5490, \"units_sold\": 10},\n  {\"product\": \"AirPods Pro\", \"sales\": 4990, \"units_sold\": 20}\n].map(item => ({json: item}))"
+      },
+      "id": "e8bf745d-43bc-4d1e-80c5-5783cea37752",
+      "name": "Generate Sales Data1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"email\": \"sarah.johnson@company.com\", \"name\": \"Sarah Johnson\", \"status\": \"active\"},\n  {\"email\": \"invalid-email-format\", \"name\": \"Invalid User\", \"status\": \"active\"},\n  {\"email\": \"sarah.johnson@company.com\", \"name\": \"Sarah Johnson\", \"status\": \"active\"},\n  {\"email\": \"mike.chen@business.org\", \"name\": \"Mike Chen\", \"status\": \"inactive\"},\n  {\"email\": \"lisa.wong@enterprise.net\", \"name\": \"Lisa Wong\", \"status\": \"active\"}\n].map(item => ({json: item}))"
+      },
+      "id": "e199ccbe-61f0-4196-825c-24d5af96b4ae",
+      "name": "Generate Customer Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"region\": \"North America\", \"product\": \"Laptop Pro 15\", \"revenue\": 12500},\n  {\"region\": \"Europe\", \"product\": \"Wireless Mouse\", \"revenue\": 850},\n  {\"region\": \"North America\", \"product\": \"Mechanical Keyboard\", \"revenue\": 3200},\n  {\"region\": \"Asia Pacific\", \"product\": \"4K Monitor\", \"revenue\": 8900},\n  {\"region\": \"Europe\", \"product\": \"Laptop Pro 15\", \"revenue\": 15000},\n  {\"region\": \"Asia Pacific\", \"product\": \"Wireless Mouse\", \"revenue\": 920},\n  {\"region\": \"North America\", \"product\": \"USB-C Hub\", \"revenue\": 1800}\n].map(item => ({json: item}))"
+      },
+      "id": "abf3cf07-1183-4e59-9544-d8c50949de26",
+      "name": "Generate Sales Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"customer_id\": \"CUST001\", \"name\": \"Alice Thompson\", \"vip\": true, \"region\": \"North America\"},\n  {\"customer_id\": \"CUST002\", \"name\": \"Bob Martinez\", \"vip\": false, \"region\": \"Europe\"},\n  {\"customer_id\": \"CUST003\", \"name\": \"Carol Zhang\", \"vip\": true, \"region\": \"Asia Pacific\"},\n  {\"customer_id\": \"CUST004\", \"name\": \"David Kim\", \"vip\": true, \"region\": \"North America\"}\n].map(item => ({json: item}))"
+      },
+      "id": "f71fc924-2403-4ba9-9bc8-d4859c8bf905",
+      "name": "Generate VIP Customer Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"customer_id\": \"CUST001\", \"discount_percent\": 15, \"loyalty_points\": 2500},\n  {\"customer_id\": \"CUST002\", \"discount_percent\": 5, \"loyalty_points\": 450},\n  {\"customer_id\": \"CUST003\", \"discount_percent\": 20, \"loyalty_points\": 5000},\n  {\"customer_id\": \"CUST004\", \"discount_percent\": 12, \"loyalty_points\": 1800}\n].map(item => ({json: item}))"
+      },
+      "id": "763251bc-ebce-47eb-9efc-91332464d7ef",
+      "name": "Generate Loyalty Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    batch_id: \"BATCH2024001\",\n    records: [\n      {\"id\": \"REC001\", \"value\": \"Transaction A\"},\n      {\"id\": \"REC002\", \"value\": \"Transaction B\"},\n      {\"id\": \"REC003\", \"value\": \"Transaction C\"},\n      {\"id\": \"REC004\", \"value\": \"Transaction D\"},\n      {\"id\": \"REC005\", \"value\": \"Transaction E\"}\n    ]\n  }\n}]"
+      },
+      "id": "66352d73-12d3-4c24-9612-875ad629023c",
+      "name": "Generate Batch Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"id\": \"PROD001\", \"product\": \"Laptop Pro 15\", \"quantity\": 45, \"price\": 1299.99},\n  {\"id\": \"PROD002\", \"product\": \"Wireless Mouse\", \"quantity\": 150, \"price\": 29.99},\n  {\"id\": \"PROD003\", \"product\": \"Mechanical Keyboard\", \"quantity\": 78, \"price\": 89.99},\n  {\"id\": \"PROD004\", \"product\": \"4K Monitor\", \"quantity\": 32, \"price\": 449.99}\n].map(item => ({json: item}))"
+      },
+      "id": "c54ce005-af89-4f6d-a808-8da50285c9ef",
+      "name": "Generate Product Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "196f6292-8b65-4324-857b-71fe0431e7a1",
+      "name": "Remove Duplicate Records1",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        192,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e94ba5c0-294a-43ac-b634-af031344c5f4",
+      "name": "Filter Invalid Data1",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "cleaned_at",
+              "value": "={{ $now.format('DD') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c394959d-ad86-4b7b-bb85-d77bc1be8c8a",
+      "name": "Clean Data Output1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "sum",
+              "field": "revenue"
+            }
+          ]
+        },
+        "fieldsToSplitBy": "region",
+        "options": {}
+      },
+      "id": "9b6e8dd3-47c8-4cd0-8e51-38beae38e75e",
+      "name": "Calculate Totals1",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "sum_revenue",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ed1a5e8c-a6c0-4a0e-9730-e6ae77d2a123",
+      "name": "Sort by Revenue1",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        416,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "region",
+              "value": "={{ $json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "total_revenue",
+              "value": "={{ $json.sum_revenue }}",
+              "type": "number"
+            },
+            {
+              "id": "id-3",
+              "name": "report_date",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d46dac3-2d0b-4972-b911-da026d58c61c",
+      "name": "Final Report1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.region }}",
+                    "rightValue": "North America",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "North America"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.region }}",
+                    "rightValue": "Europe",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Europe"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.region }}",
+                    "rightValue": "Asia Pacific",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Asia Pacific"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8adf2857-4da0-4f72-9a87-b0659ea81ec2",
+      "name": "Route by Region1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "73d6190b-e26f-4b9c-b206-1d34aca6fa3a",
+      "name": "Merge Customer Data1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "records",
+        "options": {}
+      },
+      "id": "9a14e160-3a0b-4393-9042-31d497e91393",
+      "name": "Split Records1",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        192,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "value",
+              "value": "={{ $json.value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "processed",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "id-4",
+              "name": "processed_at",
+              "value": "={{ $now.format('DD') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e09d20e9-03f6-451f-a147-2d9ea10abb47",
+      "name": "Process Each Record1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "id",
+              "renameField": true,
+              "outputFieldName": "id_list"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "567fb4fc-a5c7-4579-8580-785ce9062fba",
+      "name": "Combine Results1",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        640,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "batch_id",
+              "value": "={{ $('Generate Batch Data').first().json.batch_id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "total_processed",
+              "value": "={{ $json.id_list.length }}",
+              "type": "number"
+            },
+            {
+              "id": "id-3",
+              "name": "completed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90c6b214-a201-4bac-b54f-c4b72070ad1a",
+      "name": "Processed Output1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        944
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "dce042c8-1d1d-4cb9-8429-179ecd096219",
+      "name": "Convert to CSV1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "82fec146-c476-4119-b74a-592ad2f44f2e",
+      "name": "Extract from CSV1",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "extracted_data",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "id-2",
+              "name": "extraction_method",
+              "value": "CSV",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "extracted_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0ac4eba1-06dc-4331-b429-191f5417f77c",
+      "name": "Show Extracted Data1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        640,
+        1168
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 2
+      },
+      "id": "81fc0c06-e265-4adb-baca-34967a27f30e",
+      "name": "Top 2 Regions",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        640,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "orderId",
+              "value": "={{ $json.orderId }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "customer",
+              "value": "={{ $json.customer }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "amount",
+              "value": "={{ $json.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "id-4",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "status",
+              "value": "processed",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "processedAt",
+              "value": "={{ $now.format('DD') }}",
+              "type": "string"
+            },
+            {
+              "id": "id-7",
+              "name": "processedBy",
+              "value": "Automated System",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "12469d20-4562-46f9-8f10-56f958498816",
+      "name": "Process Order",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2768,
+        1408
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "224e3798-68e0-4d7d-a8ba-fba506b958de",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2512,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\"orderId\": \"ORD-2024-001\", \"customer\": \"Acme Corp\", \"amount\": 1250.00, \"status\": \"pending\", \"email\": \"orders@acmecorp.com\"},\n  {\"orderId\": \"ORD-2024-002\", \"customer\": \"TechStart Inc\", \"amount\": 3400.50, \"status\": \"pending\", \"email\": \"billing@techstart.com\"},\n  {\"orderId\": \"ORD-2024-003\", \"customer\": \"Global Solutions\", \"amount\": 890.25, \"status\": \"pending\", \"email\": \"finance@globalsolutions.com\"},\n  {\"orderId\": \"ORD-2024-004\", \"customer\": \"Innovation Labs\", \"amount\": 5600.00, \"status\": \"pending\", \"email\": \"accounts@innovationlabs.com\"},\n  {\"orderId\": \"ORD-2024-005\", \"customer\": \"Digital Dynamics\", \"amount\": 2100.75, \"status\": \"pending\", \"email\": \"payments@digitaldynamics.com\"},\n  {\"orderId\": \"ORD-2024-006\", \"customer\": \"Smart Systems\", \"amount\": 4250.00, \"status\": \"pending\", \"email\": \"invoices@smartsystems.com\"},\n  {\"orderId\": \"ORD-2024-007\", \"customer\": \"Future Tech\", \"amount\": 1890.50, \"status\": \"pending\", \"email\": \"billing@futuretech.com\"},\n  {\"orderId\": \"ORD-2024-008\", \"customer\": \"Cloud Nine\", \"amount\": 3200.00, \"status\": \"pending\", \"email\": \"finance@cloudnine.com\"}\n].map(item => ({json: item}))"
+      },
+      "id": "d14ceb60-5cf8-42cd-a7f2-b7941248a298",
+      "name": "Generate Batch Items1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        1360
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start - Edit Fields Demo": {
+      "main": [
+        [
+          {
+            "node": "Generate Customer Names",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Customer Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort - Order by Score": {
+      "main": [
+        [
+          {
+            "node": "Limit - Top 3 Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Pause Execution": {
+      "main": [
+        [
+          {
+            "node": "No Op - Pass Through",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Op - Pass Through": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Compression",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Duplicate Data": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Order Data": {
+      "main": [
+        [
+          {
+            "node": "IF - Check Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Category Data": {
+      "main": [
+        [
+          {
+            "node": "Switch - Route by Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Transaction Data": {
+      "main": [
+        [
+          {
+            "node": "Aggregate - Sum by Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Order with Items": {
+      "main": [
+        [
+          {
+            "node": "Split Out - Separate Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Customer Names": {
+      "main": [
+        [
+          {
+            "node": "Merge - Combine Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Customer Emails": {
+      "main": [
+        [
+          {
+            "node": "Merge - Combine Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate User Status Data": {
+      "main": [
+        [
+          {
+            "node": "Filter - Keep Active Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Player Scores": {
+      "main": [
+        [
+          {
+            "node": "Sort - Order by Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Product Catalog": {
+      "main": [
+        [
+          {
+            "node": "Wait - Pause Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Sales Data1": {
+      "main": [
+        [
+          {
+            "node": "Summarize - Calculate Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Customer Data": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicate Records1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Totals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate VIP Customer Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Region1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Loyalty Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Customer Data1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Batch Data": {
+      "main": [
+        [
+          {
+            "node": "Split Records1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Product Data": {
+      "main": [
+        [
+          {
+            "node": "Convert to CSV1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicate Records1": {
+      "main": [
+        [
+          {
+            "node": "Filter Invalid Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Invalid Data1": {
+      "main": [
+        [
+          {
+            "node": "Clean Data Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Totals1": {
+      "main": [
+        [
+          {
+            "node": "Sort by Revenue1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort by Revenue1": {
+      "main": [
+        [
+          {
+            "node": "Top 2 Regions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Region1": {
+      "main": [
+        [
+          {
+            "node": "Merge Customer Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Records1": {
+      "main": [
+        [
+          {
+            "node": "Process Each Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Each Record1": {
+      "main": [
+        [
+          {
+            "node": "Combine Results1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Results1": {
+      "main": [
+        [
+          {
+            "node": "Processed Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to CSV1": {
+      "main": [
+        [
+          {
+            "node": "Extract from CSV1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from CSV1": {
+      "main": [
+        [
+          {
+            "node": "Show Extracted Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 2 Regions": {
+      "main": [
+        [
+          {
+            "node": "Final Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Order": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Process Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Batch Items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "48decc57-c18e-4293-a658-4901a79487d4",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "j98cOaKVM0JPsjX6",
+  "tags": []
+}

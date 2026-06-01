@@ -1,0 +1,114 @@
+{
+  "name": "Introduction to Model Context Protocol",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "![img](https://ik.imagekit.io/MyImage/intro%20mcp.png)\n![img](https://ik.imagekit.io/MyImage/mcp%20illustration.png)\n",
+        "height": 1056,
+        "width": 832,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -816,
+        5120
+      ],
+      "typeVersion": 1,
+      "id": "563d8b77-1cd0-4b09-9576-7323ac160799",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "path": "020742a9-e357-433a-bb6f-2e264b2c56c2"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        5808
+      ],
+      "id": "565f366c-d79a-427a-9764-bb34b5f8befd",
+      "name": "MCP Server Trigger",
+      "webhookId": "020742a9-e357-433a-bb6f-2e264b2c56c2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -320,
+        5808
+      ],
+      "id": "abb551bf-c9a7-4684-aa00-bc2662372b2f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        6016
+      ],
+      "id": "a72c7705-64da-4ac5-a231-2564763cb619",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -480,
+        5808
+      ],
+      "id": "0d68902c-4585-408b-83a2-107a56dcfd74",
+      "name": "When chat message received",
+      "webhookId": "42c68a72-33d2-4941-bb98-e8afebcfe43d"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a6474a08-1c75-4314-8def-562bcf944b39",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "RrHRRR1W3jpvS3FxlgAkd",
+  "tags": []
+}

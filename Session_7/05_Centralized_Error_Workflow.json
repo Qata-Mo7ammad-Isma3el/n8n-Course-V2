@@ -1,0 +1,194 @@
+{
+  "name": "S7-05 Centralized Error Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 5: Centralized Error Workflow (THE KEYSTONE)\n\n### What this is\nONE error handler used by ALL your other workflows.\nBuild it once, reuse forever.\n\n### How to wire it up\n1. Save & activate this workflow\n2. Open ANY other workflow → Settings (gear icon) → Error Workflow → select THIS one\n3. From now on, when that workflow fails, this one runs automatically\n\n### What it does\n- Catches the error via Error Trigger\n- Formats a clean payload (workflow name, node, message, timestamp)\n- Routes by severity (Switch)\n- Logs to Google Sheets (always)\n- Sends Telegram alert (high severity only)\n\n### Why severity routing matters\nIf you alert on EVERY error → alert fatigue → you'll ignore real outages.\nLog everything, alert only on what matters.",
+        "height": 460,
+        "width": 800,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-440, -120],
+      "id": "note-05",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [-340, 420],
+      "id": "error-trigger",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "workflowName",
+              "value": "={{ $json.workflow?.name || 'unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "workflowId",
+              "value": "={{ $json.workflow?.id || 'unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "errorMessage",
+              "value": "={{ $json.execution?.error?.message || 'no message' }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "errorNode",
+              "value": "={{ $json.execution?.error?.node?.name || 'unknown' }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "executionUrl",
+              "value": "={{ $json.execution?.url || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f6",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "f7",
+              "name": "severity",
+              "value": "={{ ($json.execution?.error?.message || '').toLowerCase().includes('rate') ? 'low' : 'high' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-100, 420],
+      "id": "format-payload",
+      "name": "Format Error Payload"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "sev-high",
+                    "leftValue": "={{ $json.severity }}",
+                    "rightValue": "high",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "high"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "sev-low",
+                    "leftValue": "={{ $json.severity }}",
+                    "rightValue": "low",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "low"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [160, 420],
+      "id": "severity-switch",
+      "name": "Route by Severity"
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_WITH_YOUR_CHAT_ID",
+        "text": "=ALERT - workflow failed\\n\\nWorkflow: {{ $json.workflowName }}\\nNode: {{ $json.errorNode }}\\nError: {{ $json.errorMessage }}\\nTime: {{ $json.timestamp }}\\n\\n{{ $json.executionUrl }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [420, 320],
+      "id": "telegram-high",
+      "name": "Telegram Alert (HIGH)",
+      "webhookId": "centralized-error-telegram"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Errors"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $json.timestamp }}",
+            "workflowName": "={{ $json.workflowName }}",
+            "errorNode": "={{ $json.errorNode }}",
+            "errorMessage": "={{ $json.errorMessage }}",
+            "severity": "={{ $json.severity }}",
+            "executionUrl": "={{ $json.executionUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [420, 520],
+      "id": "log-sheet",
+      "name": "Log to Sheets (always)"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [[{ "node": "Format Error Payload", "type": "main", "index": 0 }]]
+    },
+    "Format Error Payload": {
+      "main": [[{ "node": "Route by Severity", "type": "main", "index": 0 }]]
+    },
+    "Route by Severity": {
+      "main": [
+        [
+          { "node": "Telegram Alert (HIGH)", "type": "main", "index": 0 },
+          { "node": "Log to Sheets (always)", "type": "main", "index": 0 }
+        ],
+        [{ "node": "Log to Sheets (always)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

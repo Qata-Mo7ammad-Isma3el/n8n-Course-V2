@@ -1,0 +1,144 @@
+these are the Evo apis that we want to use:
+
+1. Send Plain Text:
+```curl
+curl --request POST \
+  --url https://evolution-example/message/sendText/{instance} \
+  --header 'Content-Type: application/json' \
+  --header 'apikey: <api-key>' \
+  --data '
+{
+  "number": "<string>",
+  "text": "<string>",
+  "delay": 123,
+  "linkPreview": true,
+  "mentionsEveryOne": true,
+  "mentioned": [
+    "{{remoteJID}}"
+  ],
+  "quoted": {
+    "key": {
+      "id": "<string>"
+    },
+    "message": {
+      "conversation": "<string>"
+    }
+  }
+}
+'
+```
+1. Authorizations
+apikey is required
+2. Path Parameters
+instance is required
+3. Body application/json
+number is required Number to receive the message (with country code)
+text  is required
+
+
+2. Send Media
+```curl
+curl --request POST \
+  --url https://evolution-example/message/sendMedia/{instance} \
+  --header 'Content-Type: application/json' \
+  --header 'apikey: <api-key>' \
+  --data '
+{
+  "number": "<string>",
+  "mediatype": "<string>",
+  "mimetype": "<string>",
+  "caption": "<string>",
+  "media": "<string>",
+  "fileName": "<string>",
+  "delay": 123,
+  "linkPreview": true,
+  "mentionsEveryOne": true,
+  "mentioned": [
+    "{{remoteJID}}"
+  ],
+  "quoted": {
+    "key": {
+      "id": "<string>"
+    },
+    "message": {
+      "conversation": "<string>"
+    }
+  }
+}
+'
+```
+
+1. Authorizations
+apikey is required
+2. Path Parameters
+instance is required
+3. Body application/json
+number is required Number to receive the message (with country code)
+mediatype string required Image, video or document
+mimetype string required image/png
+caption string required Caption test
+average string required URL or base64
+fileName string required Image.png
+
+
+3. Send List
+
+```curl
+curl --request POST \
+  --url https://evolution-example/message/sendList/{instance} \
+  --header 'Content-Type: application/json' \
+  --header 'apikey: <api-key>' \
+  --data '
+{
+  "number": "<string>",
+  "title": "<string>",
+  "description": "<string>",
+  "buttonText": "<string>",
+  "footerText": "<string>",
+  "values": [
+    {
+      "title": "<string>",
+      "rows": [
+        {
+          "title": "<string>",
+          "description": "<string>",
+          "rowId": "<string>"
+        }
+      ]
+    }
+  ],
+  "delay": 123,
+  "linkPreview": true,
+  "mentionsEveryOne": true,
+  "mentioned": [
+    "{{remoteJID}}"
+  ],
+  "quoted": {
+    "key": {
+      "id": "<string>"
+    },
+    "message": {
+      "conversation": "<string>"
+    }
+  }
+}
+'
+```
+1. Authorizations
+apikey is required
+2. Path Parameters
+instance is required
+3. Body application/json
+number is required Number to receive the message (with country code)
+title string required Title of list
+description string required Description for lists
+buttonText string required Text Button
+footerText string required footer list https://examplelink.com.br
+values object[] required Show child attributes
+values. title string title item of list
+values. rows object[] Show child attributes
+
+
+so now om about to create session 8 based on these apis i want you to help me to build session 8
+Setup files uploaded, ready to start session-by-session optimization.
+

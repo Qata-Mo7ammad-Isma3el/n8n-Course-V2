@@ -1,0 +1,198 @@
+{
+  "name": "Telegram - Inline Keyboard & Callbacks",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ⌨️ Telegram — Inline Keyboard & Callbacks\n\n**Goal:** Build interactive buttons that users can tap, and react to those taps.\n\n**The two events you need to handle:**\n1. `message` — user sends `/start` or any text → bot replies with buttons.\n2. `callback_query` — user TAPS a button → bot updates the message and confirms.\n\n**Critical rule:** ALWAYS call `answerCallbackQuery` after a tap, otherwise the button shows a loading spinner forever in the user's app.",
+        "height": 440,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-680, -300],
+      "typeVersion": 1,
+      "id": "tg-note-003",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "updates": ["message", "callback_query"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-160, 0],
+      "id": "tg-trigger-003",
+      "name": "Telegram Trigger",
+      "webhookId": "tg-buttons-bot"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "k1",
+                    "leftValue": "={{ $json.callback_query }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "callback"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "k2",
+                    "leftValue": "={{ $json.message }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "message"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [80, 0],
+      "id": "tg-switch-003",
+      "name": "Message or Callback?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Pick your favorite color:",
+        "additionalFields": {
+          "reply_markup": "={{ JSON.stringify({\n  inline_keyboard: [\n    [\n      { text: '🔴 Red',   callback_data: 'color_red' },\n      { text: '🟢 Green', callback_data: 'color_green' },\n      { text: '🔵 Blue',  callback_data: 'color_blue' }\n    ],\n    [\n      { text: '❌ Cancel', callback_data: 'action_cancel' }\n    ]\n  ]\n}) }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [340, 200],
+      "id": "tg-send-buttons-003",
+      "name": "Send Buttons"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb1",
+              "name": "callbackQueryId",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.id }}",
+              "type": "string"
+            },
+            {
+              "id": "cb2",
+              "name": "callbackData",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+              "type": "string"
+            },
+            {
+              "id": "cb3",
+              "name": "chatId",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "cb4",
+              "name": "messageId",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}",
+              "type": "number"
+            },
+            {
+              "id": "cb5",
+              "name": "humanLabel",
+              "value": "={{ {\n  color_red: '🔴 Red',\n  color_green: '🟢 Green',\n  color_blue: '🔵 Blue',\n  action_cancel: '❌ Cancelled'\n}[$('Telegram Trigger').item.json.callback_query.data] || 'Unknown' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [340, -200],
+      "id": "tg-cb-extract-003",
+      "name": "Extract Callback Data"
+    },
+    {
+      "parameters": {
+        "resource": "callback",
+        "operation": "answerQuery",
+        "queryId": "={{ $json.callbackQueryId }}",
+        "results": "={{ 'You picked ' + $json.humanLabel }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [580, -300],
+      "id": "tg-cb-answer-003",
+      "name": "Answer Callback (stop spinner)"
+    },
+    {
+      "parameters": {
+        "operation": "editMessageText",
+        "chatId": "={{ $('Extract Callback Data').item.json.chatId }}",
+        "messageId": "={{ $('Extract Callback Data').item.json.messageId }}",
+        "text": "=✅ You picked: {{ $('Extract Callback Data').item.json.humanLabel }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [820, -300],
+      "id": "tg-cb-edit-003",
+      "name": "Edit Original Message"
+    },
+    {
+      "parameters": {
+        "content": "### ⚠️ Two-output flow\n\nWhen handling a callback you must:\n1. **Answer the query** (kills the spinner).\n2. **Edit or reply** to confirm visually.\n\nDoing only one leaves the UX broken in some way.",
+        "height": 240,
+        "width": 360,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [580, -560],
+      "typeVersion": 1,
+      "id": "tg-note-cb-003",
+      "name": "Callback Rule"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Message or Callback?", "type": "main", "index": 0 }]]
+    },
+    "Message or Callback?": {
+      "main": [
+        [{ "node": "Extract Callback Data", "type": "main", "index": 0 }],
+        [{ "node": "Send Buttons", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Callback Data": {
+      "main": [[{ "node": "Answer Callback (stop spinner)", "type": "main", "index": 0 }]]
+    },
+    "Answer Callback (stop spinner)": {
+      "main": [[{ "node": "Edit Original Message", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

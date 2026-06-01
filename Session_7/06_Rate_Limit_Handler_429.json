@@ -1,0 +1,217 @@
+{
+  "name": "S7-06 Rate Limit Handler (429)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 6: Rate Limit Handler (429)\n\n### What you'll learn\n- The most common real-world API failure: 429 Too Many Requests\n- Why plain Retry on Fail isn't enough (it doesn't back off intelligently)\n- Exponential backoff using Wait + Loop\n\n### Pattern\nHTTP → If status=429 → Wait (exponential) → retry\nElse → continue\n\n### Try it\nPoint the HTTP node at any rate-limited API.\nWhen 429 hits, it waits 2s, then 4s, then 8s, then gives up.\n\n### Real world\nUsed heavily in WhatsApp (Evolution API), OpenAI, Telegram bots,\nand any pay-per-call API. See PropAI and Kensoftwaer Dara projects.",
+        "height": 380,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-460, -80],
+      "id": "note-06",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-380, 420],
+      "id": "trigger-06",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "i1",
+              "name": "attempt",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "i2",
+              "name": "maxAttempts",
+              "value": 4,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-180, 420],
+      "id": "init",
+      "name": "Init counters"
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/status/429",
+        "options": { "response": { "response": { "fullResponse": true } } }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [60, 420],
+      "id": "http-429",
+      "name": "Call API",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "is-429",
+              "leftValue": "={{ $json.statusCode || $json.error?.httpCode }}",
+              "rightValue": 429,
+              "operator": { "type": "number", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [300, 420],
+      "id": "check-429",
+      "name": "Is 429?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "max",
+              "leftValue": "={{ $('Init counters').item.json.attempt }}",
+              "rightValue": "={{ $('Init counters').item.json.maxAttempts }}",
+              "operator": { "type": "number", "operation": "lt" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [540, 320],
+      "id": "check-attempts",
+      "name": "Attempts left?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.pow(2, $('Init counters').item.json.attempt + 1) }}",
+        "unit": "seconds"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [780, 320],
+      "id": "backoff",
+      "name": "Exponential Backoff",
+      "webhookId": "rate-limit-wait"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "inc",
+              "name": "attempt",
+              "value": "={{ $('Init counters').item.json.attempt + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "max2",
+              "name": "maxAttempts",
+              "value": "={{ $('Init counters').item.json.maxAttempts }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1020, 320],
+      "id": "increment",
+      "name": "Increment Attempt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "g1",
+              "name": "status",
+              "value": "GAVE UP after max attempts",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 480],
+      "id": "give-up",
+      "name": "Give Up"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ok1",
+              "name": "status",
+              "value": "OK",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [540, 540],
+      "id": "success",
+      "name": "Success"
+    }
+  ],
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Init counters", "type": "main", "index": 0 }]]
+    },
+    "Init counters": {
+      "main": [[{ "node": "Call API", "type": "main", "index": 0 }]]
+    },
+    "Call API": {
+      "main": [[{ "node": "Is 429?", "type": "main", "index": 0 }]]
+    },
+    "Is 429?": {
+      "main": [
+        [{ "node": "Attempts left?", "type": "main", "index": 0 }],
+        [{ "node": "Success", "type": "main", "index": 0 }]
+      ]
+    },
+    "Attempts left?": {
+      "main": [
+        [{ "node": "Exponential Backoff", "type": "main", "index": 0 }],
+        [{ "node": "Give Up", "type": "main", "index": 0 }]
+      ]
+    },
+    "Exponential Backoff": {
+      "main": [[{ "node": "Increment Attempt", "type": "main", "index": 0 }]]
+    },
+    "Increment Attempt": {
+      "main": [[{ "node": "Call API", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

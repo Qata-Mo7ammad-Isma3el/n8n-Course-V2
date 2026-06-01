@@ -1,0 +1,356 @@
+{
+  "name": "AI Core Nodes Introduction",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Generate fake customer reviews for sentiment analysis\nconst reviews = [\n  {\n    id: 1,\n    customer: \"Alice Johnson\",\n    text: \"I absolutely love this product! It exceeded all my expectations. The quality is outstanding and delivery was super fast. Will definitely buy again!\",\n    source: \"website\"\n  },\n  {\n    id: 2,\n    customer: \"Bob Smith\",\n    text: \"The product arrived on time. It works as described. Nothing special but nothing wrong either. It does what it's supposed to do.\",\n    source: \"email\"\n  },\n  {\n    id: 3,\n    customer: \"Carol Davis\",\n    text: \"Terrible experience. The item broke after two days of use. Customer support was unhelpful and rude. I want a full refund immediately. Never shopping here again.\",\n    source: \"social_media\"\n  },\n  {\n    id: 4,\n    customer: \"David Lee\",\n    text: \"Pretty good overall. The color was slightly different from the picture, but the functionality is great. I'm happy with my purchase.\",\n    source: \"website\"\n  },\n  {\n    id: 5,\n    customer: \"Emma Wilson\",\n    text: \"Worst purchase I've ever made. The packaging was damaged, the product was scratched, and it stopped working within a week. Absolutely disgusted.\",\n    source: \"email\"\n  }\n];\n\nreturn reviews.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -272
+      ],
+      "id": "6a55d6ee-c0c6-4ebb-9aa2-d693de32815d",
+      "name": "Generate Fake Data To Analyze Sentiment"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate fake unstructured text containing personal info to extract\nconst entries = [\n  {\n    id: 1,\n    text: \"Hi, my name is Sarah Thompson. I'm 29 years old and I work as a Software Engineer at Google. You can reach me at sarah.thompson@gmail.com or call me at +1-555-123-4567. I live in San Francisco, California.\"\n  },\n  {\n    id: 2,\n    text: \"My name is James Rodriguez, I'm 42. I'm currently the Marketing Director at Nike headquarters in Portland, Oregon. My email is j.rodriguez@nike.com and my office number is +1-555-987-6543.\"\n  },\n  {\n    id: 3,\n    text: \"I'm Dr. Aisha Patel, a 35-year-old Cardiologist working at Mayo Clinic in Rochester, Minnesota. For appointments, email me at aisha.patel@mayoclinic.org or call +1-555-246-8101.\"\n  },\n  {\n    id: 4,\n    text: \"Hey there! I'm Kevin O'Brien, 27, a freelance Graphic Designer based in Austin, Texas. Check out my portfolio or email me at kevin.obrien.design@outlook.com. My phone is +1-555-333-7777.\"\n  }\n];\n\nreturn entries.map(e => ({ json: e }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1632,
+        -304
+      ],
+      "id": "561d6b90-51fe-4f57-af46-5d1981af831e",
+      "name": "Generate Fake Data To Information Extractor"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate fake support tickets for text classification\nconst tickets = [\n  {\n    id: 1,\n    subject: \"Can't login to my account\",\n    text: \"I've been trying to log into my account for the past hour. I keep getting an 'invalid credentials' error even though I'm sure my password is correct. I've tried resetting my password but the reset email never arrives.\",\n    submitted_by: \"user_1023\"\n  },\n  {\n    id: 2,\n    subject: \"Charge me twice\",\n    text: \"I was charged twice for my last order #ORD-4421. The total should have been $49.99 but I see two charges of $49.99 on my credit card statement. Please refund the duplicate charge as soon as possible.\",\n    submitted_by: \"user_2087\"\n  },\n  {\n    id: 3,\n    subject: \"Feature suggestion\",\n    text: \"It would be really great if you could add a dark mode to the mobile app. I use the app at night and the bright white screen is hard on my eyes. Many other apps already offer this feature and I think it would improve user experience.\",\n    submitted_by: \"user_3301\"\n  },\n  {\n    id: 4,\n    subject: \"App keeps crashing\",\n    text: \"Every time I try to open the reports section in the app, it crashes immediately. I'm using an iPhone 14 with iOS 17. I've tried reinstalling the app but the problem persists. This is very frustrating as I need to check my weekly reports.\",\n    submitted_by: \"user_4455\"\n  },\n  {\n    id: 5,\n    subject: \"How to export data?\",\n    text: \"I need to export all my project data to a CSV file for a presentation next week. I looked through the settings and help docs but couldn't figure out how to do this. Is this feature available? If so, can you walk me through the steps?\",\n    submitted_by: \"user_5102\"\n  }\n];\n\nreturn tickets.map(t => ({ json: t }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        -288
+      ],
+      "id": "f2948e42-36e5-4d76-b523-7c346ad64a68",
+      "name": "Generate Fake Data To Text Classifier"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate fake long-form text for summarization\nconst documents = [\n  {\n    id: 1,\n    title: \"Q3 2024 Company Performance Report\",\n    content: `TechNova Inc. reported strong performance in Q3 2024, with total revenue reaching $128 million, a 23% increase compared to the same quarter last year. The growth was primarily driven by the cloud services division, which saw a 41% year-over-year increase in recurring revenue, now accounting for 62% of total company revenue.\n\nThe company added 3,200 new enterprise customers during the quarter, bringing the total active customer base to 47,500. Customer retention rate remained high at 94.3%, up from 92.1% in Q3 2023. The average contract value increased by 18% to $34,000 annually.\n\nOperating expenses grew by 15% to $98 million, primarily due to increased hiring in the engineering and sales departments. The company added 180 new employees, bringing the total headcount to 2,340. Despite the increased spending, operating margin improved to 23.4%, up from 19.8% in the previous year.\n\nThe product team launched three major features during the quarter: an AI-powered analytics dashboard, automated compliance reporting, and a new API marketplace. Early adoption metrics show that 28% of enterprise customers have already activated at least one of these new features.\n\nLooking ahead, management raised full-year guidance to $490-510 million in revenue, reflecting confidence in the continued growth of cloud services and strong demand in the enterprise segment. The company also announced plans to expand into the European market in Q1 2025, with initial offices planned for London and Berlin.`\n  },\n  {\n    id: 2,\n    title: \"Remote Work Impact Study Summary\",\n    content: `A comprehensive study conducted across 150 companies and 25,000 employees examined the impact of remote work policies adopted since 2020. The study, spanning 18 months from January 2023 to June 2024, gathered data through surveys, productivity metrics, and HR records.\n\nKey findings revealed that hybrid work models, where employees split time between home and office, resulted in a 12% increase in self-reported productivity compared to fully in-office arrangements. Fully remote employees reported a 7% productivity increase. However, the study noted that collaborative tasks requiring real-time brainstorming showed a 15% efficiency decrease in fully remote settings.\n\nEmployee satisfaction scores were highest among hybrid workers at 8.2 out of 10, compared to 7.1 for fully remote and 6.4 for fully in-office employees. Turnover rates were 34% lower in companies offering flexible work arrangements. The average employee saved approximately $4,800 per year in commuting and work-related expenses under remote arrangements.\n\nMental health indicators showed mixed results. While 67% of remote workers reported better work-life balance, 43% reported feelings of isolation and 38% struggled with setting boundaries between work and personal time. Companies that provided mental health resources and regular virtual social events saw isolation reports drop to 21%.\n\nThe study recommended that companies adopt a structured hybrid model with 2-3 days in office per week, invest in collaboration technology, establish clear communication protocols, and provide mental health support for remote employees. Companies implementing these recommendations saw a 19% improvement in overall team performance metrics within six months.`\n  }\n];\n\nreturn documents.map(d => ({\n  json: {\n    // Map it explicitly to the field the node reads\n    inputText: d.content,\n    title: d.title,\n    id: d.id\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -256
+      ],
+      "id": "0ce0cb9a-22e1-4a96-b134-5c629f72e347",
+      "name": "Generate Fake Data To Summarization Chain"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "full_name",
+              "description": "The full name of the person",
+              "required": true
+            },
+            {
+              "name": "age",
+              "type": "number",
+              "description": "The age of the person as a number",
+              "required": true
+            },
+            {
+              "name": "job_title",
+              "description": "The person's job title or occupation",
+              "required": true
+            },
+            {
+              "name": "company",
+              "description": "The company or organization they work for",
+              "required": true
+            },
+            {
+              "name": "email",
+              "description": "The person's email address",
+              "required": true
+            },
+            {
+              "name": "phone",
+              "description": "The person's phone number"
+            },
+            {
+              "name": "city",
+              "description": "The city where the person is located"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert data extraction assistant. Extract the requested personal information from the provided text. Be precise and only extract information that is explicitly stated in the text. If a field is not found in the text, leave it empty."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -1392,
+        -304
+      ],
+      "id": "2a24ce38-793c-44ae-b021-9d7a4c1b02f3",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "inputText": "=Email Subject: {{ $json.subject }}\nEmail Body : {{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Technical Issue",
+              "description": "Problems related to bugs, crashes, errors, or technical malfunctions in the product"
+            },
+            {
+              "category": "Billing Issue",
+              "description": "Problems related to payments, charges, refunds, invoices, or subscription billing"
+            },
+            {
+              "category": "Feature Request",
+              "description": "Suggestions or requests for new features, improvements, or enhancements"
+            },
+            {
+              "category": "How-To Question",
+              "description": "Questions about how to use existing features or accomplish tasks within the product"
+            },
+            {
+              "category": "Account Access",
+              "description": "Issues related to logging in, password resets, account lockouts, or authentication"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert customer support ticket classifier. Classify the given support ticket into exactly one of the provided categories. Analyze the main intent of the customer's message and choose the most appropriate category. Use the provided formatting instructions. Only output the JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -336
+      ],
+      "id": "b46fac76-a396-4c6f-9f96-d13b4f9e79ce",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {
+          "summarizationMethodAndPrompts": {
+            "values": {
+              "combineMapPrompt": "=Write a concise summary of the following:\n\n\n\"{{ $json.inputText }}\"\n\n\nCONCISE SUMMARY:",
+              "prompt": "=Write a clear and concise summary of the following document. Include the key findings, important numbers and statistics, and main conclusions. The summary should be 3-5 sentences long and easy to understand for a non-technical audience.\n\ntext to summarize:\ntitle: {{ $json.title }}\ninputText: \"{{ $json.inputText }}\"\n"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "typeVersion": 2.1,
+      "position": [
+        1504,
+        -256
+      ],
+      "id": "e78462c1-07ae-4d84-86f1-ac39d13af0ee",
+      "name": "Summarization Chain"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.text }}",
+        "options": {
+          "categories": "Positive, Neutral, Negative",
+          "systemPromptTemplate": "You are a highly intelligent and accurate sentiment analyzer. Analyze the sentiment of the provided customer review text. Consider the overall tone, word choice, and emotional intensity. Categorize it into one of the following: {categories}. Use the provided formatting instructions. Only output the JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        -288
+      ],
+      "id": "06fdccda-553b-4b27-9c74-6c51b1b15794",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        352
+      ],
+      "id": "7369ba34-f5c2-45ca-bb94-48eda65558c6",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qOtKSs1wZu97M7Sd",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 1. Information Extractor\n\n**What it does:** Pulls structured data from unstructured text.\n\n**Example scenario:** You receive paragraphs of text like *\"Hi, my name is Sarah Thompson. I'm 29 years old and I work as a Software Engineer at Google...\"* and you need to extract specific fields like name, age, job title, email, etc.\n\n**How it works:**\n\n- The Code node generates free-form text paragraphs containing personal details.\n- The Information Extractor is configured with **attributes** (full_name, age, job_title, company, email, phone, city), each with a name, description, and data type.\n- The AI reads each paragraph and outputs a clean JSON object with the extracted values.\n\n**Use cases:** Processing resumes, parsing emails, extracting order details from messages.",
+        "height": 560,
+        "width": 928,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1824,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "e97288ac-0aa4-4e58-92e3-edc61d5fdde9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 2. Text Classifier\n\n**What it does:** Assigns a category label to a piece of text.\n\n**Example scenario:** Customer support tickets come in and need to be automatically routed. A ticket saying *\"I was charged twice for my last order\"* should be tagged as **Billing Issue**, while *\"The app keeps crashing\"* should be tagged as **Technical Issue**.\n\n**How it works:**\n\n- The Code node generates realistic support tickets with different intents.\n- The Text Classifier is configured with **5 categories**: Technical Issue, Billing Issue, Feature Request, How-To Question, and Account Access — each with a description to guide the AI.\n- The AI reads each ticket and assigns the most fitting category.\n\n**Use cases:** Routing support tickets, tagging content, sorting feedback by topic.\n",
+        "height": 560,
+        "width": 1008,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -880,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "ad283764-9b65-4e46-85b7-c2bde2f40c10",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## 3. Sentiment Analysis\n\n**What it does:** Determines the emotional tone of a text (Positive, Neutral, or Negative).\n\n**Example scenario:** You collect customer reviews and want to automatically flag negative ones for follow-up. A review saying *\"I absolutely love this product!\"* is **Positive**, while *\"Terrible experience, the item broke after two days\"* is **Negative**.\n\n**How it works:**\n\n- The Code node generates 5 customer reviews with varying tones.\n- The Sentiment Analysis node is configured with three sentiment categories: **Positive, Neutral, Negative**.\n- A custom system prompt instructs the AI to consider tone, word choice, and emotional intensity.\n- The AI outputs a sentiment label for each review.\n\n**Use cases:** Monitoring brand reputation, prioritizing unhappy customers, analyzing survey responses.\n",
+        "height": 560,
+        "width": 864,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "77483c3f-a735-4650-96f9-ca61b5732f08",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "\n## 4. Summarization Chain\n\n**What it does:** Condenses long documents into short, easy-to-read summaries.\n\n**Example scenario:** You have a lengthy company performance report full of numbers and details. The AI distills it into 3–5 key sentences covering the most important findings and statistics.\n\n**How it works:**\n\n- The Code node generates long-form documents (a quarterly report and a research study).\n- The Summarization Chain is given a custom prompt asking for a concise summary with key findings, important numbers, and main conclusions.\n- The AI processes each document and returns a short paragraph summary.\n\n> **Note:** Make sure the input text field name matches what the Summarization Chain expects. If the node returns a generic *\"Please provide the document\"* message, map your text field explicitly using an expression like `{{ $json.text }}` in the node's input configuration.\n\n**Use cases:** Summarizing meeting notes, reports, articles, research papers, or email threads.",
+        "height": 560,
+        "width": 1008,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1024,
+        -656
+      ],
+      "typeVersion": 1,
+      "id": "6169067a-d8ae-4ab4-9bbe-7589375edb3c",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generate Fake Data To Analyze Sentiment": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Fake Data To Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Fake Data To Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Fake Data To Summarization Chain": {
+      "main": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "28808216-da5e-4499-b4b4-5a14de57c36e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "bX86faQ37hrmjmcC",
+  "tags": []
+}

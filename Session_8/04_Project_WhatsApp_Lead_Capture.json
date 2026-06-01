@@ -1,0 +1,288 @@
+{
+  "name": "Project - WhatsApp Lead Capture Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎯 Capstone — WhatsApp Lead Capture Bot\n\n**Flow:**\n1. User sends a free-text WhatsApp message with their info (Arabic or English).\n2. Evolution API forwards the message to this webhook.\n3. AI parses out name, email, phone.\n4. Row appended to Google Sheets.\n5. Confirmation reply sent back via `sendText`.\n\n**Evolution webhook setup:**\nIn your Evolution instance, set the webhook URL to this workflow's webhook URL and enable the `MESSAGES_UPSERT` event. Evolution will POST events here automatically.\n\n**Real-world parallel:**\nThis is a simplified version of PropAI / Kensoftwaer Dara — a real WhatsApp lead capture system.",
+        "height": 480,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-680, -300],
+      "typeVersion": 1,
+      "id": "note-intro-cap",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-lead-capture",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-180, 0],
+      "id": "wh-cap-001",
+      "name": "Evolution Webhook",
+      "webhookId": "evolution-lead-capture"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "evolutionBaseUrl",
+              "value": "https://evolution-example.com",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "instance",
+              "value": "my-instance",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "apikey",
+              "value": "REPLACE_WITH_YOUR_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "messageText",
+              "value": "={{ $json.body?.data?.message?.conversation || $json.body?.data?.message?.extendedTextMessage?.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "e5",
+              "name": "senderJid",
+              "value": "={{ $json.body?.data?.key?.remoteJid || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "e6",
+              "name": "senderNumber",
+              "value": "={{ ($json.body?.data?.key?.remoteJid || '').split('@')[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "e7",
+              "name": "fromMe",
+              "value": "={{ $json.body?.data?.key?.fromMe ?? false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [60, 0],
+      "id": "set-extract-cap",
+      "name": "Extract Message Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "g1",
+              "leftValue": "={{ $json.fromMe }}",
+              "rightValue": false,
+              "operator": { "type": "boolean", "operation": "equals" }
+            },
+            {
+              "id": "g2",
+              "leftValue": "={{ $json.messageText }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [300, 0],
+      "id": "if-valid-cap",
+      "name": "Valid Inbound Message?"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract the lead's contact details from this WhatsApp message. The message may be in Arabic or English.\n\nMessage: \"{{ $json.messageText }}\"\n\nReturn a JSON object with name, email, phone, and a short friendly confirmation_message in the SAME LANGUAGE as the user's message.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [560, -40],
+      "id": "llm-parse-cap",
+      "name": "Parse Lead with LLM"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [500, 200],
+      "id": "model-cap",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": { \"type\": \"string\", \"description\": \"Full name of the lead. Empty string if not found.\" },\n    \"email\": { \"type\": \"string\", \"description\": \"Email address. Empty string if not found.\" },\n    \"phone\": { \"type\": \"string\", \"description\": \"Phone number with country code if possible. Empty string if not found.\" },\n    \"confirmation_message\": { \"type\": \"string\", \"description\": \"Friendly reply confirming the captured details, in the same language as the user's message.\" }\n  },\n  \"required\": [\"name\", \"email\", \"phone\", \"confirmation_message\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [700, 200],
+      "id": "parser-cap",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_YOUR_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.output.name }}",
+            "Email": "={{ $json.output.email }}",
+            "Phone Number": "={{ $json.output.phone }}",
+            "WhatsApp Number": "={{ $('Extract Message Fields').item.json.senderNumber }}",
+            "Original Message": "={{ $('Extract Message Fields').item.json.messageText }}",
+            "Captured At": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "Name", "displayName": "Name", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "Email", "displayName": "Email", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "Phone Number", "displayName": "Phone Number", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "WhatsApp Number", "displayName": "WhatsApp Number", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "Original Message", "displayName": "Original Message", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true },
+            { "id": "Captured At", "displayName": "Captured At", "type": "string", "required": false, "display": true, "defaultMatch": false, "canBeUsedToMatch": true }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [880, -40],
+      "id": "sheets-cap",
+      "name": "Append Lead to Sheet"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Extract Message Fields').item.json.evolutionBaseUrl }}/message/sendText/{{ $('Extract Message Fields').item.json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('Extract Message Fields').item.json.apikey }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Extract Message Fields').item.json.senderNumber }}\",\n  \"text\": {{ JSON.stringify($('Parse Lead with LLM').item.json.output.confirmation_message) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, -40],
+      "id": "http-reply-cap",
+      "name": "Send WhatsApp Confirmation"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ok\",\n  \"captured\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1360, -40],
+      "id": "respond-cap",
+      "name": "Respond to Evolution"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"ignored\",\n  \"reason\": \"outbound or empty message\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [560, 200],
+      "id": "respond-skip-cap",
+      "name": "Respond - Ignored"
+    },
+    {
+      "parameters": {
+        "content": "### ⚠️ Important — webhook hardening\n\n- **Always check `fromMe`** — Evolution emits an event for messages YOU send too. If you don't filter, your bot replies to itself in a loop.\n- **Always respond** to Evolution within a few seconds, even on ignored messages, so it doesn't retry.\n- **Pin a sample webhook payload** during development so you can build without sending real WhatsApp messages every time.\n- For production, validate a shared secret in the webhook headers before trusting the payload.",
+        "height": 360,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [880, -360],
+      "typeVersion": 1,
+      "id": "note-hardening-cap",
+      "name": "Hardening Note"
+    }
+  ],
+  "connections": {
+    "Evolution Webhook": {
+      "main": [[{ "node": "Extract Message Fields", "type": "main", "index": 0 }]]
+    },
+    "Extract Message Fields": {
+      "main": [[{ "node": "Valid Inbound Message?", "type": "main", "index": 0 }]]
+    },
+    "Valid Inbound Message?": {
+      "main": [
+        [{ "node": "Parse Lead with LLM", "type": "main", "index": 0 }],
+        [{ "node": "Respond - Ignored", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Lead with LLM": {
+      "main": [[{ "node": "Append Lead to Sheet", "type": "main", "index": 0 }]]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [[{ "node": "Parse Lead with LLM", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [[{ "node": "Parse Lead with LLM", "type": "ai_outputParser", "index": 0 }]]
+    },
+    "Append Lead to Sheet": {
+      "main": [[{ "node": "Send WhatsApp Confirmation", "type": "main", "index": 0 }]]
+    },
+    "Send WhatsApp Confirmation": {
+      "main": [[{ "node": "Respond to Evolution", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

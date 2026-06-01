@@ -1,0 +1,101 @@
+{
+  "name": "Telegram - First Bot (Echo)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🤖 Telegram — First Bot (Echo)\n\n**Goal:** Get your first Telegram bot replying to messages in under 10 minutes.\n\n**Setup steps:**\n1. Open Telegram, search for `@BotFather`.\n2. Send `/newbot` → choose a name → choose a username ending in `bot`.\n3. Copy the **bot token** BotFather gives you.\n4. In n8n, open the Telegram Trigger node → Credentials → Create New → paste the token.\n5. Use the SAME credential on the `Send Reply` node.\n6. Activate this workflow (toggle top right). The trigger only fires when active.\n\n**How to test:** Open Telegram, search for your bot's username, send any text message.",
+        "height": 480,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-580, -280],
+      "typeVersion": 1,
+      "id": "tg-note-001",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-100, 0],
+      "id": "tg-trigger-001",
+      "name": "Telegram Trigger",
+      "webhookId": "tg-echo-bot"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "chatId",
+              "value": "={{ $json.message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "t2",
+              "name": "userText",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "t3",
+              "name": "firstName",
+              "value": "={{ $json.message.from.first_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [140, 0],
+      "id": "tg-set-001",
+      "name": "Extract Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "=Hi {{ $json.firstName }} 👋\nYou said: \"{{ $json.userText }}\"",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, 0],
+      "id": "tg-send-001",
+      "name": "Send Reply"
+    },
+    {
+      "parameters": {
+        "content": "### ✅ Checkpoint\n\nThe bot must reply in Telegram before moving on.\n\n**If no reply:**\n- Workflow not activated → toggle Active in top-right.\n- Wrong token → re-check credentials.\n- Sent a non-text message (image, sticker) → `$json.message.text` is undefined. Next workflow handles this.",
+        "height": 280,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [620, -280],
+      "typeVersion": 1,
+      "id": "tg-note-check-001",
+      "name": "Checkpoint"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Extract Fields", "type": "main", "index": 0 }]]
+    },
+    "Extract Fields": {
+      "main": [[{ "node": "Send Reply", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

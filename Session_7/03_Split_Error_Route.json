@@ -1,0 +1,90 @@
+{
+  "name": "S7-03 Continue on Fail - Split Error Route",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 3: Split Error Route\n\n### What you'll learn\n- Nodes can have TWO outputs: success path and error path\n- How to send each somewhere different\n- How to alert on the error branch (Telegram)\n\n### Try it\n1. Click Execute\n2. The HTTP node will fail → flow goes through the ERROR (red) output\n3. Telegram alert fires; success Set node does not run\n4. Fix the URL → success path runs instead\n\n### Setting used\nHTTP Request → Settings tab → On Error: Continue (using error output)\n\n### Why this matters\nThis is the cleanest pattern for node-level error handling.\nThe node handles its OWN failure locally — no global handler needed.",
+        "height": 380,
+        "width": 760,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-400, -80],
+      "id": "note-03",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-320, 420],
+      "id": "trigger-03",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "url": "https://dog.ceo/api/breeds/image/random_BROKEN_ON_PURPOSE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-80, 420],
+      "id": "http-split",
+      "name": "API call (split on error)",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "status",
+              "value": "OK",
+              "type": "string"
+            },
+            {
+              "id": "s2",
+              "name": "imageUrl",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [200, 320],
+      "id": "set-success",
+      "name": "Success path"
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_WITH_YOUR_CHAT_ID",
+        "text": "=API call failed in workflow {{ $workflow.name }}\\nError: {{ $json.error?.message || 'unknown' }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [200, 520],
+      "id": "telegram-alert",
+      "name": "Telegram Alert (error path)",
+      "webhookId": "telegram-error-alert-1"
+    }
+  ],
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "API call (split on error)", "type": "main", "index": 0 }]]
+    },
+    "API call (split on error)": {
+      "main": [
+        [{ "node": "Success path", "type": "main", "index": 0 }],
+        [{ "node": "Telegram Alert (error path)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

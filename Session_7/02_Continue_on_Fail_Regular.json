@@ -1,0 +1,80 @@
+{
+  "name": "S7-02 Continue on Fail - Regular Output",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 2: Continue on Fail (Regular Output)\n\n### What you'll learn\n- How to keep a workflow running even when a node errors\n- What the downstream node actually receives when this happens\n- How to inspect $json.error\n\n### Try it\n1. Click Execute\n2. Notice the workflow does NOT stop\n3. Open the Set node → see that $json.error contains the error details\n\n### Setting used\nHTTP Request → Settings tab → On Error: Continue (using error output disabled — regular output)\n\n### Warning\nContinue on Fail still passes data downstream. If you don't validate it, garbage flows through silently.",
+        "height": 360,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-400, -60],
+      "id": "note-02",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-320, 400],
+      "id": "trigger-02",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "url": "https://dog.ceo/api/breeds/image/random_BROKEN_ON_PURPOSE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-80, 400],
+      "id": "http-broken",
+      "name": "Broken API (continue anyway)",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "wasError",
+              "value": "={{ $json.error !== undefined }}",
+              "type": "boolean"
+            },
+            {
+              "id": "b2",
+              "name": "errorMessage",
+              "value": "={{ $json.error?.message || 'no error' }}",
+              "type": "string"
+            },
+            {
+              "id": "b3",
+              "name": "originalData",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [180, 400],
+      "id": "inspect",
+      "name": "Inspect $json.error"
+    }
+  ],
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Broken API (continue anyway)", "type": "main", "index": 0 }]]
+    },
+    "Broken API (continue anyway)": {
+      "main": [[{ "node": "Inspect $json.error", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

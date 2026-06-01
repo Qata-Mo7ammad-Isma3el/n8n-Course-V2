@@ -1,0 +1,34 @@
+{
+  "name": "WhatsApp nightmare",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "### WhatsApp Integration Overview\n\n**WhatsApp integration reality**\nWhatsApp is one of the most requested automations, but also one of the hardest to implement correctly.\nMost beginners expect it to be simple, but quickly discover many restrictions.\n\n**WhatsApp nightmare (Meta Developer account)**\nOfficial WhatsApp integration requires a Meta Developer account.\nYou must verify a business, phone number, and sometimes the company itself.\nApproval can take time and may be rejected without clear reasons.\nMessage templates must be approved before sending messages to users.\n\n**Why WhatsApp is difficult**\nWhatsApp is very strict to prevent spam.\nYou cannot freely message users unless they opt in.\nYou are limited by message windows and approved templates.\nSmall mistakes can cause number bans or blocked accounts.\n\n**Common problems**\n\n* Business verification delays or rejections\n* Phone number getting blocked\n* Template approval taking days\n* Limited automation flexibility\n* High setup complexity for simple use cases\n\n---\n\n### Evolution API for WhatsApp\n\n**What is Evolution API**\nEvolution API is an alternative solution that allows WhatsApp automation without Meta approval.\nIt connects directly to WhatsApp Web, making setup much easier.\n\n**Free WhatsApp automation**\nYou can automate WhatsApp messages without paying Meta fees.\nNo business verification required.\nFaster setup compared to official WhatsApp APIs.\n\n**Practical examples**\n\n* Send order confirmations automatically\n* Reply to customer inquiries instantly\n* Notify sales teams about new leads\n* Build WhatsApp chatbots with n8n\n* Connect WhatsApp to CRMs or Google Sheets\n\n**Why it works well with n8n**\nEvolution API integrates easily using HTTP and Webhook nodes.\nYou get full control over message logic and data flow.\nPerfect for MVPs, internal tools, and fast client solutions.\n",
+        "height": 1120,
+        "width": 528,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "59abafbf-770c-4394-9fbb-3c9c5ff682e1",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "962f93ec-096a-4999-b106-adfa130ffd00",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "dDz0TicqdwAL7sFr",
+  "tags": []
+}

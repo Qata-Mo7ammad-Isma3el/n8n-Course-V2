@@ -1,0 +1,35 @@
+{
+  "name": "Introduction to Retrieval-Augmented Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# **Retrieval-Augmented Generation Pipeline**  [More about Rags](https://github.com/NirDiamant/RAG_Techniques)\n![img](https://ik.imagekit.io/MyImage/Introduction%20to%20Retrieval-Augmented%20Generation.jpg)\n\n",
+        "height": 1040,
+        "width": 2112,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1424,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "28ad137b-7b7b-451b-ac39-8062890583c4",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "01a7f7ef-80e7-4fec-89bd-bf3ffd622bba",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "pER7J9ltPcXoLsKG6vlWU",
+  "tags": []
+}

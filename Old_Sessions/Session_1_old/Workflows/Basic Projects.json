@@ -1,0 +1,1368 @@
+{
+  "name": "Basic Projects",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "8a725a60-28b6-456a-89bd-66e513a44d3d",
+      "name": "Daily 9 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        2320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "c24d3f41-ef9d-4e22-80b2-998758643dae",
+      "name": "Manual Test Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "teacher_email",
+              "value": "teacher@school.edu",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "teacher_telegram_chat_id",
+              "value": "YOUR_TELEGRAM_CHAT_ID",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "spreadsheet_id",
+              "value": "YOUR_GOOGLE_SHEET_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "bfe99f42-27d5-46ec-bf61-1a33aaaaa43e",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate an array of 15 fake student objects\nconst students = [];\n\nconst firstNames = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason', 'Isabella', 'William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia'];\nconst lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson'];\nconst courses = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'English Literature', 'History'];\n\nfor (let i = 0; i < 15; i++) {\n  const firstName = firstNames[i];\n  const lastName = lastNames[i];\n  const name = `${firstName} ${lastName}`;\n  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@school.edu`;\n  const course = courses[Math.floor(Math.random() * courses.length)];\n  \n  // Generate random scores\n  const assignment_score = Math.floor(Math.random() * 101); // 0-100\n  const attendance_percentage = Math.floor(Math.random() * 101); // 0-100\n  const participation_score = Math.floor(Math.random() * 101); // 0-100\n  \n  // Calculate overall score as average of the three scores\n  const overall_score = Math.round((assignment_score + attendance_percentage + participation_score) / 3);\n  \n  students.push({\n    student_id: `STU${String(i + 1).padStart(3, '0')}`,\n    name: name,\n    email: email,\n    course: course,\n    assignment_score: assignment_score,\n    attendance_percentage: attendance_percentage,\n    participation_score: participation_score,\n    overall_score: overall_score\n  });\n}\n\n// Return the array of students\nreturn students.map(student => ({ json: student }));"
+      },
+      "id": "2c970d0a-85d3-427b-8990-d477950dc224",
+      "name": "Generate Student Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 85,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Excellent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 70,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  },
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 85,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Good"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 70,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Needs Improvement"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6e8414b1-26e7-42ce-b9bb-e2f96c904c83",
+      "name": "Categorize by Performance",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        1920
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.overall_score }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              },
+              "id": "aa7648b3-0da4-4ce5-aa6f-f2a137cd5ac3"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4ba68cb6-9985-47a8-89bf-0d6724867e67",
+      "name": "Filter Students Needing Attention",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -16,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "overall_score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f38797cc-1231-4735-b649-bed86a9e24f0",
+      "name": "Rank Students by Performance",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        48,
+        2768
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Excellent",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "Congratulations! Your outstanding performance demonstrates exceptional dedication and mastery of the material. Keep up the excellent work!",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Excellent Performance - Keep It Up!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "c5af0b4b-5e90-459d-b07b-90570d2c84d4",
+      "name": "Add Excellent Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        1744
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Good",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "Great job! You are performing well in the course. Continue your efforts and consider reaching for even higher goals.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Good Performance - Keep Going!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "64adc884-3c6c-477f-b864-f3cb3862ef65",
+      "name": "Add Good Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        1936
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Needs Improvement",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "We have noticed you may be struggling with the course material. Please reach out to your instructor or visit office hours for additional support. We are here to help you succeed!",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Academic Support Available - Let Us Help",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "941c3390-41da-4984-9714-a4b4581f07c6",
+      "name": "Add Needs Improvement Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        2128
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Workflow Configuration').item.json.spreadsheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Processed_Data"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "7980bf65-5a1e-4444-88c6-452f8646d421",
+      "name": "Write to Processed_Data Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        2768
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Workflow Configuration').item.json.spreadsheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Attention_Needed"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9be7bf99-37f3-4439-8a50-c83cb79d66ff",
+      "name": "Write to Attention_Needed Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        2320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.email_subject }}",
+        "message": "={{\n`Dear ${$json.name},\n\n${$json.feedback_message}\n\nCourse: ${$json.course}\nOverall Score: ${$json.overall_score}%\nAssignment Score: ${$json.assignment_score}%\nAttendance: ${$json.attendance_percentage}%\nParticipation: ${$json.participation_score}%\n\nBest regards,\nYour Teaching Team`\n}}\n",
+        "options": {}
+      },
+      "id": "708fb687-97e0-4556-a146-faad6c040d20",
+      "name": "Send Feedback Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        1936
+      ],
+      "webhookId": "a5a38583-0e72-41e0-99d9-a5193d48434c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YgWlh4VCmpscaJ1K",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "22251456-6496-4ddc-86a7-dbbc8bfdbbc3",
+      "name": "Wait 2 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        1936
+      ],
+      "webhookId": "881739af-db30-45b3-a25c-64726156839a"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Workflow Configuration').item.json.teacher_telegram_chat_id }}",
+        "text": "={{\n`📊 Daily Student Performance Summary\n\n👥 Total Students: ${$json.total_students}\n📈 Average Overall Score: ${$json.avg_overall_score.toFixed(2)}%\n📝 Average Assignment Score: ${$json.avg_assignment_score.toFixed(2)}%\n📅 Average Attendance: ${$json.avg_attendance.toFixed(2)}%\n💬 Average Participation: ${$json.avg_participation.toFixed(2)}%\n\nCheck Google Sheets for detailed breakdown!`\n}}\n",
+        "additionalFields": {}
+      },
+      "id": "568c57ee-0a3d-4964-9c22-2db652d0428e",
+      "name": "Send Teacher Summary",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        2528
+      ],
+      "webhookId": "1af77786-cf23-4fff-ac7b-6d4602628b64",
+      "credentials": {
+        "telegramApi": {
+          "id": "tSblbirAytDlRm4H",
+          "name": "n8n_QATAbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Student Performance Tracker & Automated Feedback System",
+        "height": 80,
+        "width": 1072,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -224,
+        1536
+      ],
+      "typeVersion": 1,
+      "id": "fc418f2b-9984-415b-bd71-70fd28f7940f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "=assignment_score",
+              "renameField": true,
+              "outputFieldName": "avg_assignment_score"
+            },
+            {
+              "fieldToAggregate": "attendance_percentage",
+              "renameField": true,
+              "outputFieldName": "avg_attendance"
+            },
+            {
+              "fieldToAggregate": "participation_score",
+              "renameField": true,
+              "outputFieldName": "avg_participation"
+            },
+            {
+              "fieldToAggregate": "overall_score",
+              "renameField": true,
+              "outputFieldName": "avg_overall_score"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8a202cd9-5384-4dd5-92e8-341f068a849f",
+      "name": "Get-data",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        2528
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8724d9f-660f-4e9c-bb53-a848e677114a",
+              "name": "total_students",
+              "value": "={{ $json.avg_assignment_score.length }}",
+              "type": "number"
+            },
+            {
+              "id": "25da3cab-07b6-464d-b8d9-ca77f3f12dbb",
+              "name": "avg_assignment_score",
+              "value": "={{ $json.avg_assignment_score.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "e62db5b9-484c-4d5e-9539-522606ef2eac",
+              "name": "avg_attendance",
+              "value": "={{ $json.avg_attendance.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "c20c0f64-b464-4de5-ab05-3d00b5e7f1bb",
+              "name": "avg_participation",
+              "value": "={{ $json.avg_participation.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "62a82cbf-7d14-4356-a446-6eb7dad8b619",
+              "name": "avg_overall_score",
+              "value": "={{ $json.avg_overall_score.average()}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        2528
+      ],
+      "id": "abdab3df-b824-4c3a-8a88-94f1e02e1c43",
+      "name": "Calculate Class Averages"
+    },
+    {
+      "parameters": {
+        "content": "# Daily Weather Alert System with Conditional Notifications",
+        "height": 80,
+        "width": 976,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -176,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "d3422064-91cb-42a2-84dc-ca0c0dddb683",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "4389c81b-28db-4e9a-a18c-dd09142c3449",
+      "name": "Daily 8 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create fake weather data\nconst days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];\nconst conditions = ['sunny', 'rainy', 'cloudy'];\nconst today = new Date();\nconst dayName = days[today.getDay()];\n\n// Generate random temperature between 15 and 35\nconst temperature = Math.floor(Math.random() * (35 - 15 + 1)) + 15;\n\n// Randomly select a condition\nconst condition = conditions[Math.floor(Math.random() * conditions.length)];\n\n// Create weather object\nconst weatherData = {\n  day: dayName,\n  temperature: temperature,\n  condition: condition,\n  city: 'Amman'\n};\n\n// Return as array with one item\nreturn [weatherData];"
+      },
+      "id": "bf503d0a-f36e-4411-b818-9842b0efe405",
+      "name": "Create Fake Weather Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.temperature }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "id-2",
+              "leftValue": "={{ $json.condition }}",
+              "rightValue": "rainy",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c4419e9c-40a6-4a84-ad64-2c99a24a1247",
+      "name": "Check Weather Conditions",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "message",
+              "value": "=Weather Alert for {{ $('Check Weather Conditions').item.json.city }}: It's {{ $('Check Weather Conditions').item.json.temperature }}°C and {{ $('Check Weather Conditions').item.json.condition }}.{{ $('Check Weather Conditions').item.json.temperature > 30 ? ' ⚠️ Heat warning! Stay hydrated and avoid prolonged sun exposure.' : '' }}{{ $('Check Weather Conditions').item.json.condition.toLowerCase().includes('rain') ? ' ☔ Don\\'t forget your umbrella!' : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "552579d0-24de-4d33-9d9c-3e6397156c76",
+      "name": "Add Friendly Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "1973258281",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ef66b528-ad6d-4371-b6ff-fde108a2a863",
+      "name": "Send Telegram Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        256
+      ],
+      "webhookId": "36b34aee-7986-41c7-8967-743bb2cfeeb3",
+      "credentials": {
+        "telegramApi": {
+          "id": "tSblbirAytDlRm4H",
+          "name": "n8n_QATAbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "4f2b3fdb-f065-425c-a5cd-fc2b86aa768b",
+      "name": "Wait 1 Second",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        256
+      ],
+      "webhookId": "38ee7339-1a0a-4da4-8b14-8eba7c27b7a6"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "46642374-fbb7-47cd-b5ca-ef0dc9051add",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        960,
+        256
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "id": "c7c37c4a-d2d4-4ac6-af54-4dbb89536ae2",
+      "name": "Daily at 6 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create an array of fake tasks\nconst tasks = [\n  {\n    json: {\n      task_name: 'Complete project report',\n      priority: 'high',\n      due_date: '2026-01-15'\n    }\n  },\n  {\n    json: {\n      task_name: 'Team meeting prep',\n      priority: 'medium',\n      due_date: '2026-01-14'\n    }\n  },\n  {\n    json: {\n      task_name: 'Review budget',\n      priority: 'high',\n      due_date: '2026-01-12'\n    }\n  },\n  {\n    json: {\n      task_name: 'Update documentation',\n      priority: 'low',\n      due_date: '2026-01-20'\n    }\n  },\n  {\n    json: {\n      task_name: 'Client presentation',\n      priority: 'high',\n      due_date: '2026-01-10'\n    }\n  }\n];\n\nreturn tasks;"
+      },
+      "id": "0ae41873-78b2-4bb7-b137-640a5a2ae310",
+      "name": "Create Fake Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "dc54074c-f716-4fb4-a165-6054f9e6771b",
+      "name": "Filter High Priority",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        112,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "due_date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5df6f34a-e978-4f55-b644-49889e8ab356",
+      "name": "Sort by Due Date",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        336,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "email_subject",
+              "value": "Your High Priority Tasks Reminder",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email_body",
+              "value": "={{ 'Task: ' + $json.task_name + '\\nPriority: ' + $json.priority + '\\nDue Date: ' + $json.due_date + '\\n---\\n' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d106a6d2-a1a4-47fa-944f-06a068cda746",
+      "name": "Format Email Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "imoh40398@gmail.com",
+        "subject": "={{ $json.email_subject }}",
+        "message": "={{ $json.email_body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        800
+      ],
+      "id": "3ac54a1e-07d0-42d8-b40d-dbc92187ae01",
+      "name": "Send a message",
+      "webhookId": "afff8782-8bcb-4222-8155-2c29109908dc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YgWlh4VCmpscaJ1K",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# To-Do List Reminder",
+        "height": 80,
+        "width": 368,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "c02c7e2b-9890-4b84-a079-525da04cf47c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate 5 fake contacts\nconst contacts = [\n  {\n    name: 'John Smith',\n    phone: '555-0101',\n    email: 'john@example.com'\n  },\n  {\n    name: 'Sarah Johnson',\n    phone: '555-0102',\n    email: 'sarah@example.com'\n  },\n  {\n    name: 'Michael Brown',\n    phone: '555-0103',\n    email: 'michael@example.com'\n  },\n  {\n    name: 'Emily Davis',\n    phone: '555-0104',\n    email: 'emily@example.com'\n  },\n  {\n    name: 'David Wilson',\n    phone: '555-0105',\n    email: 'david@example.com'\n  }\n];\n\n// Return array of items with json property\nreturn contacts.map(contact => ({ json: contact }));"
+      },
+      "id": "75d77b9b-2f7a-407f-9adb-bf80315687e8",
+      "name": "Generate 5 Fake Contacts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "id": "da126763-67fb-4d1c-a63b-0b2e7655abf6",
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "fileName": "contacts_backup.csv",
+          "headerRow": true
+        }
+      },
+      "id": "7378c3f6-c348-4cf4-af5e-e2251d09e043",
+      "name": "Convert to CSV Backup",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "6a541b98-fa35-4640-94e3-c4d7c04bca50",
+      "name": "Upload to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        496,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "<__PLACEHOLDER_VALUE__YOUR_CHAT_ID__>",
+        "text": "Backup complete! 5 contacts saved to Google Sheets and Drive.",
+        "additionalFields": {}
+      },
+      "id": "d3ebc8ca-9212-440e-bddf-88080cb28520",
+      "name": "Send Confirmation to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        1232
+      ],
+      "webhookId": "fd68bfcb-c0b8-437c-9cc7-3fcedcbb538f"
+    },
+    {
+      "parameters": {
+        "content": "# Contact Backup System",
+        "height": 80,
+        "width": 432,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        1104
+      ],
+      "typeVersion": 1,
+      "id": "4fb4142d-c224-43c7-b9a8-504d98365a27",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily 9 AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Test Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate 5 Fake Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Generate Student Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Student Data": {
+      "main": [
+        [
+          {
+            "node": "Categorize by Performance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Students Needing Attention",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rank Students by Performance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize by Performance": {
+      "main": [
+        [
+          {
+            "node": "Add Excellent Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Good Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Needs Improvement Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Students Needing Attention": {
+      "main": [
+        [
+          {
+            "node": "Write to Attention_Needed Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank Students by Performance": {
+      "main": [
+        [
+          {
+            "node": "Write to Processed_Data Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Excellent Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Good Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Needs Improvement Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Feedback Email": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get-data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Class Averages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Class Averages": {
+      "main": [
+        [
+          {
+            "node": "Send Teacher Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 8 AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Fake Weather Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Fake Weather Data": {
+      "main": [
+        [
+          {
+            "node": "Check Weather Conditions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Weather Conditions": {
+      "main": [
+        [
+          {
+            "node": "Add Friendly Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Friendly Message": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Alert": {
+      "main": [
+        [
+          {
+            "node": "Wait 1 Second",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1 Second": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily at 6 PM": {
+      "main": [
+        [
+          {
+            "node": "Create Fake Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Fake Tasks": {
+      "main": [
+        [
+          {
+            "node": "Filter High Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter High Priority": {
+      "main": [
+        [
+          {
+            "node": "Sort by Due Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort by Due Date": {
+      "main": [
+        [
+          {
+            "node": "Format Email Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email Message": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate 5 Fake Contacts": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Convert to CSV Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to CSV Backup": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f35cb90b-270a-4ba6-8aaf-091582a3abc4",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "Wdd23DpRKASU1Qly",
+  "tags": []
+}

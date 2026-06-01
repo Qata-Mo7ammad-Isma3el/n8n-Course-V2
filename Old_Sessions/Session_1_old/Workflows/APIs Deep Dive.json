@@ -1,0 +1,1264 @@
+{
+  "name": "APIs Deep Dive",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "![Image](https://ik.imagekit.io/MyImage/Module%2014_APIs%20Deep%20Dive_intro_4.jpg)",
+        "height": 1920,
+        "width": 1072,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        -3200
+      ],
+      "typeVersion": 1,
+      "id": "fab0257a-1179-4245-849f-10251a600cb4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "![Image](https://ik.imagekit.io/MyImage/Module%2014_APIs%20Deep%20Dive_intro_1.jpg)",
+        "height": 800,
+        "width": 896,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2352,
+        -3200
+      ],
+      "typeVersion": 1,
+      "id": "1620bc6d-14ce-44d3-af61-19285e6bf23b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n![Image](https://ik.imagekit.io/MyImage/Module%2014_APIs%20Deep%20Dive_intro_2.jpg)",
+        "height": 800,
+        "width": 870,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1440,
+        -3200
+      ],
+      "typeVersion": 1,
+      "id": "e6ca8590-cece-4c0e-9a51-e498eecc1139",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "![Image](https://ik.imagekit.io/MyImage/Module%2014_APIs%20Deep%20Dive_intro_3.jpg)",
+        "height": 800,
+        "width": 1376
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -560,
+        -3200
+      ],
+      "typeVersion": 1,
+      "id": "064ed047-8fbf-43c0-a858-a0199ec76248",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        -2176
+      ],
+      "id": "46135e12-117e-4ece-91af-14b35e191525",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api.weatherapi.com/v1/current.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "8bbbca48fac34945849143903252212"
+            },
+            {
+              "name": "q",
+              "value": "bulk"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -752,
+        -2176
+      ],
+      "id": "756592ea-9562-450b-a8d2-010f89a0f8b3",
+      "name": "get weather"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49e47087-7c3f-4b27-907f-8136ba8df72a",
+              "name": "temperature",
+              "value": "={{ $json.current.temp_c }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -512,
+        -2176
+      ],
+      "id": "94910d84-7b61-4d6e-8fae-673f21b22611",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "workflow_name",
+              "value": "Public API Data Fetch - No Authentication",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "description",
+              "value": "This workflow demonstrates how to fetch data from a public API that requires no authentication. We will use JSONPlaceholder, a free fake API for testing.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "learning_objectives",
+              "value": "Understand GET requests, JSON responses, and basic API structure",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "api_endpoint",
+              "value": "https://jsonplaceholder.typicode.com/posts/1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6e130665-9d1d-4bde-a72e-5e7871ea501e",
+      "name": "Workflow 1 Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -976,
+        -1552
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/posts/1",
+        "options": {}
+      },
+      "id": "25254923-18ac-4193-818a-b288bf0d3dd7",
+      "name": "Fetch Public API Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -752,
+        -1552
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "post_title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "post_body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "user_id",
+              "value": "={{ $json.userId }}",
+              "type": "number"
+            },
+            {
+              "id": "id-4",
+              "name": "post_id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "id-5",
+              "name": "explanation",
+              "value": "We extracted specific fields from the API response. The response was in JSON format, which n8n automatically parsed into accessible fields.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "409367a8-210e-401b-9996-ff5171ee7669",
+      "name": "Extract and Format Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -528,
+        -1552
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "student@example.com",
+        "toEmail": "instructor@example.com",
+        "subject": "API Learning: Data Fetched from JSONPlaceholder",
+        "emailFormat": "text",
+        "text": "=Successfully fetched API data!\n\nPost Title: {{ $json.post_title }}\nPost ID: {{ $json.post_id }}\nUser ID: {{ $json.user_id }}\n\nPost Content:\n{{ $json.post_body }}\n\n---\nThis demonstrates how API data can be used in real applications like sending notifications.",
+        "options": {}
+      },
+      "id": "b917f844-f79f-4aef-a50a-b5963925c75b",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        -1552
+      ],
+      "webhookId": "f15a36ea-edf4-4927-88a5-6fbc125235be"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "workflow_name",
+              "value": "API with Authentication",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "description",
+              "value": "This workflow demonstrates API authentication using API keys. Many real-world APIs require authentication to track usage and protect resources.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "learning_objectives",
+              "value": "Understand API authentication, headers, API keys, and error handling",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "api_key_placeholder",
+              "value": "YOUR_API_KEY_HERE",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "note",
+              "value": "Replace YOUR_API_KEY_HERE with an actual API key from a service like OpenWeatherMap, NewsAPI, or any API that provides free tier access",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d6336e98-affd-45d9-a542-1d022925a912",
+      "name": "Workflow 2 Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1008,
+        -1984
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.example.com/data",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_API_KEY_HERE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "20c727eb-005d-426d-89fc-51ae78359b8c",
+      "name": "API Call with Authentication",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -784,
+        -1984
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "response_status",
+              "value": "Success - API returned data",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "full_response",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "id-3",
+              "name": "explanation",
+              "value": "This node displays the complete API response structure. Examine the output to understand what data the API provides.",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "common_response_fields",
+              "value": "Most APIs return: status codes (200=success, 401=unauthorized, 404=not found), data payload, metadata, and sometimes pagination info",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "68270fca-dccb-496d-bc34-a9b35f4188b9",
+      "name": "Show Response Structure",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -1984
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b79d0366-aac8-4dd5-aa7a-4683b52827fe",
+      "name": "Check Response Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        -1984
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "status",
+              "value": "SUCCESS",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "message",
+              "value": "API call completed successfully with authentication",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "data_received",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "id-4",
+              "name": "next_steps",
+              "value": "In a real workflow, you would now process this data - store it in a database, send notifications, trigger other workflows, etc.",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "description",
+              "value": "EDUCATIONAL NOTE: This is the SUCCESS path. The API authenticated your request and returned data. Status code was likely 200 (OK) or 201 (Created).",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a601323-b1ab-4966-b467-4d252b5d97b3",
+      "name": "Success Response Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -2080
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "status",
+              "value": "ERROR",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "message",
+              "value": "API call failed - check authentication and endpoint",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "common_errors",
+              "value": "401 Unauthorized: Invalid/missing API key | 403 Forbidden: Valid key but no permission | 404 Not Found: Wrong endpoint URL | 429 Too Many Requests: Rate limit exceeded | 500 Server Error: API service issue",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "troubleshooting",
+              "value": "1. Verify API key is correct, 2. Check if key is active/not expired, 3. Confirm endpoint URL is correct, 4. Review API documentation for required headers, 5. Check rate limits",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "error_data",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "252a09e6-e47d-4177-9d26-6ccf8488aadc",
+      "name": "Error Response Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -1888
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "workflow_name",
+              "value": "POST Request with JSON Body",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "description",
+              "value": "This workflow demonstrates POST requests, which send data TO an API to create or update resources. Unlike GET (which retrieves), POST modifies data on the server.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "learning_objectives",
+              "value": "Understand POST vs GET, JSON request bodies, Content-Type headers, and how APIs return created resource IDs",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "api_endpoint",
+              "value": "https://jsonplaceholder.typicode.com/posts",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f714428a-ae3a-4c95-99a2-4eb1d6f1bd20",
+      "name": "Workflow 3 Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -992,
+        -1760
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "title",
+              "value": "Learning About APIs in n8n",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "body",
+              "value": "This is a test post created via API. POST requests allow us to send data to servers to create new resources.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "userId",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "id-4",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "explanation",
+              "value": "This data will be sent as JSON in the request body to the API",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "72caebe0-0a29-44a2-ae09-be2eb74f1e67",
+      "name": "Create Sample JSON Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        -1760
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"title\": \"{{ $json.title }}\", \"body\": \"{{ $json.body }}\", \"userId\": {{ $json.userId }} }",
+        "options": {}
+      },
+      "id": "e4eed67a-7284-4e1c-ae71-d8f44cef9ae5",
+      "name": "POST Request to API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        -1760
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "created_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "userId",
+              "value": "={{ $json.userId }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "explanation",
+              "value": "=The API returned our data WITH a new ID ({{ $json.id }}). This ID would be used to reference this resource in future API calls (GET, PUT, DELETE).",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "api_response_note",
+              "value": "Status 201 (Created) indicates successful resource creation. The response includes the complete created object.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e4f67078-6500-4941-8c47-35cb4807f1c3",
+      "name": "Show API Response with ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -1760
+      ]
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n# ROOT ENDPOINT\ncurl -X GET \"http://localhost:8000/\"\n\n\n\n\n\n\n\n# QUERY PARAMETERS\ncurl -X GET \"http://localhost:8000/sum/query?num1=15&num2=25\"\n\n\n\n\n\n\n\n# REQUEST BODY\ncurl -X POST \"http://localhost:8000/sum/body\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 30, \"num2\": 12}'\n\n\n\n\n\n\n\n# HEADER PARAMETERS\ncurl -X GET \"http://localhost:8000/sum/header\" \\\n  -H \"X-Num1: 7.5\" \\\n  -H \"X-Num2: 2.5\"\n\n\n\n\n\n\n\n# API KEY IN HEADER (Valid)\ncurl -X GET \"http://localhost:8000/auth/api-key-header?num1=100&num2=50\" \\\n  -H \"X-API-Key: my-secret-api-key-123\"\n\n\n\n\n\n\n\n# API KEY IN HEADER (Invalid)\ncurl -X GET \"http://localhost:8000/auth/api-key-header?num1=100&num2=50\" \\\n  -H \"X-API-Key: invalid-key-xyz\"\n\n\n\n\n\n\n\n# API KEY IN QUERY\ncurl -X GET \"http://localhost:8000/auth/api-key-query?num1=80&num2=20&api_key=my-secret-api-key-123\"\n\n\n\n\n\n\n\n# BEARER TOKEN (OAuth 2.0)\ncurl -X POST \"http://localhost:8000/auth/bearer\" \\\n  -H \"Authorization: Bearer valid-bearer-token-xyz\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 45, \"num2\": 55}'\n\n\n\n\n\n\n\n# BEARER TOKEN (Invalid)\ncurl -X POST \"http://localhost:8000/auth/bearer\" \\\n  -H \"Authorization: Bearer invalid-token\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 45, \"num2\": 55}'\n\n\n\n\n\n\n\n# BASIC AUTHENTICATION (Using -u flag)\ncurl -X POST \"http://localhost:8000/auth/basic\" \\\n  -u admin:secret123 \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 33, \"num2\": 67}'\n\n\n\n\n\n\n\n# BASIC AUTHENTICATION (Manual Base64 Header)\ncurl -X POST \"http://localhost:8000/auth/basic\" \\\n  -H \"Authorization: Basic YWRtaW46c2VjcmV0MTIz\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 33, \"num2\": 67}'\n\n\n\n\n\n\n\n# BASIC AUTHENTICATION (Invalid Credentials)\ncurl -X POST \"http://localhost:8000/auth/basic\" \\\n  -u wrong:password \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 33, \"num2\": 67}'\n\n\n\n\n\n\n\n# COMBINED EXAMPLE\ncurl -X POST \"http://localhost:8000/combined/all-methods?multiplier=2.5\" \\\n  -H \"X-API-Key: my-secret-api-key-123\" \\\n  -H \"X-Operation: sum\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"num1\": 10, \"num2\": 20}'",
+        "height": 2880,
+        "width": 1040,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2320,
+        -2368
+      ],
+      "typeVersion": 1,
+      "id": "a76573a3-430b-4b04-9428-e5c445fb006d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1904,
+        -2352
+      ],
+      "id": "b7a3bd96-325f-424a-808a-eb1f037048e3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/sum/query",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "100"
+            },
+            {
+              "name": "num2",
+              "value": "25"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        -2160
+      ],
+      "id": "1a10ec42-7f51-48e0-a1b9-33a7591fd5a0",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/sum/body",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "30"
+            },
+            {
+              "name": "num2",
+              "value": "12"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        -1952
+      ],
+      "id": "687fceeb-cfcb-4537-b2b2-e0f3a0365917",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/sum/header",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Num1",
+              "value": "7.5"
+            },
+            {
+              "name": "X-Num2",
+              "value": "2.5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1776,
+        -1760
+      ],
+      "id": "48fbac94-4673-430a-9b03-81c44a669c86",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/api-key-header",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "100"
+            },
+            {
+              "name": "num2",
+              "value": "50"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "my-secret-api-key-123"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1680,
+        -1536
+      ],
+      "id": "7d85ce7c-ac7b-47bc-8fe7-2ba1730a735d",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/api-key-header",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "100"
+            },
+            {
+              "name": "num2",
+              "value": "50"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "invalid-key-xyz"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1664,
+        -1328
+      ],
+      "id": "928b7be3-1b98-47c2-972e-b155ac9130c3",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/api-key-query",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "80"
+            },
+            {
+              "name": "num2",
+              "value": "20"
+            },
+            {
+              "name": "api_key",
+              "value": "my-secret-api-key-123"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1504,
+        -1120
+      ],
+      "id": "2d23449b-0068-4e04-90e7-d00ffe0ba8ab",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/bearer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer valid-bearer-token-xyz"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "45"
+            },
+            {
+              "name": "num2",
+              "value": "55"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1712,
+        -928
+      ],
+      "id": "cb3de4d8-abb3-4cff-a6d0-6ef398b081d4",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/bearer",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer invalid-token"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "45"
+            },
+            {
+              "name": "num2",
+              "value": "55"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1728,
+        -688
+      ],
+      "id": "7a46339f-dbfd-4ddd-b843-f3d9c126d1d9",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/basic",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "Basic YWRtaW46c2VjcmV0MTIz"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "33"
+            },
+            {
+              "name": "num2",
+              "value": "67"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1600,
+        -448
+      ],
+      "id": "66ab2bc1-00bb-4bca-9059-8207ebc2cfca",
+      "name": "HTTP Request9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/basic",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Basic YWRtaW46c2VjcmV0MTIz"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "33"
+            },
+            {
+              "name": "num2",
+              "value": "67"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1920,
+        -160
+      ],
+      "id": "fbf673fd-740a-4a40-8a9b-da0fa247cbdf",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/auth/basic",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "Basic d3Jvbmc6cGFzc3dvcmQ="
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "33"
+            },
+            {
+              "name": "num2",
+              "value": "67"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1920,
+        96
+      ],
+      "id": "73fe0fc4-f7ad-40e8-9fa2-73975244b2b6",
+      "name": "HTTP Request11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://assign-enters-lives-necessarily.trycloudflare.com/combined/all-methods",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "multiplier",
+              "value": "2.5"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "my-secret-api-key-123"
+            },
+            {
+              "name": "X-Operation",
+              "value": "sum"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "num1",
+              "value": "10"
+            },
+            {
+              "name": "num2",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        320
+      ],
+      "id": "749c0a59-f670-4383-adb6-7017a38e4629",
+      "name": "HTTP Request12"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "get weather",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get weather": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow 1 Configuration": {
+      "main": [
+        [
+          {
+            "node": "Fetch Public API Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Public API Data": {
+      "main": [
+        [
+          {
+            "node": "Extract and Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract and Format Response": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow 2 Configuration": {
+      "main": [
+        [
+          {
+            "node": "API Call with Authentication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API Call with Authentication": {
+      "main": [
+        [
+          {
+            "node": "Show Response Structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Show Response Structure": {
+      "main": [
+        [
+          {
+            "node": "Check Response Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Response Status": {
+      "main": [
+        [
+          {
+            "node": "Success Response Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow 3 Configuration": {
+      "main": [
+        [
+          {
+            "node": "Create Sample JSON Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sample JSON Data": {
+      "main": [
+        [
+          {
+            "node": "POST Request to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POST Request to API": {
+      "main": [
+        [
+          {
+            "node": "Show API Response with ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "70068b1d-01fa-4307-8ed2-f60d069e345a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "JJdjl9neO5N6kkYi",
+  "tags": []
+}

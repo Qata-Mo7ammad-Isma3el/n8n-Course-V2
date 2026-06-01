@@ -1,0 +1,5 @@
+Placeholders you must replace before running:
+• REPLACE_WITH_YOUR_CHAT_ID — Telegram chat ID in workflows 03, 05, 08
+• REPLACE_WITH_SHEET_ID — Google Sheet ID in workflows 05, 08
+• REPLACE_WITH_CHILD_WORKFLOW_ID — in workflow 07 (after you create the child)
+• Credentials (Telegram, Gmail, Google Sheets, OpenAI, Gemini) need to be re-attached after import — n8n strips credential bindings on export

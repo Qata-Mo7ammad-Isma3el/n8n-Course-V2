@@ -1,0 +1,132 @@
+{
+  "name": "Evolution API - Send Interactive List",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📋 Evolution API — Send Interactive List\n\n**Goal:** Send a tappable WhatsApp menu via `/message/sendList/{instance}`.\n\nThis is how real WhatsApp ordering bots show menus (NEXTGEN Pizza, The Golden Meal Project).\n\n**Body shape — pay attention:**\n- `values` is an array of **sections**.\n- Each section has a `title` and a `rows` array.\n- Each row has `title`, `description`, and a unique `rowId`.\n- `rowId` is what you receive back when the user taps a row.\n\n**The #1 student mistake** is flattening rows into values directly. Don't.",
+        "height": 460,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-580, -260],
+      "typeVersion": 1,
+      "id": "note-intro-003",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-100, 0],
+      "id": "trigger-003",
+      "name": "When clicking 'Test workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "evolutionBaseUrl",
+              "value": "https://evolution-example.com",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "instance",
+              "value": "my-instance",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "apikey",
+              "value": "REPLACE_WITH_YOUR_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "c4",
+              "name": "targetNumber",
+              "value": "962787499976",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [120, 0],
+      "id": "set-creds-003",
+      "name": "Set Credentials"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build a restaurant-style menu list payload.\n// Each section maps to a category; each row is an item the user can tap.\n\nconst creds = $input.first().json;\n\nconst payload = {\n  number: creds.targetNumber,\n  title: \"🍕 NEXTGEN Pizza Menu\",\n  description: \"Tap a category to see what's available, then pick an item to order.\",\n  buttonText: \"View Menu\",\n  footerText: \"Powered by n8n + Evolution API\",\n  values: [\n    {\n      title: \"Pizzas\",\n      rows: [\n        { title: \"Margherita\",   description: \"Classic tomato, mozzarella, basil — 7 JOD\", rowId: \"pizza_margherita\" },\n        { title: \"Pepperoni\",    description: \"Pepperoni + mozzarella — 8 JOD\",          rowId: \"pizza_pepperoni\" },\n        { title: \"Veggie Deluxe\", description: \"Peppers, olives, mushrooms — 8 JOD\",       rowId: \"pizza_veggie\" }\n      ]\n    },\n    {\n      title: \"Drinks\",\n      rows: [\n        { title: \"Cola\",      description: \"330ml can — 1 JOD\",       rowId: \"drink_cola\" },\n        { title: \"Water\",     description: \"500ml bottle — 0.5 JOD\",  rowId: \"drink_water\" }\n      ]\n    },\n    {\n      title: \"Actions\",\n      rows: [\n        { title: \"View Cart\",  description: \"See what you've ordered\", rowId: \"action_view_cart\" },\n        { title: \"Checkout\",   description: \"Place your order now\",     rowId: \"action_checkout\" }\n      ]\n    }\n  ]\n};\n\nreturn [{ json: { ...creds, payload } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 0],
+      "id": "code-build-003",
+      "name": "Build List Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.evolutionBaseUrl }}/message/sendList/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $json.apikey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [580, 0],
+      "id": "http-list-003",
+      "name": "Evolution API - Send List"
+    },
+    {
+      "parameters": {
+        "content": "### 🎯 What happens when the user taps?\n\nWhen the user picks a row, Evolution sends a **`messages.upsert`** webhook event back with the chosen `rowId`.\n\nIn the capstone project (Workflow 8), you'll catch that event and:\n1. Look up which item was tapped (`pizza_margherita`, `action_checkout`, etc.)\n2. Add it to a cart in Google Sheets / Postgres\n3. Reply with confirmation via `sendText`\n\nThis is exactly how the NEXTGEN Pizza bot works in production.",
+        "height": 320,
+        "width": 420,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [820, -260],
+      "typeVersion": 1,
+      "id": "note-callback-003",
+      "name": "Callback Hint"
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [[{ "node": "Set Credentials", "type": "main", "index": 0 }]]
+    },
+    "Set Credentials": {
+      "main": [[{ "node": "Build List Payload", "type": "main", "index": 0 }]]
+    },
+    "Build List Payload": {
+      "main": [[{ "node": "Evolution API - Send List", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

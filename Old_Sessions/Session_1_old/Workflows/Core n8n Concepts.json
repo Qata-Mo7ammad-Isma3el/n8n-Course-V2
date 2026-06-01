@@ -1,0 +1,34 @@
+{
+  "name": "Core n8n Concepts",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "\n### **What is a workflow**\n* A workflow is a visual automation made of connected steps\n* It starts with a trigger and ends with one or more actions\n* A workflow represents a complete business process\n\n### **n8n control panel (Editor UI)**\n* Canvas: the main area where workflows are built\n* Nodes panel: where you search and add nodes\n* Execution panel: shows what happened during a run\n* Workflow settings: execution mode, error handling, and saving behavior\n* Credentials section: where API keys and app connections are stored\n\n### **Nodes**\n* Nodes are the building blocks of a workflow\n* Each node performs one task (get data, process data, send data)\n* Examples: Trigger nodes, Core nodes, App nodes, AI nodes\n* Nodes can be reused and reordered easily\n\n### **Connections and execution flow**\n* Lines between nodes define the order of execution\n* n8n runs nodes from left to right\n* One node finishes before the next one starts\n* Conditions can split the flow into multiple paths\n\n### **Items and data passing between nodes**\n* Data moves through the workflow as items\n* Each item is usually a JSON object\n* Nodes receive items, modify them, and pass them forward\n* One workflow run can process one item or many items\n\n### **How n8n \"thinks\"**\n* n8n follows logic, not intuition\n* It executes nodes step by step based on connections\n* It processes data exactly as it is structured\n* If data is missing or wrong, the workflow fails or behaves differently\n",
+        "height": 832,
+        "width": 640,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -112
+      ],
+      "id": "4efa6c6f-2809-40b3-af04-8b2f3d47e7e6",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "1f95ff5e-d5cd-4f99-a268-ae153ebe4939",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "X4GqUGaIOviP2JzX",
+  "tags": []
+}

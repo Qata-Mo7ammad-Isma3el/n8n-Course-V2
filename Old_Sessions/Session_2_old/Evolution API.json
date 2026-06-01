@@ -1,0 +1,289 @@
+{
+  "name": "Evolution API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "90da8116-6bd9-45a7-b6d6-cf5a4c1e581c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "5452e5f4-ba74-45a7-9bda-200ef1163845",
+      "name": "Webhook",
+      "webhookId": "90da8116-6bd9-45a7-b6d6-cf5a4c1e581c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query.message }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.8,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "6210f100-f175-4c1e-a42c-4990249f9134",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "348dc7fe-f1a2-4fea-ac19-c903e1957b2d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1QWSlfEKu63X0T25GP2JlS76tK_qmE8YSFlc2Y3StguY",
+          "mode": "list",
+          "cachedResultName": "AI email draft assistant - Contacts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QWSlfEKu63X0T25GP2JlS76tK_qmE8YSFlc2Y3StguY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1325903902,
+          "mode": "list",
+          "cachedResultName": "extract the table",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1QWSlfEKu63X0T25GP2JlS76tK_qmE8YSFlc2Y3StguY/edit#gid=1325903902"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        -16
+      ],
+      "id": "b8e8fba7-6745-4141-929b-7ecc1e3867ca",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        192
+      ],
+      "id": "00f3db84-3820-4a3c-99e0-f61d6325ac54",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WioUbbLpRWXE7iDC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"The person's full name\"\n    },\n    \"email\": {\n      \"type\": \"string\",\n      \"description\": \"The person's email address\"\n    },\n    \"phone\": {\n      \"type\": \"string\",\n      \"description\": \"The person's phone number\"\n    },\n    \"confirmation_message\": {\n      \"type\": \"string\",\n      \"description\": \"A message confirming the captured details to the user\"\n    }\n  },\n  \"required\": [\"name\", \"email\", \"phone\", \"confirmation_message\"]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        224
+      ],
+      "id": "2396d10a-3364-4653-8024-c463c4a5cc99",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,ar-JO;q=0.8,ar;q=0.7",
+            "cookie": "rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX189%2BGHhRBgKbwLTAJsGXokvusBnc75elJg%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX1%2BWYy7HSUr1T3CNYIw%2BLFdzpk6eWq80Cq8%3D; abuse_interstitial=sunday-chirurgic-earlene.ngrok-free.dev; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX1%2BiY3OELZ6rCCH9zJ61nHR0STytFDklwxK37zAtCSrqAt%2FSD8Xfn0AIInNm2mUJEkYOb9MqXqcFCg%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX1%2FNX55EL1o1wTcufMIzYVHX46UZoWmEDoVeY8pi%2FCWIgKAbGzvSzU1Ajp46SflgkgaXh5yKHHz%2BMGnlMa8DZABL8mmhAcvyGseVnN0yk6XCwrTVkxeibSAUqyxU%2FizOQdgdxUWwqDo2OW7ELgECKf%2B2bunQm615Cv4%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX1%2BpyuNQp26J68kMQ18L8tngfHoPrqsgsCXKBdZuNqIFLhNRtoenFvdFPMfmIjJG%2BjalmkpYcVyqVhq6U99gX0NMGc1vE%2FC7Y0M%2BJP%2BDVOGHoMzuhnhdu3ectdi862%2FWYbGvj3aFi4k5JDnnmVplitEsNBwQmHUNqgo%3D; rl_session=RudderEncrypt%3AU2FsdGVkX186IbRsm7ZwSCWcHfgcyjsvUUB53CYZ%2FeJsPbWo2M%2F1qhh77Gp9G31CF1kT%2FPvNUqyjOxguJ8xllU9Y0b7ZpkPBLAVIdxzDWBaT2hRNvd5duaQUmt8oInIDuKVvzsSebeZ%2BRRkGgHF93w%3D%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22%24device_id%22%3A%220199e768-2133-7710-bf1e-199c01ef78c1%22%2C%22distinct_id%22%3A%22253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0%233a77b455-b8ba-4ba9-bb0a-803ece6910b4%22%2C%22%24sesid%22%3A%5B1769798713217%2C%22019c102e-a1e4-704d-9f11-b2ce9efe6ace%22%2C1769798017508%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fsunday-chirurgic-earlene.ngrok-free.dev%2Fsignin%3Fredirect%3D%25252F%22%7D%7D",
+            "priority": "u=0, i",
+            "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "x-forwarded-for": "2a01:9700:481c:6700:a5c4:eee9:ad40:5f70",
+            "x-forwarded-host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {
+            "message": "اسمي محمد إسماعيل موبايلي 0787499976 وايميلي imoh40398@gmail.com"
+          },
+          "body": {},
+          "webhookUrl": "https://sunday-chirurgic-earlene.ngrok-free.dev/webhook-test/90da8116-6bd9-45a7-b6d6-cf5a4c1e581c",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "ab2ccbee-6d06-4917-a166-92bd08cd4f89",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "da7L9FAcSQCYEToe",
+  "tags": []
+}

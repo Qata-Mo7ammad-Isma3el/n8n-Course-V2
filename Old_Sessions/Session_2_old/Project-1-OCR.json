@@ -1,0 +1,997 @@
+{
+  "name": "Project-1-OCR",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1440,
+        416
+      ],
+      "id": "7b3c663b-9ce4-4e2c-ae0d-de46709b08b3",
+      "name": "Telegram Trigger",
+      "webhookId": "88e4fad0-9c50-45ca-9cb8-3cf037ce163e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0a206fe7-521b-4f11-9af8-2cb03b0d1985",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1152,
+        416
+      ],
+      "id": "2025ab00-2eae-45d6-9564-a6a97547bd14",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo.last().file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -896,
+        656
+      ],
+      "id": "06150e2c-3aee-47bf-a5d1-6fbeb08eeb66",
+      "name": "Get a file",
+      "webhookId": "e143e724-0968-4121-a461-960bc6206f11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -64,
+        768
+      ],
+      "id": "7c6b933b-fcc9-428d-93fd-8683f77351f4",
+      "name": "upload image to imageBB"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"qwen/qwen2.5-vl-32b-instruct:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.prompt }}\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"{{ $('upload image to imageBB').item.json.data.url }}\"\n          }\n        }\n      ]\n    }\n  ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        496,
+        768
+      ],
+      "id": "bee1e053-ddf1-45ba-80a1-0fd75ebf6f16",
+      "name": "openrouter.ai Qwen 2.5 VL"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.choices[0].message.content }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Cardholder_Name",
+              "description": "A person's full name shown on the card (given name and surname). Usually prominent and near the center or top; may include honorifics (Eng., Dr.) or initials."
+            },
+            {
+              "name": "Company Name",
+              "description": "The business or organization the card represents. Often appears with the logo and uses larger or stylized type; may include suffixes like Ltd., Inc., or an Arabic/foreign-language variant."
+            },
+            {
+              "name": "Email_Address",
+              "description": "A contact email in standard format (local@domain.tld). Validate with a simple pattern (contains \"@\" and a domain) and prefer the address closest to other contact details."
+            },
+            {
+              "name": "Cardholder_Position",
+              "description": "The job title or role of the cardholder (e.g., Senior Developer, HR Manager). Typically appears beneath the name or next to it and may include department or seniority words (Sr., Head, Lead)."
+            },
+            {
+              "name": "Website",
+              "description": "The company or personal site (domain or full URL). Look for domains (example.com) or prefixed URLs (www., http://, https://); treat short domains or TLD-only text as website if near company info."
+            },
+            {
+              "name": "Phone Number",
+              "description": "One or more telephone numbers, including country and area codes (e.g., +962 77 551 2130). Normalize by keeping the plus sign and digits, and accept common separators (spaces, dashes, parentheses)."
+            },
+            {
+              "name": "Company_Location",
+              "description": "The physical address or city/country for the business (street, city, postal code, country). May be multi-line; prefer the full mailing address if available, otherwise extract city/region and country."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=You are an expert information-extraction agent. Extract ONLY the requested attributes and return no extra commentary or metadata. If a value cannot be found, return an empty value or omit the field. For Company Name: prefer explicit company text on the card; if not present, infer from the email domain by taking the second-level domain (e.g., a.hasan@orbitech.jo → orbitech, mohammad_ismail@robotna.org → robotna). Do NOT infer company from public email providers (gmail, yahoo, outlook, hotmail, aol, protonmail, icloud); leave Company Name empty for those. When inferring, normalize the name (remove digits/underscores/hyphens, convert to readable capitalization). Preserve original Arabic text; provide transliteration if requested. Always keep output strictly to the requested structured format."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        768
+      ],
+      "id": "9824e16c-d59e-4bde-96c5-8bd3ed20dcb8",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        880,
+        976
+      ],
+      "id": "feb5f2ed-0e90-424a-9919-d46ee8114642",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/crop_card/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -576,
+        656
+      ],
+      "id": "c4a4f494-405a-488c-9dab-8c484c8ee38b",
+      "name": "crop_image"
+    },
+    {
+      "parameters": {
+        "content": "# most be replaced",
+        "height": 288,
+        "width": 480,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        576
+      ],
+      "id": "01295eef-ac4b-4e96-99c8-7feccb97225d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "# Role\nYou are a specialized **Business Card Data Management Agent**. Your primary function is to process user requests related to saving, modifying, or reporting on extracted business card data.\n\n# Goal\nEfficiently manage the flow of business card data by confirming, updating, and saving information to a Google Sheet, and providing daily summaries upon request.\n\n# Behavior\nYou operate in a structured, professional, and helpful manner.\n* Be **concise** and **direct** in your responses.\n* Use a **friendly** tone when confirming actions or asking for clarification.\n* Always use the provided tools to handle data interaction tasks.\n* Ensure all necessary information is gathered before calling the `Add_Business_Card` tool.\n* **Data Handling:** If you are unsure or unable to confirm a value for a specific field, the field's value should be set to `None` before being passed to `Add_Business_Card`.\n* **Phone Number Formatting:** When preparing the data for the `Add_Business_Card` tool, you **must** remove the leading `+` sign from any phone number field. If the number does not start with `+`, leave it as it is.\n\n# Key Instructions and Scenarios\n\n## 1- Confirmation and Saving (User Input: \"✅ Yes, Correct\" or Explicit Confirmation)\n1.  **Tool Call:** Immediately call `fetch_latest_row` to retrieve the most recently extracted business card data.\n2.  **Data Preprocessing:** Before saving, check all phone number fields in the retrieved data. **Remove the leading `+` sign** if present.\n3.  **Action:** Upon successful retrieval and preprocessing, immediately call `Add_Business_Card` to save the data to the Google Sheet.\n4.  **User Notification:** After successfully adding the card, respond with the message: \"**Business Card Saved Successfully ✅**\".\n\n## 2- Modification and Saving (User Input: \"❌ No, Need Changes\" or Explicit Rejection)\n1.  **Tool Call:** Immediately call `fetch_latest_row` to retrieve the latest business card data.\n2.  **Presentation:** Present the data retrieved from the tool to the user in the following, easy-to-read, markdown format:\n    ```markdown\n    Okay lets update Business Card data🫡\n    * **Name:** [Name]\n    * **Position:** [Position]\n    * **Company:** [Company]\n    * **Website:** [Website]\n    * **Email:** [Email]\n    * **Phone (Office):** [Office Phone]\n    * **Phone (Mobile):** [Mobile Phone]\n    * **Location:** [Location]\n\n    Please confirm any details that need adjustment🙃.\n    ```\n    *Note: You must structure the phone numbers into (Office) and (Mobile) if the input contains two, or use a single \"Phone\" field if only one is available. You must infer this structure based on the fetched data.*\n3.  **Gather Adjustments:** Engage with the user to gather all necessary changes/updates to the data fields. Remember to set any unknown value to `None`.\n4.  **Final Confirmation:** After receiving all adjustments, present the *final, updated* data to the user one last time and explicitly ask for a final confirmation: \"Is the updated information correct? Please confirm explicitly to save.\"\n5.  **Data Preprocessing:** Before saving, check all phone number fields in the final, updated data. **Remove the leading `+` sign** if present.\n6.  **Action:** Only upon receiving an explicit confirmation (e.g., \"Yes\", \"Confirm\", \"Looks good\") call `Add_Business_Card` with the fully updated data.\n7.  **User Notification:** After successfully adding the card, only respond with the message: \"**Business Card Saved Successfully ✅**\".\n    note: message \"**Business Card Saved Successfully ✅**\" should be sent just one time. not for **each update** made by user\n## 3- Daily Count (User Input: \"Count for today 🔢\" or Explicit Request for Today's Count)\n1.  **Tool Call:** Immediately call `Count_For_Today`.\n2.  **Response Focus:** Analyze the JSON output from `Count_For_Today`.\n3.  **Action:** Your response to the user must prioritize and use the content of the `agent_summary` field. If `agent_summary` is not available, use `agent_message_short`. Send this content directly to the user.\n\n# Tools\n\n## `fetch_latest_row`\n**Description:** Fetches the complete and latest extracted business card data from the temporary storage (e.g., the last row processed by the extraction workflow).\n**Usage:** Must be called before saving or modifying data (Scenarios 1 and 2).\n**Output:** Returns a JSON object containing the latest extracted business card data fields.\n\n## `Add_Business_Card`\n**Description:** Appends the business card data (fetched or modified) to the primary Google Sheet.\n**Usage:** Called after data confirmation in Scenario 1, or after modification and final confirmation in Scenario 2.\n**Input:** Requires a structured JSON object containing all the business card fields (Name, Position, Company, Email, etc.). Ensure all phone numbers have the leading `+` removed and uncertain values are set to `None`.\n\n## `Count_For_Today`\n**Description:** Retrieves a summary of all business cards saved to the sheet on the current date.\n**Usage:** Called when the user requests the daily count (Scenario 3).\n**Output:** Returns a JSON object containing daily count statistics, including the `agent_summary` and `agent_message_short` fields."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -176,
+        -112
+      ],
+      "id": "3b3cc440-75af-4813-a568-cda4c536fdba",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        176
+      ],
+      "id": "12f3b56c-3119-41fa-98f4-acedc3c280a7",
+      "name": "Google Gemini Chat Model2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from previous node (Information Extractor output)\nconst info = $input.first().json.output;\n\n// Get chat ID from the Telegram Trigger node\nconst chatId = $('Telegram Trigger').first().json.message.chat.id;\n\n// Auto-generate current UTC date/time\nconst now = new Date();\n\n// Format the date and time for Jordan timezone (Asia/Amman)\nconst formattedDate = now.toLocaleDateString('en-US', { \n  year: 'numeric', \n  month: 'long', \n  day: 'numeric',\n  timeZone: 'Asia/Amman'\n});\n\nconst formattedTime = now.toLocaleTimeString('en-US', { \n  hour: '2-digit', \n  minute: '2-digit',\n  second: '2-digit',\n  hour12: true,\n  timeZone: 'Asia/Amman'\n});\n\n// Generate formatted message\nconst message = `\n<b>Extracted Business Card Information:</b>\n\n<b>Name:</b> ${info.Cardholder_Name}\n<b>Position:</b> ${info.Cardholder_Position}\n<b>Company:</b> ${info[\"Company Name\"]}\n<b>Website:</b> ${info.Website}\n<b>Email:</b> ${info.Email_Address}\n<b>Phone:</b> ${info[\"Phone Number\"]}\n<b>Location:</b> ${info.Company_Location}\n\n━━━━━━━━━━━━━━━━━━━━\n\n• <b>Extracted on:</b> ${formattedDate} at ${formattedTime}\n\n━━━━━━━━━━━━━━━━━━━━\n\n✅ <b>Is this information correct?</b>\n`.trim();\n\n// Return data for Telegram node with inline keyboard buttons\nreturn {\n  json: {\n    chatId: chatId,\n    text: message,\n    parse_mode: 'HTML',\n    reply_markup: {\n      inline_keyboard: [\n        [\n          { text: 'Yes, Correct ✅', callback_data: 'confirm_yes' },\n          { text: 'No, Need Changes ❌', callback_data: 'confirm_no' },\n          { text: 'Count for today 🔢', callback_data: 'confirm_no' }\n        ]\n      ]\n    }\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        640
+      ],
+      "id": "b4f620ac-0b56-4067-a560-e4f3a2aec660",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }} ",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[0][0].text }}",
+                    "additionalFields": {}
+                  },
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[0][1].text }}",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[0][2].text }}",
+                    "additionalFields": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {},
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "reply_to_message_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1616,
+        640
+      ],
+      "id": "69f061eb-4f8b-486d-bfd4-00b8b6c34f44",
+      "name": "Send results to User",
+      "webhookId": "97188705-9eea-4741-892f-7bd109948c3a"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        176
+      ],
+      "id": "d1be407c-9574-4395-9aa8-2130c5c79aac",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dE3T0Wk6uZiBveLUzrOtTKC27b2cMX_jBv6NKAD6POM",
+          "mode": "list",
+          "cachedResultName": "Business_Cards_Information",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dE3T0Wk6uZiBveLUzrOtTKC27b2cMX_jBv6NKAD6POM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dE3T0Wk6uZiBveLUzrOtTKC27b2cMX_jBv6NKAD6POM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Cardholder_Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Cardholder_Name', ``, 'string') }}",
+            "Company_Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company_Name', ``, 'string') }}",
+            "Email_Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Address', ``, 'string') }}",
+            "Cardholder_Position": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Cardholder_Position', ``, 'string') }}",
+            "Website": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Website', ``, 'string') }}",
+            "Phone_Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Company_Location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Company_Location', ``, 'string') }}",
+            "Date": "={{ $now.setZone('Asia/Amman').format('yyyy/MM/dd') }}",
+            "Time": "={{ $now.setZone('Asia/Amman').format('HH:mm:ss') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cardholder_Name",
+              "displayName": "Cardholder_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company_Name",
+              "displayName": "Company_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email_Address",
+              "displayName": "Email_Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cardholder_Position",
+              "displayName": "Cardholder_Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone_Number",
+              "displayName": "Phone_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company_Location",
+              "displayName": "Company_Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        192
+      ],
+      "id": "dcbbae83-e797-4db6-8dc5-db9c325c135c",
+      "name": "Add_Business_Card"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "Go0hsGKJYAJwPXCg",
+          "mode": "list",
+          "cachedResultName": "Raw_Business_Card_Data",
+          "cachedResultUrl": "/projects/Cs7IGmCwnzDXKKzg/datatables/Go0hsGKJYAJwPXCg"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.setZone('Asia/Amman').format('yyyy/MM/dd') }}",
+            "Time": "={{ $now.setZone('Asia/Amman').format('HH:mm:ss') }}",
+            "Cardholder_Name": "={{ $json.output.Cardholder_Name }}",
+            "Company_Name": "={{ $json.output['Company Name'] }}",
+            "Email_Address": "={{ $json.output.Email_Address }}",
+            "Cardholder_Position": "={{ $json.output.Cardholder_Position }}",
+            "Website": "={{ $json.output.Website }}",
+            "Phone_Number": "={{ $json.output['Phone Number'] }}",
+            "Company_Location": "={{ $json.output.Company_Location }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Cardholder_Name",
+              "displayName": "Cardholder_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company_Name",
+              "displayName": "Company_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email_Address",
+              "displayName": "Email_Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Cardholder_Position",
+              "displayName": "Cardholder_Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone_Number",
+              "displayName": "Phone_Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company_Location",
+              "displayName": "Company_Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        832
+      ],
+      "id": "01288ea5-6951-477a-84a2-2fa9646d42b7",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "description": "Retrieves the most recently added business card entry from the Raw_Business_Card_Data table by identifying and returning the row with the highest ID value. This ensures the workflow always provides the latest extracted card data for further processing.",
+        "workflowId": {
+          "__rl": true,
+          "value": "3ETPmswuOWpaqVXm",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/3ETPmswuOWpaqVXm",
+          "cachedResultName": "fetch_latest_row"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        192
+      ],
+      "id": "8df2abab-629e-488e-937a-ace453a7e704",
+      "name": "fetch_latest_row"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -112
+      ],
+      "id": "7002e440-65a9-4083-9f92-ba7acf2a5220",
+      "name": "Send Response To User",
+      "webhookId": "02050f33-a37d-485f-8b1e-a7c5ca423090"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('If').item.json.message.chat.id }}",
+        "text": "Please capture a clearer image! 💡 Ensure the document is flat, well-lit, and fully visible within the frame. ✅",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        544
+      ],
+      "id": "45795491-90c4-4aab-aef6-3fb127bfc89c",
+      "name": "Send to user \"Get  clearer image\"",
+      "webhookId": "c45989b9-fae0-4614-9445-eb61150c8558"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6db0178a-a5d5-4634-a3d1-d71bab106e1c",
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "No four corners detected.",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        656
+      ],
+      "id": "cc2a6207-211e-4ce8-bc64-6a1a48b3455d",
+      "name": "ckeck for imege"
+    },
+    {
+      "parameters": {
+        "description": "Automatically retrieves and summarizes business cards collected on a specific date from Google Sheets, generating a formatted report for agents.",
+        "workflowId": {
+          "__rl": true,
+          "value": "wf3st3fKh7jKSEIm",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wf3st3fKh7jKSEIm",
+          "cachedResultName": "Count_For_Today"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.setZone('Asia/Amman').format('yyyy/MM/dd') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        192
+      ],
+      "id": "1107f817-dc26-4f19-9f5c-6d6f83d9e13b",
+      "name": "Count_For_Today"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a3e46587-685e-4d23-96ef-4ceb81fcbf6b",
+              "name": "prompt",
+              "value": "Extract all text from the image and return ONLY in this exact format:\\n\\n### English Text:\\n(All English text lines)\\n\\n### Arabic Text:\\n(All Arabic text lines)\\n\\n### Translation of Arabic Text:\\n- Arabic line (transliteration): English translation\\n- Arabic line (transliteration): English translation\\n\\n### Full Address:\\n- Complete address in English\\n\\n### Phone Numbers:\\n- phone 1\\n- phone 2\\n\\n### Email and Website:\\n- email\\n- website\\n\\nRules: Keep all headers even if section is empty (use None for empty sections). No additional text or explanations. Maintain exact formatting with bullet points. Preserve order as shown above.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        768
+      ],
+      "id": "c801e83a-3f7e-459b-a1ab-c61a16368b90",
+      "name": "user prompt"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "crop_image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload image to imageBB": {
+      "main": [
+        [
+          {
+            "node": "user prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openrouter.ai Qwen 2.5 VL": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crop_image": {
+      "main": [
+        [
+          {
+            "node": "ckeck for imege",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Response To User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send results to User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add_Business_Card": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fetch_latest_row": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ckeck for imege": {
+      "main": [
+        [
+          {
+            "node": "Send to user \"Get  clearer image\"",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "upload image to imageBB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count_For_Today": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "user prompt": {
+      "main": [
+        [
+          {
+            "node": "openrouter.ai Qwen 2.5 VL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "909cae23-8ae1-4445-a9cb-650dc63fa0f8",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "RHWKcDbHbaVDkMgt",
+  "tags": []
+}

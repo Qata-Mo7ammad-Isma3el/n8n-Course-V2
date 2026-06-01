@@ -1,0 +1,122 @@
+{
+  "name": "S7-07 Modular Sub-Workflow Pattern",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 7: Modular Sub-Workflow Pattern\n\n### What you'll learn\n- How to extract repeated logic into a CHILD workflow\n- How to call it from a PARENT workflow with Execute Workflow\n- Why this is the foundation of clean, maintainable automation\n\n### The architecture\nThis file contains the PARENT.\nYou'll also need a CHILD workflow with an Execute Workflow Trigger.\nCreate a new workflow → add 'When Executed by Another Workflow' → save it →\ncopy its workflow ID → paste into the Execute Workflow node below.\n\n### Why bother\n- ONE place to fix bugs instead of 10\n- Child workflow can have its OWN error handling\n- Reusable across many parent workflows\n- Easier to test in isolation",
+        "height": 400,
+        "width": 760,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-440, -100],
+      "id": "note-07",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-360, 420],
+      "id": "trigger-07",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "userEmail",
+              "value": "test@example.com",
+              "type": "string"
+            },
+            {
+              "id": "p2",
+              "name": "userName",
+              "value": "Mohammad",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-140, 420],
+      "id": "prep-data",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_CHILD_WORKFLOW_ID"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userEmail": "={{ $json.userEmail }}",
+            "userName": "={{ $json.userName }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [120, 420],
+      "id": "call-child",
+      "name": "Call Child Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "result",
+              "value": "={{ JSON.stringify($json) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [380, 420],
+      "id": "use-result",
+      "name": "Use Returned Data"
+    },
+    {
+      "parameters": {
+        "content": "## CHILD workflow blueprint (build separately)\n\n1. New workflow → 'When Executed by Another Workflow' trigger\n2. Define inputs: userEmail (string), userName (string)\n3. Do the actual work (validate email, fetch user, whatever)\n4. Add internal error handling here — Continue on Error or Split Route\n5. Last node returns the result to parent automatically\n6. Save workflow → copy ID → paste into Execute Workflow node above\n\n### Tip\nPut the centralized error workflow (Lesson 5) as this child's Error Workflow too.\nThat way every layer is covered.",
+        "height": 320,
+        "width": 760,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-440, 600],
+      "id": "note-07-child",
+      "name": "Child Blueprint"
+    }
+  ],
+  "connections": {
+    "When clicking Execute": {
+      "main": [[{ "node": "Prepare Data", "type": "main", "index": 0 }]]
+    },
+    "Prepare Data": {
+      "main": [[{ "node": "Call Child Workflow", "type": "main", "index": 0 }]]
+    },
+    "Call Child Workflow": {
+      "main": [[{ "node": "Use Returned Data", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

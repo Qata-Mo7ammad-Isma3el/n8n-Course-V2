@@ -1,0 +1,706 @@
+{
+  "name": "Project 2 Student Performance Tracker & Automated Feedback System",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "teacher_email",
+              "value": "teacher@school.edu",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "teacher_telegram_chat_id",
+              "value": "YOUR_TELEGRAM_CHAT_ID",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "spreadsheet_id",
+              "value": "YOUR_GOOGLE_SHEET_ID",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "522d5a12-9779-4acc-bbb6-b8cabf878a0c",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate an array of 15 fake student objects\nconst students = [];\n\nconst firstNames = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan', 'Sophia', 'Mason', 'Isabella', 'William', 'Mia', 'James', 'Charlotte', 'Benjamin', 'Amelia'];\nconst lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson'];\nconst courses = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'English Literature', 'History'];\n\nfor (let i = 0; i < 15; i++) {\n  const firstName = firstNames[i];\n  const lastName = lastNames[i];\n  const name = `${firstName} ${lastName}`;\n  const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@school.edu`;\n  const course = courses[Math.floor(Math.random() * courses.length)];\n  \n  // Generate random scores\n  const assignment_score = Math.floor(Math.random() * 101); // 0-100\n  const attendance_percentage = Math.floor(Math.random() * 101); // 0-100\n  const participation_score = Math.floor(Math.random() * 101); // 0-100\n  \n  // Calculate overall score as average of the three scores\n  const overall_score = Math.round((assignment_score + attendance_percentage + participation_score) / 3);\n  \n  students.push({\n    student_id: `STU${String(i + 1).padStart(3, '0')}`,\n    name: name,\n    email: email,\n    course: course,\n    assignment_score: assignment_score,\n    attendance_percentage: attendance_percentage,\n    participation_score: participation_score,\n    overall_score: overall_score\n  });\n}\n\n// Return the array of students\nreturn students.map(student => ({ json: student }));"
+      },
+      "id": "85b2cfe0-09dd-4782-8aaf-fe26ccacb8a3",
+      "name": "Generate Student Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 85,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Excellent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 70,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  },
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 85,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Good"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.overall_score }}",
+                    "rightValue": 70,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Needs Improvement"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9ce4ffc9-8067-4826-b71a-9277270193b3",
+      "name": "Categorize by Performance",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.overall_score }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              },
+              "id": "aa7648b3-0da4-4ce5-aa6f-f2a137cd5ac3"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0d5838b6-5425-4c68-b700-0f004cea296a",
+      "name": "Filter Students Needing Attention",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "overall_score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "01ee7a17-8962-452a-9baf-ad0ec84d58f9",
+      "name": "Rank Students by Performance",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        272,
+        1232
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Excellent",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "Congratulations! Your outstanding performance demonstrates exceptional dedication and mastery of the material. Keep up the excellent work!",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Excellent Performance - Keep It Up!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "851dec4c-d64b-4795-b367-0a6f0c30c748",
+      "name": "Add Excellent Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Good",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "Great job! You are performing well in the course. Continue your efforts and consider reaching for even higher goals.",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Good Performance - Keep Going!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b4376dcf-5c0a-48e7-989c-347f4c599262",
+      "name": "Add Good Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "performance_category",
+              "value": "Needs Improvement",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "feedback_message",
+              "value": "We have noticed you may be struggling with the course material. Please reach out to your instructor or visit office hours for additional support. We are here to help you succeed!",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "email_subject",
+              "value": "Academic Support Available - Let Us Help",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "4b70c978-6a95-4d45-bb96-7dc68cce49f3",
+      "name": "Add Needs Improvement Feedback",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Workflow Configuration').item.json.spreadsheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Processed_Data"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5e3be03f-8623-40ee-b5dd-a8a7a97c587e",
+      "name": "Write to Processed_Data Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        1232
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('Workflow Configuration').item.json.spreadsheet_id }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Attention_Needed"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6211c2e0-b154-4978-bb07-df087eeb9f30",
+      "name": "Write to Attention_Needed Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        784
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.email_subject }}",
+        "message": "={{\n`Dear ${$json.name},\n\n${$json.feedback_message}\n\nCourse: ${$json.course}\nOverall Score: ${$json.overall_score}%\nAssignment Score: ${$json.assignment_score}%\nAttendance: ${$json.attendance_percentage}%\nParticipation: ${$json.participation_score}%\n\nBest regards,\nYour Teaching Team`\n}}\n",
+        "options": {}
+      },
+      "id": "65ce0a24-b7b9-4ad1-989b-ccaa4a6aa0d0",
+      "name": "Send Feedback Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        400
+      ],
+      "webhookId": "a5a38583-0e72-41e0-99d9-a5193d48434c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YgWlh4VCmpscaJ1K",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "812fdeba-d04e-420a-9945-07849cccbab7",
+      "name": "Wait 2 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        400
+      ],
+      "webhookId": "881739af-db30-45b3-a25c-64726156839a"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Workflow Configuration').item.json.teacher_telegram_chat_id }}",
+        "text": "={{\n`📊 Daily Student Performance Summary\n\n👥 Total Students: ${$json.total_students}\n📈 Average Overall Score: ${$json.avg_overall_score.toFixed(2)}%\n📝 Average Assignment Score: ${$json.avg_assignment_score.toFixed(2)}%\n📅 Average Attendance: ${$json.avg_attendance.toFixed(2)}%\n💬 Average Participation: ${$json.avg_participation.toFixed(2)}%\n\nCheck Google Sheets for detailed breakdown!`\n}}\n",
+        "additionalFields": {}
+      },
+      "id": "ec5cfc39-7e8b-4da8-b2b5-657809c23029",
+      "name": "Send Teacher Summary",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        992
+      ],
+      "webhookId": "1af77786-cf23-4fff-ac7b-6d4602628b64",
+      "credentials": {
+        "telegramApi": {
+          "id": "tSblbirAytDlRm4H",
+          "name": "n8n_QATAbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Student Performance Tracker & Automated Feedback System",
+        "height": 80,
+        "width": 1072,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "6d749331-25f6-4179-868c-7e7761d47338",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "=assignment_score",
+              "renameField": true,
+              "outputFieldName": "avg_assignment_score"
+            },
+            {
+              "fieldToAggregate": "attendance_percentage",
+              "renameField": true,
+              "outputFieldName": "avg_attendance"
+            },
+            {
+              "fieldToAggregate": "participation_score",
+              "renameField": true,
+              "outputFieldName": "avg_participation"
+            },
+            {
+              "fieldToAggregate": "overall_score",
+              "renameField": true,
+              "outputFieldName": "avg_overall_score"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b7409c8-7f4d-4922-9f1b-a98012fec05d",
+      "name": "Get-data",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        208,
+        992
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8724d9f-660f-4e9c-bb53-a848e677114a",
+              "name": "total_students",
+              "value": "={{ $json.avg_assignment_score.length }}",
+              "type": "number"
+            },
+            {
+              "id": "25da3cab-07b6-464d-b8d9-ca77f3f12dbb",
+              "name": "avg_assignment_score",
+              "value": "={{ $json.avg_assignment_score.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "e62db5b9-484c-4d5e-9539-522606ef2eac",
+              "name": "avg_attendance",
+              "value": "={{ $json.avg_attendance.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "c20c0f64-b464-4de5-ab05-3d00b5e7f1bb",
+              "name": "avg_participation",
+              "value": "={{ $json.avg_participation.average() }}",
+              "type": "number"
+            },
+            {
+              "id": "62a82cbf-7d14-4356-a446-6eb7dad8b619",
+              "name": "avg_overall_score",
+              "value": "={{ $json.avg_overall_score.average()}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        992
+      ],
+      "id": "4e8b210a-805f-4672-9747-9f2535ff4509",
+      "name": "Calculate Class Averages"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Generate Student Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Student Data": {
+      "main": [
+        [
+          {
+            "node": "Categorize by Performance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Students Needing Attention",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rank Students by Performance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize by Performance": {
+      "main": [
+        [
+          {
+            "node": "Add Excellent Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Good Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Needs Improvement Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Students Needing Attention": {
+      "main": [
+        [
+          {
+            "node": "Write to Attention_Needed Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rank Students by Performance": {
+      "main": [
+        [
+          {
+            "node": "Write to Processed_Data Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Excellent Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Good Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Needs Improvement Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Feedback Email": {
+      "main": [
+        [
+          {
+            "node": "Wait 2 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get-data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Class Averages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Class Averages": {
+      "main": [
+        [
+          {
+            "node": "Send Teacher Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "d9995041-8e73-4d7e-b36d-22f87a919aff",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "WTJURqAypaiax6RK",
+  "tags": []
+}

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Uploader — n8n Webhook</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23E9466E'/%3E%3Cstop offset='100%25' stop-color='%23ED6887'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Cpath d='M30 25h25l15 15v35a5 5 0 0 1-5 5H30a5 5 0 0 1-5-5V30a5 5 0 0 1 5-5z' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M55 25v15h15' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M45 55v-12m-6 6l6-6 6 6' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --grey: #9A9A9A;
+      --pink: #E9466E;
+      --pink-light: #ED6887;
+      --white: #FFFFFF;
+      --dark: #323232;
+      --dark-card: #2a2a2a;
+      --dark-surface: #3a3a3a;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background-color: var(--dark);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Animated Background ── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-grid::before {
+      content: '';
+      position: absolute;
+      inset: -50%;
+      background-image:
+        linear-gradient(var(--dark-surface) 1px, transparent 1px),
+        linear-gradient(90deg, var(--dark-surface) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.3;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(60px, 60px); }
+    }
+
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb.one {
+      width: 500px;
+      height: 500px;
+      background: var(--pink);
+      top: -100px;
+      right: -100px;
+      animation: floatOrb 12s ease-in-out infinite alternate;
+    }
+
+    .glow-orb.two {
+      width: 400px;
+      height: 400px;
+      background: var(--pink-light);
+      bottom: -80px;
+      left: -80px;
+      animation: floatOrb 15s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -30px) scale(1.1); }
+      100% { transform: translate(-20px, 20px) scale(0.95); }
+    }
+
+    /* ── Layout ── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      animation: fadeDown 0.6s ease-out both;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 20px rgba(233, 70, 110, 0.3);
+    }
+
+    .logo-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      color: var(--pink);
+    }
+
+    .subtitle {
+      color: var(--grey);
+      font-size: 15px;
+      font-weight: 300;
+      margin-bottom: 48px;
+      text-align: center;
+      animation: fadeDown 0.6s ease-out 0.1s both;
+    }
+
+    /* ── Webhook Input ── */
+    .webhook-section {
+      width: 100%;
+      margin-bottom: 32px;
+      animation: fadeDown 0.6s ease-out 0.2s both;
+    }
+
+    .field-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--grey);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field-label .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--pink);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .webhook-input {
+      width: 100%;
+      padding: 16px 20px;
+      background: var(--dark-card);
+      border: 1.5px solid var(--dark-surface);
+      border-radius: 14px;
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .webhook-input::placeholder {
+      color: #555;
+    }
+
+    .webhook-input:focus {
+      border-color: var(--pink);
+      box-shadow: 0 0 0 3px rgba(233, 70, 110, 0.15);
+    }
+
+    /* ── Drop Zone ── */
+    .drop-zone-wrapper {
+      width: 100%;
+      animation: fadeDown 0.6s ease-out 0.3s both;
+    }
+
+    .drop-zone {
+      width: 100%;
+      min-height: 300px;
+      border: 2px dashed var(--dark-surface);
+      border-radius: 20px;
+      background: var(--dark-card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-zone::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(233, 70, 110, 0.03), rgba(237, 104, 135, 0.03));
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: var(--pink);
+      background: #2e2e2e;
+      transform: scale(1.005);
+    }
+
+    .drop-zone:hover::before,
+    .drop-zone.drag-over::before {
+      opacity: 1;
+    }
+
+    .drop-zone-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 40px;
+    }
+
+    .upload-icon-container {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(233, 70, 110, 0.12), rgba(237, 104, 135, 0.08));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .drop-zone:hover .upload-icon-container {
+      transform: translateY(-4px);
+    }
+
+    .upload-icon-container svg {
+      width: 36px;
+      height: 36px;
+      stroke: var(--pink);
+    }
+
+    .drop-zone-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .drop-zone-title span {
+      color: var(--pink);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .drop-zone-hint {
+      font-size: 13px;
+      color: var(--grey);
+      font-weight: 300;
+    }
+
+    .drop-zone-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--grey);
+      background: var(--dark-surface);
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* ── File List ── */
+    .file-list {
+      width: 100%;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: fadeDown 0.3s ease-out both;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: var(--dark-card);
+      border: 1px solid var(--dark-surface);
+      border-radius: 14px;
+      animation: slideIn 0.35s ease-out both;
+      transition: border-color 0.3s ease;
+    }
+
+    .file-item:hover {
+      border-color: #555;
+    }
+
+    .file-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .file-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--white);
+    }
+
+    .file-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: var(--grey);
+      font-weight: 300;
+      margin-top: 2px;
+    }
+
+    .file-remove {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--grey);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .file-remove:hover {
+      background: rgba(233, 70, 110, 0.15);
+      color: var(--pink);
+    }
+
+    /* ── Send Button ── */
+    .send-section {
+      width: 100%;
+      margin-top: 32px;
+      animation: fadeDown 0.6s ease-out 0.4s both;
+    }
+
+    .send-btn {
+      width: 100%;
+      padding: 18px 32px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--pink), var(--pink-light));
+      color: var(--white);
+      font-family: 'Sora', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
+    }
+
+    .send-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--pink-light), var(--pink));
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(233, 70, 110, 0.35);
+    }
+
+    .send-btn:hover::before {
+      opacity: 1;
+    }
+
+    .send-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .send-btn .btn-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .send-btn.loading .spinner {
+      display: block;
+    }
+
+    .send-btn.loading .btn-label {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed;
+      top: 28px;
+      right: 28px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 16px 22px;
+      border-radius: 14px;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.4s ease-out both;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      max-width: 380px;
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #1a3a2a, #1e4030);
+      border: 1px solid #2d6b4a;
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #3a1a1a, #402020);
+      border: 1px solid #6b2d2d;
+    }
+
+    .toast.removing {
+      animation: toastOut 0.3s ease-in forwards;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px) scale(0.95); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateX(40px) scale(0.95); }
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: auto;
+      padding-top: 60px;
+      text-align: center;
+      animation: fadeDown 0.6s ease-out 0.5s both;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: var(--white);
+      font-weight: 300;
+    }
+
+    .footer a {
+      color: var(--pink-light);
+      text-decoration: none;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .container {
+        padding: 40px 16px 60px;
+      }
+
+      .drop-zone {
+        min-height: 240px;
+      }
+
+      .drop-zone-content {
+        padding: 28px 20px;
+      }
+
+      .toast-container {
+        top: 16px;
+        right: 16px;
+        left: 16px;
+      }
+
+      .toast {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Effects -->
+  <div class="bg-grid"></div>
+  <div class="glow-orb one"></div>
+  <div class="glow-orb two"></div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="container">
+
+    <!-- Header -->
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <div class="logo-text">pdf<span>→</span>n8n</div>
+    </div>
+    <p class="subtitle">Upload PDF files and send them to your n8n webhook</p>
+
+    <!-- Webhook URL -->
+    <div class="webhook-section">
+      <label class="field-label"><span class="dot"></span> Webhook URL</label>
+      <input
+        type="url"
+        class="webhook-input"
+        id="webhookUrl"
+        placeholder="https://your-n8n-instance.com/webhook/your-id"
+        value="https://sunday-chirurgic-earlene.ngrok-free.dev/webhook-test/QMI"
+        spellcheck="false"
+      >
+    </div>
+
+    <!-- Drop Zone -->
+    <div class="drop-zone-wrapper">
+      <label class="field-label"><span class="dot"></span> PDF Files</label>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple accept=".pdf,application/pdf">
+        <div class="drop-zone-content">
+          <div class="upload-icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="drop-zone-title">Drop files here or <span>browse</span></p>
+          <p class="drop-zone-hint">Select one or multiple PDF files</p>
+          <div class="drop-zone-badge">PDF only · Max 25 MB each</div>
+        </div>
+      </div>
+
+      <!-- File List -->
+      <div class="file-list" id="fileList"></div>
+    </div>
+
+    <!-- Send Button -->
+    <div class="send-section">
+      <button class="send-btn" id="sendBtn" disabled>
+        <span class="btn-content">
+          <span class="btn-label">Send to Webhook</span>
+          <span class="spinner"></span>
+        </span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Built for <a href="https://n8n.io" target="_blank">n8n</a> workflows</p>
+      <p style="margin-top: 6px; opacity: 0.7;">by Qata-Mo7ammad-Isma3el</p>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const sendBtn = document.getElementById('sendBtn');
+    const webhookInput = document.getElementById('webhookUrl');
+    const toastContainer = document.getElementById('toastContainer');
+
+    let selectedFiles = [];
+
+    // ── Drop Zone Events ──
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const files = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+      if (files.length === 0) {
+        showToast('Only PDF files are allowed', 'error');
+        return;
+      }
+      addFiles(files);
+    });
+
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files);
+      addFiles(files);
+      fileInput.value = '';
+    });
+
+    // ── File Management ──
+    function addFiles(files) {
+      const maxSize = 25 * 1024 * 1024; // 25MB
+      for (const file of files) {
+        if (file.size > maxSize) {
+          showToast(`"${file.name}" exceeds 25 MB limit`, 'error');
+          continue;
+        }
+        // Avoid duplicates
+        if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) continue;
+        selectedFiles.push(file);
+      }
+      renderFileList();
+      updateSendBtn();
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      renderFileList();
+      updateSendBtn();
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function renderFileList() {
+      fileList.innerHTML = '';
+      selectedFiles.forEach((file, i) => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.style.animationDelay = `${i * 0.06}s`;
+        item.innerHTML = `
+          <div class="file-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="file-details">
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${formatSize(file.size)}</div>
+          </div>
+          <button class="file-remove" onclick="removeFile(${i})" title="Remove">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        `;
+        fileList.appendChild(item);
+      });
+    }
+
+    function updateSendBtn() {
+      sendBtn.disabled = selectedFiles.length === 0;
+    }
+
+    // ── Send to Webhook ──
+    sendBtn.addEventListener('click', async () => {
+      const url = webhookInput.value.trim();
+
+      if (!url) {
+        showToast('Please enter a webhook URL', 'error');
+        webhookInput.focus();
+        return;
+      }
+
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        showToast('Webhook URL must start with http:// or https://', 'error');
+        webhookInput.focus();
+        return;
+      }
+
+      if (selectedFiles.length === 0) {
+        showToast('Please add at least one PDF file', 'error');
+        return;
+      }
+
+      sendBtn.classList.add('loading');
+      sendBtn.disabled = true;
+
+      try {
+        const formData = new FormData();
+        selectedFiles.forEach((file, index) => {
+          formData.append(`file_${index}`, file, file.name);
+        });
+        formData.append('fileCount', selectedFiles.length.toString());
+        formData.append('timestamp', new Date().toISOString());
+
+        const response = await fetch(url, {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const count = selectedFiles.length;
+          showToast(`${count} file${count > 1 ? 's' : ''} sent successfully!`, 'success');
+          selectedFiles = [];
+          renderFileList();
+        } else {
+          showToast(`Webhook returned ${response.status}: ${response.statusText}`, 'error');
+        }
+      } catch (err) {
+        showToast(`Failed to connect: ${err.message}`, 'error');
+      } finally {
+        sendBtn.classList.remove('loading');
+        updateSendBtn();
+      }
+    });
+
+    // ── Toast Notifications ──
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icon = type === 'success'
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      toast.innerHTML = icon + `<span>${message}</span>`;
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('removing');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

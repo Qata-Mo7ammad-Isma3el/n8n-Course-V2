@@ -1,0 +1,859 @@
+{
+  "name": "project-1 -Automated-resume-scoring",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.cloud.llamaindex.ai/api/parsing/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file_0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5a32f5f0-3ce7-487b-ae0f-bfda6cc8c061",
+      "name": "Upload to LlamaParse",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -976,
+        368
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "olyzPgTdhlrAptfR",
+          "name": "LIamaIndex"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "296ab729-f601-45d1-8425-b8e227f392a3",
+      "name": "Get Processing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -672,
+        384
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "olyzPgTdhlrAptfR",
+          "name": "LIamaIndex"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "5a9d1474-9c98-4821-9f21-ccc8ce0dac75",
+      "name": "Wait to stay within service limits",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -240,
+        480
+      ],
+      "webhookId": "17a96ed6-b5ff-47bb-a8a2-39c1eb40185a",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 1,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "300fce8c-b19a-4d0c-86e8-f62853c70ce2",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "SUCCESS"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "SUCCESS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 1,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "e6058aa0-a3e2-4ce3-9bed-6ff41a5be052",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ERROR"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "ERROR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 1,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "ceb6338f-4261-40ac-be11-91f61c7302ba",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "CANCELED"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "CANCELED"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "version": 1,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "0fa97d86-432a-409a-917e-5f1a002b1ab9",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "PENDING"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "PENDING"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "id": "034a1c28-1cf1-489c-ae17-9195571d2333",
+      "name": "Is Job Ready?",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -496,
+        352
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b8fdacf2-a185-4caf-b84e-06c8105b9c6b",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        384,
+        736
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qOtKSs1wZu97M7Sd",
+          "name": "test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "subject: Job application for SDR, has:attachment"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "id": "f356dfd1-abf1-45c0-81db-2a017bc9890e",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        -1280,
+        64
+      ],
+      "typeVersion": 1.2,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Get Parsed Resume').item.json.markdown }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "MObile No.",
+              "type": "number",
+              "description": "Extract Mobile Number / Telephone no.",
+              "required": true
+            },
+            {
+              "name": "City",
+              "description": "Extract the city in which candidate is currently residing"
+            },
+            {
+              "name": "Full Name",
+              "description": "Extract the full name of candidate",
+              "required": true
+            },
+            {
+              "name": "Email",
+              "description": "Extract the email of the candidate only.",
+              "required": true
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert extraction algorithm.\nOnly extract relevant information from the text.\nIf you do not know the value of an attribute asked to extract, you may omit the attribute's value."
+        }
+      },
+      "id": "bc0afc77-f463-4cc3-b3bb-f45baeec5345",
+      "name": "Personal Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        384,
+        528
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.markdown }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Job History",
+              "description": "Work history summary, mentioning all companies and duration worked, focusing major impactful achievements and work done. ",
+              "required": true
+            },
+            {
+              "name": "Skills",
+              "description": "Extract the candidate’s technical skills. What software, frameworks, functional, business skills they are proficient in. Make a bulleted list.",
+              "required": true
+            },
+            {
+              "name": "Title & Employer",
+              "description": "Extract all Job Title and Employer with working years. For Example Job Title- Account Executive , Employer - SAP, Working Years - 2 Year, Job Title- Account Manager , Employer - Salesforce, Working Years - 3 Year. Combine the experience by Employer.",
+              "required": true
+            },
+            {
+              "name": "Work Experience",
+              "description": "Extract years of experience and group experience by job function or role type. Format Example: Total Years Exp: 7 - Account Executive: 2 years - Sales Development Representative: 2 years - Account Manager: 3 years",
+              "required": true
+            },
+            {
+              "name": "Promotions Checker",
+              "type": "number",
+              "description": "For an employees, check if candidates designation has changed. Count total number of senior changes (i.e advancement in position) across the entire working experience."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d704491c-0dcd-44c0-bf4d-c285f6347356",
+      "name": "Professional Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        384,
+        208
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Get Parsed Resume').item.json.markdown }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Education Information",
+              "description": "Create a tabular list of colleges, schools attended along with graduation degree, certification, passing year and any notable achievement in education.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ef9e3fe4-f56c-482d-8679-2c72755a52b2",
+      "name": "Educational Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        384,
+        368
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "553f8b6f-7cfd-4f53-9dff-57597216fecf",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        768,
+        288
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "8d153048-898b-4e38-92a0-bae7a4b81ae0",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1104,
+        352
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "url": "=https://api.cloud.llamaindex.ai/api/parsing/job/{{ $json.id }}/result/markdown",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "f616d55c-003c-431e-8d1a-261603aa0ac4",
+      "name": "Get Parsed Resume",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -240,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "olyzPgTdhlrAptfR",
+          "name": "LIamaIndex"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Step 1: Waiting for Resume.\nThis node is fetching resumes from Emails basis the specific Subject every hour.",
+        "height": 340,
+        "width": 304
+      },
+      "id": "a2c32b61-bbd6-480b-8c49-9fbe1ba99871",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Step 2: Parsing the Resume",
+        "height": 480,
+        "width": 980,
+        "color": 4
+      },
+      "id": "520de70f-f4b7-4e4a-a6b1-0daa469d3844",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1024,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Data Extraction from Resume\nThis mode will identify personal, educational and professional info from Resume",
+        "height": 780,
+        "width": 640,
+        "color": 6
+      },
+      "id": "5310beac-d4e2-4e21-be84-a85ad97d24b6",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "QMI",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1264,
+        400
+      ],
+      "id": "6573c788-eee2-4f9e-aa05-7631406043c0",
+      "name": "Webhook",
+      "webhookId": "ccdc4e6c-5310-4106-9452-0ba08423c80d"
+    },
+    {
+      "parameters": {
+        "content": "## How to use LIamaIndex [Guide](https://developers.llamaindex.ai/typescript/cloud/llamaparse/getting_started/)\n## LIamaIndex APIs v2 [API](https://developers.llamaindex.ai/cloud-api-reference/category/v-2)\n",
+        "height": 112,
+        "width": 368,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1024,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "340b893b-8b89-4c80-80b0-cb69a627b90d",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "Upload to LlamaParse": [
+      {
+        "json": {
+          "id": "cec11b74-979f-4e49-8f4c-63f9ac86371c",
+          "status": "PENDING",
+          "error_code": null,
+          "error_message": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Get Processing Status": [
+      {
+        "json": {
+          "id": "cec11b74-979f-4e49-8f4c-63f9ac86371c",
+          "status": "SUCCESS"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Get Parsed Resume": [
+      {
+        "json": {
+          "markdown": "\nMohammad Ismail\nArtificial Intelligence and robotics\nimoh40398@gmail.com | Amman, Jordan, Amman City Center, 11118 | 0787499976\nGitHub • LinkedIn • Portfolio\n\n# Summary\n\nAI and Robotics graduate and Automation Engineer with hands-on experience in workflow automation, AI integration, and cloud deployment. Skilled in n8n, Docker, Prompt Engineering, and RAGs (Retrieval-Augmented Generation) for building intelligent, AI-driven systems. Experienced Backend Developer using FastAPI, building scalable APIs, authentication systems, and automation-ready services that integrate smoothly with modern AI and workflow tools. Delivered training to over 800 learners in AI, data science, and robotics, combining technical expertise with practical, project-based learning. Passionate about creating automation and AI solutions that enhance business efficiency and bridge the gap between artificial intelligence and real-world applications.\n\n# Education\n\nBachelor of Artificial Intelligence and Robotics\n\nAl-Balqa Applied University | Sep 2022 – Aug 2025\n\nGPA: 3.82/4.0 — Graduated First in Class\n\n# Technical Skills:\n\n- Programming: Python, C/C++, Java, HTML/CSS, Bootstrap\n- AI &#x26; Machine Learning: Computer Vision, Predictive Modeling, Transfer Learning, Supervised &#x26; Unsupervised Learning.\n- Deep Learning &#x26; NLP: TensorFlow, PyTorch, CNNs, RNNs, HuggingFace, LangChain.\n- Data &#x26; Analytics: Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn.\n- Automation &#x26; DevOps: n8n, Docker, Workflow Automation, Cloud Deployment, API Integration, Task Orchestration.\n- Backend &#x26; APIs: FastAPI, REST APIs, API Development\n- Databases: Pinecone, FAISS, ChromaDB, PostgreSQL, Supabase\n- Hardware &#x26; Robotics: Arduino, Mobile Robotics, Electronic Circuits.\n- Tools &#x26; Platforms: Git, GitHub, Google Colab, Jupyter.\n- Training &#x26; Mentorship: Delivered 200+ hours of technical training and workshops.\n\n# EXPERIENCE:\n\n- Academic Member – The Solid Code Team (Sep 2021 – Sep 2022)\n\nSupported technical events and mentored junior students.\n- Member – IEEE SIGHT (May 2024 – Dec 2024)\n\nParticipated in outreach and innovation projects.\n- Workshop Manager – IEEE Robotics and Automation Society (Jul 2024 – Aug 2025)\n\nOrganized and delivered workshops on AI, data science, Arduino, and robotics, training 800+ students and managing large-scale technical events.\n- Automation Engineer – Orbit (Sep 2025 – Dec 2025)\n\nDeveloping and deploying automation workflows using n8n to optimize internal IT operations and technical processes.\n\n# PROJECTS\n\n- Dentelligence System\n- D3aj Buggy\n- PDF Question-Answering Chatbot\n- AI modelthon 2025\n- Arduino99 Course Content\n- flower classifier\n\n",
+          "job_metadata": {
+            "credits_used": 0,
+            "job_credits_usage": 0,
+            "job_pages": 1,
+            "job_auto_mode_triggered_pages": 0,
+            "job_is_cache_hit": false
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+            "content-length": "154501",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,ar-JO;q=0.8,ar;q=0.7",
+            "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryMAUSAhww4ca5H7Nm",
+            "origin": "http://127.0.0.1:5500",
+            "priority": "u=1, i",
+            "referer": "http://127.0.0.1:5500/",
+            "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "81.21.8.18",
+            "x-forwarded-host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "fileCount": "1",
+            "timestamp": "2026-02-09T08:54:00.808Z"
+          },
+          "webhookUrl": "https://sunday-chirurgic-earlene.ngrok-free.dev/webhook-test/QMI",
+          "executionMode": "test"
+        },
+        "binary": {
+          "file_0": {
+            "mimeType": "application/pdf",
+            "fileType": "pdf",
+            "fileExtension": "pdf",
+            "data": "filesystem-v2",
+            "fileName": "Mohammad Ismail resume.pdf",
+            "id": "filesystem-v2:workflows/1kU8VZfdn0lXvsW3/executions/temp/binary_data/23e21b59-30c5-4dd1-8d1c-1b0849fb9ce4",
+            "fileSize": "154 kB"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Personal Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "MObile No.": 787499976,
+            "City": "Amman",
+            "Full Name": "Mohammad Ismail",
+            "Email": "imoh40398@gmail.com"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Professional Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "Job History": "Mohammad Ismail has a diverse work history starting as an Academic Member at The Solid Code Team from Sep 2021 to Sep 2022, where he supported technical events and mentored junior students. He also served as a Member of IEEE SIGHT from May 2024 to Dec 2024, participating in outreach and innovation projects. From Jul 2024 to Aug 2025, he was a Workshop Manager for the IEEE Robotics and Automation Society, where he organized and delivered workshops on AI, data science, Arduino, and robotics, successfully training over 800 students and managing large-scale technical events. Most recently, from Sep 2025 to Dec 2025, he worked as an Automation Engineer at Orbit, developing and deploying automation workflows using n8n to optimize internal IT operations and technical processes.",
+            "Skills": "- Programming: Python, C/C++, Java, HTML/CSS, Bootstrap\n- AI & Machine Learning: Computer Vision, Predictive Modeling, Transfer Learning, Supervised & Unsupervised Learning.\n- Deep Learning & NLP: TensorFlow, PyTorch, CNNs, RNNs, HuggingFace, LangChain.\n- Data & Analytics: Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn.\n- Automation & DevOps: n8n, Docker, Workflow Automation, Cloud Deployment, API Integration, Task Orchestration.\n- Backend & APIs: FastAPI, REST APIs, API Development\n- Databases: Pinecone, FAISS, ChromaDB, PostgreSQL, Supabase\n- Hardware & Robotics: Arduino, Mobile Robotics, Electronic Circuits.\n- Tools & Platforms: Git, GitHub, Google Colab, Jupyter.\n- Training & Mentorship: Delivered 200+ hours of technical training and workshops.",
+            "Title & Employer": "Job Title - Academic Member, Employer - The Solid Code Team, Working Years - 1 Year\nJob Title - Member, Employer - IEEE SIGHT, Working Years - 8 Months\nJob Title - Workshop Manager, Employer - IEEE Robotics and Automation Society, Working Years - 1 Year, 1 Month\nJob Title - Automation Engineer, Employer - Orbit, Working Years - 4 Months",
+            "Work Experience": "Total Years Exp: 3 years, 1 month - Academic Member: 1 year - Member: 8 months - Workshop Manager: 1 year, 1 month - Automation Engineer: 4 months",
+            "Promotions Checker": 2
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Educational Information Extractor": [
+      {
+        "json": {
+          "output": {
+            "Education Information": "| Institution              | Degree/Certification                  | Passing Year | Notable Achievement       |\n|--------------------------|---------------------------------------|--------------|---------------------------|\n| Al-Balqa Applied University | Bachelor of Artificial Intelligence and Robotics | Aug 2025     | GPA: 3.82/4.0, Graduated First in Class |"
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "output": {
+            "Job History": "Mohammad Ismail has a diverse work history starting as an Academic Member at The Solid Code Team from Sep 2021 to Sep 2022, where he supported technical events and mentored junior students. He also served as a Member of IEEE SIGHT from May 2024 to Dec 2024, participating in outreach and innovation projects. From Jul 2024 to Aug 2025, he was a Workshop Manager for the IEEE Robotics and Automation Society, where he organized and delivered workshops on AI, data science, Arduino, and robotics, successfully training over 800 students and managing large-scale technical events. Most recently, from Sep 2025 to Dec 2025, he worked as an Automation Engineer at Orbit, developing and deploying automation workflows using n8n to optimize internal IT operations and technical processes.",
+            "Skills": "- Programming: Python, C/C++, Java, HTML/CSS, Bootstrap\n- AI & Machine Learning: Computer Vision, Predictive Modeling, Transfer Learning, Supervised & Unsupervised Learning.\n- Deep Learning & NLP: TensorFlow, PyTorch, CNNs, RNNs, HuggingFace, LangChain.\n- Data & Analytics: Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn.\n- Automation & DevOps: n8n, Docker, Workflow Automation, Cloud Deployment, API Integration, Task Orchestration.\n- Backend & APIs: FastAPI, REST APIs, API Development\n- Databases: Pinecone, FAISS, ChromaDB, PostgreSQL, Supabase\n- Hardware & Robotics: Arduino, Mobile Robotics, Electronic Circuits.\n- Tools & Platforms: Git, GitHub, Google Colab, Jupyter.\n- Training & Mentorship: Delivered 200+ hours of technical training and workshops.",
+            "Title & Employer": "Job Title - Academic Member, Employer - The Solid Code Team, Working Years - 1 Year\nJob Title - Member, Employer - IEEE SIGHT, Working Years - 8 Months\nJob Title - Workshop Manager, Employer - IEEE Robotics and Automation Society, Working Years - 1 Year, 1 Month\nJob Title - Automation Engineer, Employer - Orbit, Working Years - 4 Months",
+            "Work Experience": "Total Years Exp: 3 years, 1 month - Academic Member: 1 year - Member: 8 months - Workshop Manager: 1 year, 1 month - Automation Engineer: 4 months",
+            "Promotions Checker": 2,
+            "Education Information": "| Institution              | Degree/Certification                  | Passing Year | Notable Achievement       |\n|--------------------------|---------------------------------------|--------------|---------------------------|\n| Al-Balqa Applied University | Bachelor of Artificial Intelligence and Robotics | Aug 2025     | GPA: 3.82/4.0, Graduated First in Class |"
+          }
+        },
+        "binary": {},
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 0,
+            "input": 1
+          }
+        ]
+      }
+    ],
+    "Merge1": [
+      {
+        "json": {
+          "output": {
+            "Job History": "Mohammad Ismail has a diverse work history starting as an Academic Member at The Solid Code Team from Sep 2021 to Sep 2022, where he supported technical events and mentored junior students. He also served as a Member of IEEE SIGHT from May 2024 to Dec 2024, participating in outreach and innovation projects. From Jul 2024 to Aug 2025, he was a Workshop Manager for the IEEE Robotics and Automation Society, where he organized and delivered workshops on AI, data science, Arduino, and robotics, successfully training over 800 students and managing large-scale technical events. Most recently, from Sep 2025 to Dec 2025, he worked as an Automation Engineer at Orbit, developing and deploying automation workflows using n8n to optimize internal IT operations and technical processes.",
+            "Skills": "- Programming: Python, C/C++, Java, HTML/CSS, Bootstrap\n- AI & Machine Learning: Computer Vision, Predictive Modeling, Transfer Learning, Supervised & Unsupervised Learning.\n- Deep Learning & NLP: TensorFlow, PyTorch, CNNs, RNNs, HuggingFace, LangChain.\n- Data & Analytics: Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn.\n- Automation & DevOps: n8n, Docker, Workflow Automation, Cloud Deployment, API Integration, Task Orchestration.\n- Backend & APIs: FastAPI, REST APIs, API Development\n- Databases: Pinecone, FAISS, ChromaDB, PostgreSQL, Supabase\n- Hardware & Robotics: Arduino, Mobile Robotics, Electronic Circuits.\n- Tools & Platforms: Git, GitHub, Google Colab, Jupyter.\n- Training & Mentorship: Delivered 200+ hours of technical training and workshops.",
+            "Title & Employer": "Job Title - Academic Member, Employer - The Solid Code Team, Working Years - 1 Year\nJob Title - Member, Employer - IEEE SIGHT, Working Years - 8 Months\nJob Title - Workshop Manager, Employer - IEEE Robotics and Automation Society, Working Years - 1 Year, 1 Month\nJob Title - Automation Engineer, Employer - Orbit, Working Years - 4 Months",
+            "Work Experience": "Total Years Exp: 3 years, 1 month - Academic Member: 1 year - Member: 8 months - Workshop Manager: 1 year, 1 month - Automation Engineer: 4 months",
+            "Promotions Checker": 2,
+            "Education Information": "| Institution              | Degree/Certification                  | Passing Year | Notable Achievement       |\n|--------------------------|---------------------------------------|--------------|---------------------------|\n| Al-Balqa Applied University | Bachelor of Artificial Intelligence and Robotics | Aug 2025     | GPA: 3.82/4.0, Graduated First in Class |",
+            "MObile No.": 787499976,
+            "City": "Amman",
+            "Full Name": "Mohammad Ismail",
+            "Email": "imoh40398@gmail.com"
+          }
+        },
+        "binary": {},
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 0,
+            "input": 1
+          }
+        ]
+      }
+    ]
+  },
+  "connections": {
+    "Upload to LlamaParse": {
+      "main": [
+        [
+          {
+            "node": "Get Processing Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Processing Status": {
+      "main": [
+        [
+          {
+            "node": "Is Job Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait to stay within service limits": {
+      "main": [
+        [
+          {
+            "node": "Get Processing Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Job Ready?": {
+      "main": [
+        [
+          {
+            "node": "Get Parsed Resume",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        [
+          {
+            "node": "Wait to stay within service limits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Personal Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Professional Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Educational Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Personal Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Professional Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Educational Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        []
+      ]
+    },
+    "Get Parsed Resume": {
+      "main": [
+        [
+          {
+            "node": "Professional Information Extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Educational Information Extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Personal Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Upload to LlamaParse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "9912ebde-dfd7-45a0-82d9-86626939486f",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "1kU8VZfdn0lXvsW3",
+  "tags": []
+}

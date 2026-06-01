@@ -1,0 +1,201 @@
+{
+  "name": "Telegram - Media Handling",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 📦 Telegram — Media Handling\n\n**Goal:** Handle the four most common Telegram message types without crashing.\n\nA Telegram update is ALWAYS a `message` object, but its content keys differ:\n- Text → `message.text`\n- Photo → `message.photo` (array, last item is highest resolution)\n- Voice → `message.voice` (with `file_id`, `duration`, `mime_type`)\n- Document → `message.document` (with `file_id`, `file_name`, `mime_type`)\n\nThe Switch node routes based on which key exists.",
+        "height": 440,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-660, -300],
+      "typeVersion": 1,
+      "id": "tg-note-002",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-160, 0],
+      "id": "tg-trigger-002",
+      "name": "Telegram Trigger",
+      "webhookId": "tg-media-bot"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "r1",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": { "type": "string", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "r2",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "r3",
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": "",
+                    "operator": { "type": "array", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "photo"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "r4",
+                    "leftValue": "={{ $json.message.document }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "document"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra", "renameFallbackOutput": "other" }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [80, 0],
+      "id": "tg-switch-002",
+      "name": "Route by Message Type"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📝 Text received: \"{{ $('Telegram Trigger').item.json.message.text }}\"",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, -300],
+      "id": "tg-reply-text-002",
+      "name": "Reply: Text"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=🎤 Voice note received\nDuration: {{ $('Telegram Trigger').item.json.message.voice.duration }}s\nMime: {{ $('Telegram Trigger').item.json.message.voice.mime_type }}\nfile_id: `{{ $('Telegram Trigger').item.json.message.voice.file_id }}`",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, -100],
+      "id": "tg-reply-voice-002",
+      "name": "Reply: Voice"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📷 Photo received\nResolutions available: {{ $('Telegram Trigger').item.json.message.photo.length }}\nLargest file_id: `{{ $('Telegram Trigger').item.json.message.photo[$('Telegram Trigger').item.json.message.photo.length - 1].file_id }}`",
+        "additionalFields": { "parse_mode": "Markdown" }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, 100],
+      "id": "tg-reply-photo-002",
+      "name": "Reply: Photo"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=📄 Document received\nName: {{ $('Telegram Trigger').item.json.message.document.file_name }}\nSize: {{ Math.round($('Telegram Trigger').item.json.message.document.file_size / 1024) }} KB\nMime: {{ $('Telegram Trigger').item.json.message.document.mime_type }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, 300],
+      "id": "tg-reply-doc-002",
+      "name": "Reply: Document"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "🤔 I got something I don't handle yet. Try sending text, voice, a photo, or a document.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [380, 500],
+      "id": "tg-reply-other-002",
+      "name": "Reply: Other"
+    },
+    {
+      "parameters": {
+        "content": "### 💡 Tip\n\nFor voice and photo, you only have a `file_id`. To actually USE the file (transcribe, OCR, save), you need to:\n1. Use the **Telegram → Get File** operation with that `file_id` to get a URL.\n2. Then HTTP Request to download it (or feed it to the next node).\n\nThe **voice capstone** does exactly this with Whisper/Gemini transcription.",
+        "height": 280,
+        "width": 420,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [820, 60],
+      "typeVersion": 1,
+      "id": "tg-note-tip-002",
+      "name": "Next Step Tip"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Route by Message Type", "type": "main", "index": 0 }]]
+    },
+    "Route by Message Type": {
+      "main": [
+        [{ "node": "Reply: Text", "type": "main", "index": 0 }],
+        [{ "node": "Reply: Voice", "type": "main", "index": 0 }],
+        [{ "node": "Reply: Photo", "type": "main", "index": 0 }],
+        [{ "node": "Reply: Document", "type": "main", "index": 0 }],
+        [{ "node": "Reply: Other", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

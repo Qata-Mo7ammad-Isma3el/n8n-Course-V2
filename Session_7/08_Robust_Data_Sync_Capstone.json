@@ -1,0 +1,149 @@
+{
+  "name": "S7-08 Robust Data Sync (Capstone)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Session 7 Capstone: Robust Data Sync\n\n### What it does\nEvery hour: pull data from an API → transform → write to Google Sheets.\nIf ANYTHING fails: retry, then alert via Telegram, then log to Sheets.\n\n### Combines everything from Session 7\n1. Schedule trigger\n2. HTTP with Retry on Fail + backoff (Lesson 1)\n3. Split error route (Lesson 3)\n4. Linked to Centralized Error Workflow (Lesson 5)\n5. Telegram alert on failure\n6. Code node for transform with try/catch\n\n### Setup steps\n1. Activate Lesson 5 (centralized error workflow) first\n2. Open this workflow → Settings → Error Workflow → pick Lesson 5\n3. Replace the Sheet ID and Telegram chat ID\n4. Save & Activate\n\n### Test it\n- Run manually → should succeed\n- Break the URL → run again → Telegram alert fires + row logged in error sheet",
+        "height": 460,
+        "width": 800,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-460, -140],
+      "id": "note-08",
+      "name": "Capstone Note"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 1 }]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [-360, 420],
+      "id": "schedule",
+      "name": "Every Hour"
+    },
+    {
+      "parameters": {
+        "url": "https://dog.ceo/api/breeds/image/random",
+        "options": { "timeout": 10000 }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-120, 420],
+      "id": "http-fetch",
+      "name": "Fetch Data (retry+backoff)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Transform with try/catch — never let bad data crash the workflow\nconst out = [];\nfor (const item of $input.all()) {\n  try {\n    if (!item.json.message) {\n      throw new Error('Missing message field');\n    }\n    out.push({\n      json: {\n        imageUrl: item.json.message,\n        status: item.json.status || 'unknown',\n        fetchedAt: new Date().toISOString()\n      }\n    });\n  } catch (e) {\n    // Push an error item instead of throwing — keeps workflow alive\n    out.push({\n      json: {\n        imageUrl: null,\n        status: 'transform_error',\n        error: e.message,\n        fetchedAt: new Date().toISOString()\n      }\n    });\n  }\n}\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [140, 320],
+      "id": "transform",
+      "name": "Transform (try/catch)"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Sync"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "imageUrl": "={{ $json.imageUrl }}",
+            "status": "={{ $json.status }}",
+            "fetchedAt": "={{ $json.fetchedAt }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [400, 320],
+      "id": "sheets-write",
+      "name": "Write to Sheets"
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_WITH_YOUR_CHAT_ID",
+        "text": "=Data Sync FAILED at {{ $now.toISO() }}\\nError: {{ $json.error?.message || 'unknown' }}\\nWorkflow: {{ $workflow.name }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [140, 540],
+      "id": "telegram-fail",
+      "name": "Telegram: Sync Failed",
+      "webhookId": "capstone-telegram-fail"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "REPLACE_WITH_SHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "Failures"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $now.toISO() }}",
+            "error": "={{ $json.error?.message || 'unknown' }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [400, 540],
+      "id": "log-failure",
+      "name": "Log Failure to Sheet"
+    }
+  ],
+  "connections": {
+    "Every Hour": {
+      "main": [[{ "node": "Fetch Data (retry+backoff)", "type": "main", "index": 0 }]]
+    },
+    "Fetch Data (retry+backoff)": {
+      "main": [
+        [{ "node": "Transform (try/catch)", "type": "main", "index": 0 }],
+        [
+          { "node": "Telegram: Sync Failed", "type": "main", "index": 0 },
+          { "node": "Log Failure to Sheet", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Transform (try/catch)": {
+      "main": [[{ "node": "Write to Sheets", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

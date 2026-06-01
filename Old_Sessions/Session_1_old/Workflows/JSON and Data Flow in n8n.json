@@ -1,0 +1,224 @@
+{
+  "name": "JSON and Data Flow in n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# What is JSON?\n## JSON = JavaScript  Object  Notation\n- A way to store and transfer data  \n- Looks like text, but structured so computers can read it  \n- Think of it as the English for computers\n\n# EVERYTHING IS BUILT IN JSON\n## - APIs, config files, databases\n\n# Basic Structure: Key-Value Pairs\n## Keys are strings (always in quotes \" \"), values can be:\n- String → \"Michele\"\n- Number → 42\n- Boolean → true / false\n- Null → null\n- Object → { } (another JSON structure)\n- Array → [ ] (a list of values)\n\n## Example:\n```json\n{\n     Key      Value\n    \"name\": \"Mohammad\",\n    \"age\": 22,\n    \"student\": false,\n    \"skills\": [\"automation\", \"AI\", \"Notion\"],\n    \"person\": {\n        \"name\": \"Michele\",\n        \"contacts\": {\n               \"email\": \"michele@example.com\",\n               \"phone\": \"123-456\"\n        }\n    }\n}\n```\n\n# JSON IN APIs\n## HTTP Request (with curl):\n```bash\ncurl -X GET \"https://api.example.com/users/1\" \\\n     -H \"Accept: application/json\"\n```\n\n## Response (JSON):\n```json\n{\n    \"id\": 1,\n    \"name\": \"Alice\",\n    \"email\": \"alice@example.com\",\n    \"isActive\": true,\n    \"roles\": [\"admin\", \"editor\"]\n}\n```\n---\n# Practical Example\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# Rules to Remember\n## 1. Keys must be in double quotes\n## 2. understand the difference between types\n- String → \"Michele\"\n- Number → 42\n- Boolean → true / false\n- Null → null\n- Object → { } (another JSON structure)\n- Array → [ ] (a list of values)\n## 3. always separate pairs with commas **(  ,  )** \n## 4. wrap the whole thing in curly brackets **( {} )** if it's an object",
+        "height": 2176,
+        "width": 896,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "401cc847-5582-4cba-aba8-5d9472157314",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        1440
+      ],
+      "id": "7701681c-4869-4be1-a559-eb95035fb923",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7226ffc3-90a1-48b6-acac-9b3b5aefafe8",
+              "name": "Full Name",
+              "value": "Mohammad Ismail",
+              "type": "string"
+            },
+            {
+              "id": "8ad2ebb1-aaeb-4979-abfc-3214c4b1c714",
+              "name": "Age",
+              "value": 22,
+              "type": "number"
+            },
+            {
+              "id": "5d8c8ffe-2d87-496a-83d3-19f477d6bea7",
+              "name": "student",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "d4a20727-1039-4b3d-abff-e9cb63907fb6",
+              "name": "Skills",
+              "value": "[\"AI\", \"n8n\", \"langchain\"]",
+              "type": "array"
+            },
+            {
+              "id": "ed63bc9a-2827-41f1-8686-66e1d1d108e4",
+              "name": "summary",
+              "value": "   {       \"Full Name\":  \"Mohammad Ismail\",       \"Age\":  22,       \"student\":  false,       \"Skills\":  [          \"AI\",          \"n8n\",          \"langchain\"       ]    }",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        1440
+      ],
+      "id": "bb573263-97d8-4f16-85af-5a070139c2b8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86a2f2bd-711b-4ab0-b816-bf8780184e7e",
+              "name": "first name",
+              "value": "={{ $json['Full Name'].split(' ').first() }}",
+              "type": "string"
+            },
+            {
+              "id": "e1dee356-2cb0-4b45-8227-24193e093f08",
+              "name": "last name",
+              "value": "={{ $json['Full Name'].split(' ').last() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        1440
+      ],
+      "id": "fcdb8d0b-86f5-4673-b3ea-12d0e66f8d2d",
+      "name": "get first && last name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a9035a9b-d8c2-4b15-ac1d-8b368110030e",
+              "leftValue": "={{ $json['first name'] }}",
+              "rightValue": "Mohammad",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        1440
+      ],
+      "id": "670adea1-cc23-46e4-a437-3fcd34df9ce0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "formTitle": "Test Form ",
+        "formDescription": "Test Form Description",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "placeholder": "Mohammad",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Age",
+              "fieldType": "number",
+              "placeholder": "22",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Date",
+              "fieldType": "date",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        1664
+      ],
+      "id": "db36a640-e47c-4f8f-86fb-87b812d228e9",
+      "name": "On form submission",
+      "webhookId": "b05fff1e-ab38-4e92-8dab-7148028ce026"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "get first && last name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get first && last name": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "0024c925-5588-4fcd-b9fe-f08fd15f4160",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "XpIo5OyMuhhwVsSq",
+  "tags": []
+}

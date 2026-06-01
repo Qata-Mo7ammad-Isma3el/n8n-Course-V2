@@ -1,0 +1,132 @@
+{
+  "name": "Evolution API - Connection Test",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🧪 Evolution API — Connection Test\n\n**Goal:** Send your first WhatsApp message from n8n via Evolution API.\n\n**Before you run:**\n1. Have an Evolution API instance running (self-hosted or hosted).\n2. Connect a WhatsApp number to that instance via QR scan.\n3. Get your `apikey` and `instance` name.\n4. Fill them in the **Set Credentials** node (or move them to n8n Credentials for production).\n\n**Phone format:** Country code WITHOUT `+` or `00`.\n✅ `962787499976`\n❌ `+962787499976`\n❌ `0787499976`\n\nIf this works, every other Evolution workflow will work.\nIf this fails, fix it here before moving on.",
+        "height": 460,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-560, -240],
+      "typeVersion": 1,
+      "id": "note-intro-001",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-100, 0],
+      "id": "trigger-001",
+      "name": "When clicking 'Test workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "evolutionBaseUrl",
+              "value": "https://evolution-example.com",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "instance",
+              "value": "my-instance",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "apikey",
+              "value": "REPLACE_WITH_YOUR_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "targetNumber",
+              "value": "962787499976",
+              "type": "string"
+            },
+            {
+              "id": "a5",
+              "name": "message",
+              "value": "Hello from n8n! This is my first Evolution API message.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [120, 0],
+      "id": "set-creds-001",
+      "name": "Set Credentials"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.evolutionBaseUrl }}/message/sendText/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $json.apikey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.targetNumber }}\",\n  \"text\": \"{{ $json.message }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [380, 0],
+      "id": "http-send-001",
+      "name": "Evolution API - Send Text"
+    },
+    {
+      "parameters": {
+        "content": "### ✅ Checkpoint\n\nYou should see:\n1. A real WhatsApp message on the target phone.\n2. The HTTP Request node returns a JSON response with a `key.id` and a `status`.\n\n**If it failed:**\n- `401` → wrong apikey\n- `404` → wrong instance name\n- `400` → number format wrong, or instance disconnected\n- No error but no message → instance not connected to WhatsApp (re-scan QR)",
+        "height": 320,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [620, -240],
+      "typeVersion": 1,
+      "id": "note-checkpoint-001",
+      "name": "Checkpoint Note"
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [[{ "node": "Set Credentials", "type": "main", "index": 0 }]]
+    },
+    "Set Credentials": {
+      "main": [[{ "node": "Evolution API - Send Text", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

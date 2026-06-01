@@ -1,0 +1,149 @@
+{
+  "name": "Evolution API - Send Media",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🖼️ Evolution API — Send Media\n\n**Goal:** Send images, videos, or documents to WhatsApp via `/message/sendMedia/{instance}`.\n\n**Required body fields:**\n- `mediatype` — `image` | `video` | `document`\n- `mimetype` — e.g. `image/png`, `video/mp4`, `application/pdf`\n- `media` — public URL OR base64 string\n- `fileName` — used especially for documents\n- `caption` — optional text shown with the media\n\n**URL vs base64:**\n- URL is easier but must be **publicly reachable** (Evolution fetches it).\n- base64 works for private files but inflates payload size.",
+        "height": 480,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-560, -260],
+      "typeVersion": 1,
+      "id": "note-intro-002",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-100, 0],
+      "id": "trigger-002",
+      "name": "When clicking 'Test workflow'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "evolutionBaseUrl",
+              "value": "https://evolution-example.com",
+              "type": "string"
+            },
+            {
+              "id": "b2",
+              "name": "instance",
+              "value": "my-instance",
+              "type": "string"
+            },
+            {
+              "id": "b3",
+              "name": "apikey",
+              "value": "REPLACE_WITH_YOUR_API_KEY",
+              "type": "string"
+            },
+            {
+              "id": "b4",
+              "name": "targetNumber",
+              "value": "962787499976",
+              "type": "string"
+            },
+            {
+              "id": "b5",
+              "name": "mediatype",
+              "value": "image",
+              "type": "string"
+            },
+            {
+              "id": "b6",
+              "name": "mimetype",
+              "value": "image/png",
+              "type": "string"
+            },
+            {
+              "id": "b7",
+              "name": "media",
+              "value": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/280px-PNG_transparency_demonstration_1.png",
+              "type": "string"
+            },
+            {
+              "id": "b8",
+              "name": "fileName",
+              "value": "demo.png",
+              "type": "string"
+            },
+            {
+              "id": "b9",
+              "name": "caption",
+              "value": "Sent from n8n via Evolution API 🚀",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [120, 0],
+      "id": "set-media-002",
+      "name": "Set Media Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.evolutionBaseUrl }}/message/sendMedia/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $json.apikey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.targetNumber }}\",\n  \"mediatype\": \"{{ $json.mediatype }}\",\n  \"mimetype\": \"{{ $json.mimetype }}\",\n  \"caption\": \"{{ $json.caption }}\",\n  \"media\": \"{{ $json.media }}\",\n  \"fileName\": \"{{ $json.fileName }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [380, 0],
+      "id": "http-media-002",
+      "name": "Evolution API - Send Media"
+    },
+    {
+      "parameters": {
+        "content": "### ⚠️ Common Gotchas\n\n- **`mediatype` and `mimetype` mismatch** → Evolution rejects.\n  - For PDF: `mediatype: document`, `mimetype: application/pdf`\n  - For MP4: `mediatype: video`, `mimetype: video/mp4`\n- **URL behind auth** → Evolution can't fetch. Use base64 instead.\n- **No `fileName`** → documents arrive without a name. Always set it.\n- **Image too large** → some Evolution builds cap at ~5MB. Compress before sending.",
+        "height": 320,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [620, -260],
+      "typeVersion": 1,
+      "id": "note-gotchas-002",
+      "name": "Gotchas Note"
+    }
+  ],
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [[{ "node": "Set Media Payload", "type": "main", "index": 0 }]]
+    },
+    "Set Media Payload": {
+      "main": [[{ "node": "Evolution API - Send Media", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

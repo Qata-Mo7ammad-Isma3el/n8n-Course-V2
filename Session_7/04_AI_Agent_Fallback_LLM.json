@@ -1,0 +1,83 @@
+{
+  "name": "S7-04 AI Agent - Fallback LLM",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 4: AI Agent Fallback Model\n\n### What you'll learn\n- AI Agents can have multiple LLMs attached\n- If the primary fails (rate limit, outage, key issue), the fallback takes over automatically\n- This applies to AI nodes too — error handling isn't just for HTTP\n\n### Try it\n1. Open the AI Agent → enable 'Needs Fallback Model'\n2. The first LLM input is primary, the second is fallback\n3. Send a chat message → answer comes from primary\n4. Disable your OpenAI credential temporarily → fallback (Gemini) answers instead\n\n### Cost vs reliability\nA fallback model adds resilience but also adds cost when triggered.\nUse a CHEAPER model as fallback when possible (e.g. Gemini Flash).",
+        "height": 380,
+        "width": 760,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-400, -80],
+      "id": "note-04",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [-260, 400],
+      "id": "chat-trigger",
+      "name": "When chat message received",
+      "webhookId": "session7-fallback-chat"
+    },
+    {
+      "parameters": {
+        "needsFallback": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [-20, 400],
+      "id": "ai-agent",
+      "name": "AI Agent (with fallback)"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-120, 580],
+      "id": "openai-primary",
+      "name": "Primary: OpenAI"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [60, 580],
+      "id": "gemini-fallback",
+      "name": "Fallback: Gemini"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [[{ "node": "AI Agent (with fallback)", "type": "main", "index": 0 }]]
+    },
+    "Primary: OpenAI": {
+      "ai_languageModel": [
+        [{ "node": "AI Agent (with fallback)", "type": "ai_languageModel", "index": 0 }]
+      ]
+    },
+    "Fallback: Gemini": {
+      "ai_languageModel": [
+        [{ "node": "AI Agent (with fallback)", "type": "ai_languageModel", "index": 1 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

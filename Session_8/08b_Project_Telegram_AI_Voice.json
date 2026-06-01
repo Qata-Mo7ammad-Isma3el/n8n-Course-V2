@@ -1,0 +1,264 @@
+{
+  "name": "Project B - Telegram AI Assistant (Voice + Text)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🎯 Capstone B — Telegram AI Assistant (Voice + Text)\n\n**Flow for voice:**\n1. User sends a voice note.\n2. Telegram → Get File operation returns a file path.\n3. HTTP Request downloads the audio (`.ogg`).\n4. Audio sent to Gemini for transcription.\n5. Transcript fed into the same agent + memory as the text capstone.\n6. Agent reply sent back as Telegram text.\n\n**Why same memory for both branches?**\nA real user mixes text and voice in one chat. If the bot has separate memories per modality, it will forget half the conversation. The session key `tg-{{ chat.id }}` is shared.\n\n**Real-world parallel:**\nMagnetor-assistant-project-v1.0 — voice + text Telegram assistant.",
+        "height": 540,
+        "width": 460,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-700, -340],
+      "typeVersion": 1,
+      "id": "cap-voice-note-001",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-200, 0],
+      "id": "cap-voice-trigger",
+      "name": "Telegram Trigger",
+      "webhookId": "tg-ai-assistant-voice"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "vr1",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": { "type": "object", "operation": "exists", "singleValue": true }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "id": "vr2",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": { "type": "string", "operation": "notEmpty" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra", "renameFallbackOutput": "other" }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [40, 0],
+      "id": "cap-voice-switch",
+      "name": "Voice / Text / Other"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [280, -200],
+      "id": "cap-voice-getfile",
+      "name": "Get Voice File"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribeRecording",
+        "binaryPropertyName": "data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [520, -200],
+      "id": "cap-voice-transcribe",
+      "name": "Transcribe with Gemini"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "vt1",
+              "name": "userInput",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "vt2",
+              "name": "modality",
+              "value": "voice",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [760, -200],
+      "id": "cap-voice-set-input",
+      "name": "Set Voice Input"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "tt1",
+              "name": "userInput",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "tt2",
+              "name": "modality",
+              "value": "text",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [280, 60],
+      "id": "cap-voice-set-text",
+      "name": "Set Text Input"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userInput }}",
+        "options": {
+          "systemMessage": "You are a friendly, helpful Telegram assistant that handles both text and voice messages.\n\nRules:\n- Always reply in the SAME language as the user (English or Arabic).\n- Keep replies short and conversational — Telegram is not the place for essays.\n- Remember context from earlier in the conversation.\n- The user may switch between text and voice freely; treat them as one conversation.\n- If the user asks something you genuinely don't know, say so honestly."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [1020, -100],
+      "id": "cap-voice-agent",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [920, 140],
+      "id": "cap-voice-model",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=tg-{{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [1080, 140],
+      "id": "cap-voice-memory",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1320, -100],
+      "id": "cap-voice-send",
+      "name": "Send Reply"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "I can handle text and voice notes. Try sending one of those!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [280, 280],
+      "id": "cap-voice-fallback",
+      "name": "Send Fallback"
+    },
+    {
+      "parameters": {
+        "content": "### ⚠️ Voice gotchas\n\n- **Telegram voice is `.ogg/opus`** — Gemini handles it natively. Whisper also handles it.\n- **Long voice notes** (> 1 min) cost more and take longer. Consider rejecting > 60s in production.\n- **Get File returns binary** on the `data` property — don't drop binary between nodes or transcription will fail.\n- **Same memory key as text** so the conversation stays unified.\n\n**Pro extension:** add a Wait node and send a typing action `sendChatAction` while transcribing — feels much faster.",
+        "height": 360,
+        "width": 460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [760, -560],
+      "typeVersion": 1,
+      "id": "cap-voice-note-gotcha",
+      "name": "Gotchas"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Voice / Text / Other", "type": "main", "index": 0 }]]
+    },
+    "Voice / Text / Other": {
+      "main": [
+        [{ "node": "Get Voice File", "type": "main", "index": 0 }],
+        [{ "node": "Set Text Input", "type": "main", "index": 0 }],
+        [{ "node": "Send Fallback", "type": "main", "index": 0 }]
+      ]
+    },
+    "Get Voice File": {
+      "main": [[{ "node": "Transcribe with Gemini", "type": "main", "index": 0 }]]
+    },
+    "Transcribe with Gemini": {
+      "main": [[{ "node": "Set Voice Input", "type": "main", "index": 0 }]]
+    },
+    "Set Voice Input": {
+      "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]]
+    },
+    "Set Text Input": {
+      "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [[{ "node": "AI Agent", "type": "ai_memory", "index": 0 }]]
+    },
+    "AI Agent": {
+      "main": [[{ "node": "Send Reply", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

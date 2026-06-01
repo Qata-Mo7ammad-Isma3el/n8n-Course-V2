@@ -1,0 +1,339 @@
+{
+  "name": "Intoduction to webhooks",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Introduction To WebHooks \n\n\n\n\n\n\n\n\n\n\n\n\n\n![Workflow Diagram](https://ik.imagekit.io/MyImage/4_webhooks_in_n8n.png)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n## Lets Hit our WebHook from n8n itself ",
+        "height": 800,
+        "width": 928,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c9906da7-f093-4caa-9a4c-2d3faf1c25eb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "979ed29c-291b-4409-a9a9-9c22c9a906b1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        96
+      ],
+      "id": "6183657f-73d7-420f-bb5f-04a6a87259eb",
+      "name": "Webhook",
+      "webhookId": "979ed29c-291b-4409-a9a9-9c22c9a906b1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "this is the Webook Intro By Mohammad Ismail",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        576,
+        96
+      ],
+      "id": "341d4024-f8b7-4ce2-a8c1-6beb7bf682e1",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "43a650bc-168a-4c24-a2bb-4bcfd75dc431",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        384
+      ],
+      "id": "44aa54ab-9d94-4557-8640-2d8c0bc8198d",
+      "name": "Webhook1",
+      "webhookId": "43a650bc-168a-4c24-a2bb-4bcfd75dc431"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hMhaajGUfuLqYvmCs3Pgs-fmk-aNg1Qhl5ply5lUAgU",
+          "mode": "list",
+          "cachedResultName": "_4_Webhooks_Intro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hMhaajGUfuLqYvmCs3Pgs-fmk-aNg1Qhl5ply5lUAgU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hMhaajGUfuLqYvmCs3Pgs-fmk-aNg1Qhl5ply5lUAgU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone.startsWith('+') ? $json.body.phone.slice(1):$json.body.phone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        384
+      ],
+      "id": "55a57764-81e1-431b-8f07-91438d25b13e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OdbI8eEbUoIEXy7X",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Email From Mohammad Ismail",
+        "emailType": "text",
+        "message": "=Hi {{ $json[\"Full Name\"] }},\n\nThanks for applying to our form!\n\nBest regards,\nYour Company Team",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        384
+      ],
+      "id": "cf062644-d1a8-4477-ab44-e757d0a3a2e4",
+      "name": "Send a message",
+      "webhookId": "89879667-2e9a-4e60-9c4e-5c4a9705c41c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YgWlh4VCmpscaJ1K",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Please Check your Email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        736,
+        384
+      ],
+      "id": "6021be6d-4a6a-4267-a50b-fb8774e18127",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        624
+      ],
+      "id": "d07b2adb-2a49-47da-91a5-bf6d3cce920a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sunday-chirurgic-earlene.ngrok-free.dev/webhook-test/43a650bc-168a-4c24-a2bb-4bcfd75dc431",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n \"FullName\": \"Mohammad\",\n \"Email\": \"imoh40398@gmail.com\",\n \"Phone\": \"+962787499976\"  \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        512,
+        624
+      ],
+      "id": "b4f7ed93-1950-4db9-80aa-fd757dcca1a2",
+      "name": "Send-to-Webhook"
+    },
+    {
+      "parameters": {
+        "content": "\n### Webhooks Introduction\n\n* **What webhooks are**\nWebhooks are a way for one system to send data to another system automatically when something happens.\nInstead of asking “did something change?”, the system pushes the data immediately.\n\n* **Webhooks vs APIs**\nAPIs are usually request-based. You ask for data, then get a response.\nWebhooks are event-based. The data is sent to you automatically when an event happens.\nIn simple terms:\nAPI = you ask\nWebhook = you listen\n\n* **Real-time data flow**\nWebhooks enable real-time automation.\nAs soon as an event happens (form submitted, message received), the workflow starts instantly.\nNo delays, no polling.\n\n\n### Webhook Node and Respond to Webhook\n\n*  **Receiving data**\nThe Webhook node creates a URL.\nWhen data is sent to this URL, the workflow starts.\nCommon data types: form data, JSON, query parameters.\n\n* **Validating requests**\nYou can check if the request is valid before processing it.\n#### Examples:\n* Check required fields\n* Verify a token or secret\n* Reject invalid or empty requests\n\n* **Sending responses**\nThe Respond to Webhook node sends a response back to the caller.\nThis can be a success message, error message, or structured JSON response.\nIt confirms that the request was received and processed.\n\n\n",
+        "height": 800,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        944,
+        0
+      ],
+      "id": "0d8338f2-ecd6-485d-b70f-55a1b7cc9ed7",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+            "content-length": "61",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "en-US,en;q=0.9,ar-JO;q=0.8,ar;q=0.7",
+            "cache-control": "max-age=0",
+            "content-type": "application/x-www-form-urlencoded",
+            "cookie": "abuse_interstitial=sunday-chirurgic-earlene.ngrok-free.dev",
+            "origin": "http://127.0.0.1:5500",
+            "priority": "u=0, i",
+            "referer": "http://127.0.0.1:5500/",
+            "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "x-forwarded-for": "2a01:9700:481c:6100:6c88:d139:1280:30f5",
+            "x-forwarded-host": "sunday-chirurgic-earlene.ngrok-free.dev",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "ismail",
+            "email": "imoh40398@gmail.com",
+            "phone": "+962787499976"
+          },
+          "webhookUrl": "https://sunday-chirurgic-earlene.ngrok-free.dev/webhook-test/43a650bc-168a-4c24-a2bb-4bcfd75dc431",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Send-to-Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "99c16640-4b34-450a-a158-699a0abdfc41",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "5cUMQTN6TqUEeDAb",
+  "tags": []
+}

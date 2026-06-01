@@ -1,0 +1,118 @@
+{
+  "name": "S7-01 Retry on Fail with Backoff",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Lesson 1: Retry on Fail (with Backoff)\n\n### What you'll learn\n- How n8n re-runs a failing node automatically\n- Max Tries, Wait Between Tries\n- WHEN retry actually helps (transient errors)\n- WHEN retry is pointless (401, 404, 422)\n\n### Try it\n1. Run the workflow as-is → top branch FAILS after 3 retries (URL is wrong on purpose)\n2. Run the bottom branch → SUCCEEDS (good URL)\n3. Open each HTTP node → Settings tab → see Retry On Fail / Max Tries / Wait Between Tries\n\n### Rule of thumb\nRetry transient stuff (5xx, timeouts, network blips).\nDon't retry logical errors (4xx). Retrying a 401 just wastes API quota.",
+        "height": 380,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-400, -80],
+      "id": "note-01-intro",
+      "name": "Lesson Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-320, 400],
+      "id": "trigger-01",
+      "name": "When clicking Execute"
+    },
+    {
+      "parameters": {
+        "url": "https://dog.ceo/api/breeds/image/random_BROKEN_ON_PURPOSE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-80, 320],
+      "id": "http-fail",
+      "name": "Flaky API (will retry 3x)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "url": "https://dog.ceo/api/breeds/image/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-80, 480],
+      "id": "http-ok",
+      "name": "Healthy API (succeeds)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "status",
+              "value": "FAILED after retries",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [180, 320],
+      "id": "set-fail",
+      "name": "Mark Failed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2",
+              "name": "status",
+              "value": "OK",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "imageUrl",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [180, 480],
+      "id": "set-ok",
+      "name": "Mark OK"
+    }
+  ],
+  "connections": {
+    "When clicking Execute": {
+      "main": [
+        [
+          { "node": "Flaky API (will retry 3x)", "type": "main", "index": 0 },
+          { "node": "Healthy API (succeeds)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Flaky API (will retry 3x)": {
+      "main": [[{ "node": "Mark Failed", "type": "main", "index": 0 }]]
+    },
+    "Healthy API (succeeds)": {
+      "main": [[{ "node": "Mark OK", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

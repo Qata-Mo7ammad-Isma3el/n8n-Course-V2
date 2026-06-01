@@ -1,0 +1,34 @@
+{
+  "name": "Introduction To Prompt Engineering",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Prompt Engineering for n8n AI Agents\n\n## What is Prompt Engineering?\n\nPrompt engineering is simply **the art of telling AI what to do clearly**. Think of it like writing instructions for a new employee on their first day — the better your instructions, the better their work will be.\n\nIn n8n, when you use AI nodes (like the AI Agent, Sentiment Analysis, or Text Classifier), you write **prompts** that guide the AI's behavior. A well-written prompt gives you accurate, consistent results. A vague prompt gives you unpredictable outputs.\n\n---\n\n## Why Does It Matter in n8n?\n\nIn a normal ChatGPT conversation, you can go back and forth to clarify things. But in an **n8n workflow, the AI runs automatically** — there's no human in the loop to fix misunderstandings. Your prompt needs to be clear enough to work correctly every single time without supervision.\n\n---\n\n## The Basic Prompt Structure\n\nEvery good n8n agent prompt has **four building blocks**:\n\n```\n┌─────────────────────────────────┐\n│  1. ROLE                        │  → Who is the AI?\n│  2. TASK                        │  → What should it do?\n│  3. RULES                       │  → How should it behave?\n│  4. OUTPUT FORMAT               │  → What should the result look like?\n└─────────────────────────────────┘\n```\n\nLet's break each one down.\n\n---\n\n### 1. Role — \"Who Are You?\"\n\nStart by telling the AI **what role to play**. This sets the tone and expertise level for everything that follows.\n\n**Bad:**\n```\nAnalyze this text.\n```\n\n**Good:**\n```\nYou are an experienced customer support manager who specializes\nin understanding customer complaints.\n```\n\n> **Why it works:** Giving the AI a role focuses its responses. A \"customer support manager\" will interpret text differently than a \"legal advisor\" would.\n\n---\n\n### 2. Task — \"What Do You Need To Do?\"\n\nClearly describe **what action** you want the AI to perform. Be specific. Don't assume the AI will figure out what you mean.\n\n**Bad:**\n```\nHandle this email.\n```\n\n**Good:**\n```\nRead the incoming customer email and determine:\n- What is the customer's main problem?\n- How urgent is the issue? (low, medium, high)\n- Which department should handle it? (billing, technical, sales)\n```\n\n> **Why it works:** Breaking the task into specific points removes ambiguity. The AI knows exactly what outputs you expect.\n\n---\n\n### 3. Rules — \"What Are the Boundaries?\"\n\nSet **constraints and guidelines** for how the AI should behave. Think of these as guardrails that keep the AI on track.\n\n**Example:**\n```\nRules:\n- Only classify into the categories provided. Do not create new ones.\n- If the text is unclear, default to \"General Inquiry\".\n- Never make up information that isn't in the original text.\n- Keep responses professional and neutral in tone.\n- If you are unsure, say \"uncertain\" instead of guessing.\n```\n\n> **Why it works:** Without rules, the AI might get creative in ways you don't want. Rules prevent surprises in an automated workflow.\n\n---\n\n### 4. Output Format — \"What Should the Result Look Like?\"\n\nTell the AI **exactly how to format** its response. This is critical in n8n because the next node in your workflow needs to understand the AI's output.\n\n**Bad:**\n```\nGive me the results.\n```\n\n**Good:**\n```\nRespond ONLY with a JSON object in this exact format:\n{\n  \"category\": \"one of: billing, technical, sales, general\",\n  \"urgency\": \"one of: low, medium, high\",\n  \"summary\": \"one sentence describing the issue\"\n}\nDo not include any text before or after the JSON.\n```\n\n> **Why it works:** n8n workflows process data automatically. If the AI adds extra text like \"Sure! Here's the result...\" it can break the next node. Strict formatting keeps things working smoothly.\n\n---\n\n## Putting It All Together\n\nHere's a complete prompt using all four building blocks:\n\n```\n== ROLE ==\nYou are an expert customer support ticket classifier working for\na SaaS company.\n\n== TASK ==\nAnalyze the incoming support ticket and determine:\n1. The category of the issue\n2. The urgency level\n3. A one-sentence summary of the problem\n\n== RULES ==\n- Categories are: Technical Issue, Billing Issue, Feature Request,\n  Account Access, General Inquiry\n- Urgency levels are: Low, Medium, High\n- Only use the categories and urgency levels listed above\n- Base urgency on impact: service down = High, inconvenience = Medium,\n  question = Low\n- Do not invent information not present in the ticket\n- If the ticket is vague, classify as \"General Inquiry\" with \"Low\" urgency\n\n== OUTPUT FORMAT ==\nRespond ONLY with this JSON structure:\n{\n  \"category\": \"\",\n  \"urgency\": \"\",\n  \"summary\": \"\"\n}\nNo extra text, no markdown, no explanation. Only the JSON.\n```\n",
+        "height": 3456,
+        "width": 880,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -256,
+        -272
+      ],
+      "typeVersion": 1,
+      "id": "aaedf98f-e5a6-4ab2-84fe-a1bc9c3acf45",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "33c19964-ae12-4664-b86a-ba8e85c6cd6d",
+  "meta": {
+    "instanceId": "253ebe0fa0889258745727faa7bf3014a33ccdd40ea6f441485c645eb0d410c0"
+  },
+  "id": "W6A9EnVau9MIHdVy",
+  "tags": []
+}
